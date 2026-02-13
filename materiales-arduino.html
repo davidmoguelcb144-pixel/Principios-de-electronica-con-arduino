@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Materiales de Arduino</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: #1a1a1a;
+            color: #fff;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Fondo pixelado estilo Minecraft */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                linear-gradient(0deg, transparent 24%, rgba(46, 125, 50, .05) 25%, rgba(46, 125, 50, .05) 26%, transparent 27%, transparent 74%, rgba(46, 125, 50, .05) 75%, rgba(46, 125, 50, .05) 76%, transparent 77%, transparent),
+                linear-gradient(90deg, transparent 24%, rgba(46, 125, 50, .05) 25%, rgba(46, 125, 50, .05) 26%, transparent 27%, transparent 74%, rgba(46, 125, 50, .05) 75%, rgba(46, 125, 50, .05) 76%, transparent 77%, transparent);
+            background-size: 50px 50px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Header estilo Minecraft */
+        .header {
+            background: linear-gradient(180deg, #2e7d32 0%, #1b5e20 100%);
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 
+                0 8px 0 #1b5e20,
+                0 8px 20px rgba(0, 0, 0, 0.5);
+            position: relative;
+            z-index: 1;
+            border-bottom: 4px solid #000;
+            image-rendering: pixelated;
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: -12px;
+            left: 0;
+            right: 0;
+            height: 8px;
+            background: repeating-linear-gradient(
+                90deg,
+                #424242 0px,
+                #424242 8px,
+                #212121 8px,
+                #212121 16px
+            );
+        }
+
+        /* Decoraciones de bloques Minecraft */
+        .minecraft-block {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background: #8b4513;
+            border: 3px solid #000;
+            box-shadow: 
+                inset -3px -3px 0 rgba(0, 0, 0, 0.3),
+                inset 3px 3px 0 rgba(255, 255, 255, 0.2);
+            image-rendering: pixelated;
+            animation: blockFloat 3s ease-in-out infinite;
+        }
+
+        .block-left {
+            left: 5%;
+            top: 50%;
+            transform: translateY(-50%);
+            background: linear-gradient(135deg, 
+                #d84315 0%, #d84315 25%,
+                #c62828 25%, #c62828 50%,
+                #b71c1c 50%, #b71c1c 75%,
+                #c62828 75%);
+        }
+
+        .block-right {
+            right: 5%;
+            top: 50%;
+            transform: translateY(-50%);
+            background: linear-gradient(135deg, 
+                #1976d2 0%, #1976d2 25%,
+                #1565c0 25%, #1565c0 50%,
+                #0d47a1 50%, #0d47a1 75%,
+                #1565c0 75%);
+            animation-delay: 1.5s;
+        }
+
+        @keyframes blockFloat {
+            0%, 100% { transform: translateY(-50%) rotate(0deg); }
+            50% { transform: translateY(-60%) rotate(5deg); }
+        }
+
+        .titulo-principal {
+            font-size: clamp(2rem, 6vw, 4rem);
+            font-weight: 900;
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 
+                4px 4px 0 #000,
+                8px 8px 0 rgba(0, 0, 0, 0.3);
+            margin: 0;
+            position: relative;
+            z-index: 2;
+            image-rendering: pixelated;
+        }
+
+        /* Contenedor principal */
+        .contenido {
+            max-width: 1200px;
+            margin: 3rem auto;
+            padding: 0 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Grid de materiales estilo inventario Minecraft */
+        .inventario-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        /* Card estilo slot de inventario */
+        .material-card {
+            background: linear-gradient(145deg, #424242 0%, #212121 100%);
+            border: 4px solid #000;
+            border-radius: 0;
+            padding: 1.5rem;
+            position: relative;
+            transition: all 0.2s ease;
+            box-shadow: 
+                inset -3px -3px 0 rgba(0, 0, 0, 0.5),
+                inset 3px 3px 0 rgba(255, 255, 255, 0.1),
+                0 6px 0 #000,
+                0 6px 20px rgba(0, 0, 0, 0.5);
+            image-rendering: pixelated;
+        }
+
+        .material-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 
+                inset -3px -3px 0 rgba(0, 0, 0, 0.5),
+                inset 3px 3px 0 rgba(255, 255, 255, 0.2),
+                0 10px 0 #000,
+                0 10px 30px rgba(76, 175, 80, 0.4);
+            background: linear-gradient(145deg, #4caf50 0%, #2e7d32 100%);
+        }
+
+        .material-icono {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 1rem;
+            background: linear-gradient(135deg, #ffa726 0%, #ff6f00 100%);
+            border: 3px solid #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            box-shadow: 
+                inset -2px -2px 0 rgba(0, 0, 0, 0.3),
+                inset 2px 2px 0 rgba(255, 255, 255, 0.2);
+            image-rendering: pixelated;
+        }
+
+        .material-nombre {
+            font-size: 1.3rem;
+            font-weight: 900;
+            color: #fff;
+            margin-bottom: 0.8rem;
+            text-transform: uppercase;
+            text-shadow: 2px 2px 0 #000;
+            text-align: center;
+            letter-spacing: 1px;
+        }
+
+        .material-descripcion {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: #e0e0e0;
+            text-shadow: 1px 1px 0 #000;
+        }
+
+        /* Cantidad estilo Minecraft */
+        .cantidad {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            color: #fff;
+            padding: 0.3rem 0.6rem;
+            font-weight: bold;
+            border: 2px solid #000;
+            text-shadow: 2px 2px 0 #000;
+            font-size: 1.1rem;
+        }
+
+        /* Sección de título */
+        .seccion-titulo {
+            background: linear-gradient(135deg, #6a1b9a 0%, #4a148c 100%);
+            color: #fff;
+            padding: 1rem 2rem;
+            margin: 3rem 0 1.5rem;
+            font-size: 1.8rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            text-shadow: 3px 3px 0 #000;
+            border: 4px solid #000;
+            box-shadow: 
+                0 6px 0 #000,
+                0 6px 20px rgba(106, 27, 154, 0.5);
+            position: relative;
+            image-rendering: pixelated;
+        }
+
+        .seccion-titulo::before {
+            content: '▶';
+            margin-right: 1rem;
+            color: #ffeb3b;
+        }
+
+        /* Botón estilo Minecraft */
+        .btn-volver {
+            display: inline-block;
+            background: linear-gradient(145deg, #795548 0%, #5d4037 100%);
+            color: white;
+            padding: 1rem 2rem;
+            border: 4px solid #000;
+            text-decoration: none;
+            font-weight: 900;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            box-shadow: 
+                0 6px 0 #000,
+                0 6px 20px rgba(0, 0, 0, 0.5);
+            transition: all 0.2s ease;
+            margin: 2rem 0;
+            text-shadow: 2px 2px 0 #000;
+            image-rendering: pixelated;
+        }
+
+        .btn-volver:hover {
+            transform: translateY(-4px);
+            background: linear-gradient(145deg, #8d6e63 0%, #6d4c41 100%);
+            box-shadow: 
+                0 10px 0 #000,
+                0 10px 30px rgba(0, 0, 0, 0.7);
+        }
+
+        .btn-volver:active {
+            transform: translateY(2px);
+            box-shadow: 
+                0 2px 0 #000,
+                0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Footer */
+        .footer {
+            background: linear-gradient(180deg, #212121 0%, #000 100%);
+            color: #888;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 4rem;
+            border-top: 4px solid #000;
+            font-size: 0.9rem;
+            text-shadow: 1px 1px 0 #000;
+        }
+
+        /* Crafteo estilo receta */
+        .crafteo-box {
+            background: rgba(0, 0, 0, 0.8);
+            border: 4px solid #000;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            box-shadow: 
+                inset -3px -3px 0 rgba(0, 0, 0, 0.5),
+                inset 3px 3px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        .crafteo-titulo {
+            color: #ffeb3b;
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 0 #000;
+            text-transform: uppercase;
+        }
+
+        .crafteo-lista {
+            list-style: none;
+            padding: 0;
+            margin: 0.5rem 0 0 0;
+        }
+
+        .crafteo-lista li {
+            padding: 0.4rem 0;
+            color: #bdbdbd;
+            text-shadow: 1px 1px 0 #000;
+        }
+
+        .crafteo-lista li::before {
+            content: '▪';
+            color: #4caf50;
+            margin-right: 0.5rem;
+            font-size: 1.2rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .minecraft-block {
+                width: 40px;
+                height: 40px;
+            }
+
+            .inventario-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .material-card {
+                padding: 1rem;
+            }
+
+            .seccion-titulo {
+                font-size: 1.3rem;
+                padding: 0.8rem 1rem;
+            }
+        }
+
+        /* Animación de partículas */
+        @keyframes particleFall {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .particle {
+            position: fixed;
+            width: 8px;
+            height: 8px;
+            background: #4caf50;
+            border: 1px solid #000;
+            pointer-events: none;
+            z-index: 0;
+            animation: particleFall linear infinite;
+            image-rendering: pixelated;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="minecraft-block block-left"></div>
+        <h1 class="titulo-principal">⛏ Materiales de Arduino ⛏</h1>
+        <div class="minecraft-block block-right"></div>
+    </header>
+
+    <!-- Contenido principal -->
+    <main class="contenido">
+        <center>
+            <a href="index.html" class="btn-volver">← Volver al Menú Principal</a>
+        </center>
+
+        <!-- Sección: Placas Arduino -->
+        <h2 class="seccion-titulo">Placas Arduino</h2>
+        <div class="inventario-grid">
+            <div class="material-card">
+                <div class="cantidad">x1</div>
+                <div class="material-icono">🔷</div>
+                <h3 class="material-nombre">Arduino UNO</h3>
+                <p class="material-descripcion">
+                    La placa más popular y versátil. Cuenta con microcontrolador ATmega328P, 14 pines digitales, 6 pines analógicos, puerto USB y jack de alimentación. Ideal para principiantes y proyectos educativos.
+                </p>
+            </div>
+
+            <div class="material-card">
+                <div class="cantidad">x1</div>
+                <div class="material-icono">🔶</div>
+                <h3 class="material-nombre">Arduino MEGA</h3>
+                <p class="material-descripcion">
+                    Versión más grande con ATmega2560, 54 pines digitales y 16 analógicos. Perfecta para proyectos complejos que requieren más entradas/salidas y memoria adicional.
+                </p>
+            </div>
+
+            <div class="material-card">
+                <div class="cantidad">x1</div>
+                <div class="material-icono">💎</div>
+                <h3 class="material-nombre">Arduino NANO</h3>
+                <p class="material-descripcion">
+                    Versión compacta con las mismas capacidades del UNO pero en formato reducido. Perfecta para proyectos donde el espacio es limitado. Se conecta mediante mini-USB.
+                </p>
+            </div>
+        </div>
+
+        <!-- Sección: Componentes Básicos -->
+        <h2 class="seccion-titulo">Componentes Básicos</h2>
+        <div class="inventario-grid">
+            <div class="material-card">
+                <div class="cantidad">x64</div>
+                <div class="material-icono">💡</div>
+                <h3 class="material-nombre">LEDs</h3>
+                <p class="material-descripcion">
+                    Diodos emisores de luz en varios colores. Componentes fundamentales para indicadores visuales. Requieren resistencias de 220Ω-330Ω para limitar la corriente.
+                </p>
+                <div class="crafteo-box">
+                    <div class="crafteo-titulo">⚙ Características:</div>
+                    <ul class="crafteo-lista">
+                        <li>Voltaje: 2-3.3V según color</li>
+                        <li>Corriente: 20mA máximo</li>
+                        <li>Polaridad: Ánodo (+) y Cátodo (-)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="material-card">
+                <div class="cantidad">x128</div>
+                <div class="material-icono">⚡</div>
+                <h3 class="material-nombre">Resistencias</h3>
+                <p class="material-descripcion">
+                    Limitan el flujo de corriente en el circuito. Esenciales para proteger componentes. Se identifican por bandas de colores que indican su valor en Ohmios (Ω).
+                </p>
+                <div class="crafteo-box">
+                    <div class="crafteo-titulo">⚙ Valores comunes:</div>
+                    <ul class="crafteo-lista">
+                        <li>220Ω - 330Ω para LEDs</li>
+                        <li>1kΩ - 10kΩ para pull-up/pull-down</li>
+                        <li>Potencia: 1/4W o 1/2W</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="material-card">
+                <div class="cantidad">x32</div>
+                <div class="material-icono">🔘</div>
+                <h3 class="material-nombre">Pulsadores</h3>
+                <p class="material-descripcion">
+                    Interruptores momentáneos que permiten la entrada de usuario. Se usan con resistencias pull-up o pull-down para evitar estados flotantes en los pines.
+                </p>
+                <div class="crafteo-box">
+                    <div class="crafteo-titulo">⚙ Tipos:</div>
+                    <ul class="crafteo-lista">
+                        <li>Tactile switch (común)</li>
+                        <li>Push button con retención</li>
+                        <li>Conexión: normalmente abierto</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="material-card">
+                <div class="cantidad">x16</div>
+                <div class="material-icono">🎚️</div>
+                <h3 class="material-nombre">Potenciómetros</h3>
+                <p class="material-descripcion">
+                    Resistencias variables que permiten leer valores analógicos entre 0 y 1023. Perfectos para controles de velocidad, volumen o ajustes graduales.
+                </p>
+                <div class="crafteo-box">
+                    <div class="crafteo-titulo">⚙ Especificaciones:</div>
+                    <ul class="crafteo-lista">
+                        <li>Valores: 1kΩ, 10kΩ, 100kΩ</li>
+                        <li>3 terminales: VCC, GND, señal</li>
+                        <li>Rotación: 270° típicamente</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="material-card">
+                <div class="cantidad">x200</div>
+                <div class="material-icono">🔌</div>
+                <div class="material-nombre">Cables Jumper</div>
+                <p class="material-descripcion">
+                    Cables de conexión con diferentes terminaciones: macho-macho, macho-hembra, hembra-hembra. Esenciales para conectar componentes en el protoboard.
+                </p>
+            </div>
+
+            <div class="material-card">
+                <div class="cantidad">x1</div>
+                <div class="material-icono">📟</div>
+                <h3 class="material-nombre">Protoboard</h3>
+                <p class="material-descripcion">
+                    Placa de pruebas sin soldadura con 400-830 contactos. Permite crear circuitos temporales conectando filas y columnas de orificios internamente.
+                </p>
+                <div class="crafteo-box">
+                    <div class="crafteo-titulo">⚙ Distribución:</div>
+                    <ul class="crafteo-lista">
+                        <li>Líneas de alimentación (+ y -)</li>
+                        <li>Área central en filas de 5 puntos</li>
+                        <li>Canal central para chips</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección: Sensores -->
+        <h2 class="seccion-titulo">Sensores</h2>
+        <div class="inventario-grid">
+            <div class="material-card">
+                <div class="cantidad">x8</div>
+                <div class="material-icono">🌡️</div>
+                <h3 class="material-nombre">Sensor de Temperatura</h3>
+                <p class="material-descripcion">
+                    DHT11 o DHT22 para medir temperatura y humedad. TMP36 para solo temperatura. Devuelven valores analógicos o digitales según el modelo.
+                </p>
+            </div>
+
+            <div class="material-card">
+                <div class="cantidad">x8</div>
+                <div class="material-icono">📏</div>
+                <h3 class="material-nombre">Sensor Ultrasónico</h3>
+                <p class="material-descripcion">
+                    HC-SR04 mide distancias de 2cm a 4m mediante ondas ultrasónicas. Tiene pines Trigger y Echo. Útil para robots y sistemas de detección.
+                </p>
+            </div>
+
+            <div class="material-card">
+                <div class="cantidad">x8</div>
+                <div class="material-icono">☀️</div>
+                <h3 class="material-nombre">Fotoresistencia LDR</h3>
+                <p class="material-descripcion">
+                    Sensor de luz que varía su resistencia según la iluminación. Disminuye resistencia con más luz. Usado en sistemas de iluminación automática.
+                </p>
+            </div>
+
+            <div class="material-card">
+                <div class="cantidad">x8</div>
+                <div class="material-icono">🧭</div>
+                <h3 class="material-nombre">Sensor PIR</h3>
+                <p class="material-descripcion">
+                    Detector de movimiento infrarrojo pasivo. Detecta cambios de calor por movimiento humano. Perfecto para alarmas y sistemas de seguridad.
+                </p>
+            </div>
+        </div>
+
+        <!-- Sección: Actuadores -->
+        <h2 class="seccion-titulo">Actuadores</h2>
+        <div class="inventario-grid">
+            <div class="material-card">
+                <div class="cantidad">x4</div>
+                <div class="material-icono">⚙️</div>
+                <h3 class="material-nombre">Servomotor</h3>
+                <p class="material-descripcion">
+                    SG90 o similar, gira 180° con control de posición preciso mediante señales PWM. Usado en robótica para articulaciones y mecanismos.
+                </p>
+                <div class="crafteo-box">
+                    <div class="crafteo-titulo">⚙ Especificaciones:</div>
+                    <ul class="crafteo-lista">
+                        <li>Voltaje: 4.8V - 6V</li>
+                        <li>Torque: 1.8 kg/cm</li>
+                        <li>3 cables: VCC, GND, señal</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="material-card">
+                <div class="cantidad">x4</div>
+                <div class="material-icono">🔄</div>
+                <h3 class="material-nombre">Motor DC</h3>
+                <p class="material-descripcion">
+                    Motor de corriente continua para rotación continua. Requiere driver L298N o similar para control desde Arduino por su alto consumo.
+                </p>
+            </div>
+
+            <div class="material-card">
+                <div class="cantidad">x2</div>
+                <div class="material-icono">🔊</div>
+                <h3 class="material-nombre">Buzzer</h3>
+                <p class="material-descripcion">
+                    Zumbador piezoeléctrico activo o pasivo. Emite sonidos para alarmas o tonos musicales. El pasivo permite control de frecuencia.
+                </p>
+            </div>
+
+            <div class="material-card">
+                <div class="cantidad">x4</div>
+                <div class="material-icono">🔆</div>
+                <h3 class="material-nombre">Relé</h3>
+                <p class="material-descripcion">
+                    Interruptor electromagnético que permite controlar circuitos de alta potencia (110V/220V) con la señal de 5V de Arduino. Incluye protección con diodo.
+                </p>
+            </div>
+        </div>
+
+        <!-- Sección: Módulos de Comunicación -->
+        <h2 class="seccion-titulo">Comunicación y Displays</h2>
+        <div class="inventario-grid">
+            <div class="material-card">
+                <div class="cantidad">x1</div>
+                <div class="material-icono">📱</div>
+                <h3 class="material-nombre">Módulo Bluetooth</h3>
+                <p class="material-descripcion">
+                    HC-05 o HC-06 para comunicación inalámbrica con smartphones y computadoras. Usa comunicación serial UART.
+                </p>
+            </div>
+
+            <div class="material-card">
+                <div class="cantidad">x1</div>
+                <div class="material-icono">📺</div>
+                <h3 class="material-nombre">Display LCD 16x2</h3>
+                <p class="material-descripcion">
+                    Pantalla de cristal líquido de 2 líneas y 16 caracteres. Con módulo I2C solo requiere 2 pines. Ideal para mostrar datos y menús.
+                </p>
+            </div>
+
+            <div class="material-card">
+                <div class="cantidad">x1</div>
+                <div class="material-icono">🌐</div>
+                <h3 class="material-nombre">Módulo WiFi ESP8266</h3>
+                <p class="material-descripcion">
+                    Permite conectividad WiFi para proyectos IoT. Puede funcionar standalone o como shield de Arduino. Incluye microcontrolador propio.
+                </p>
+            </div>
+
+            <div class="material-card">
+                <div class="cantidad">x1</div>
+                <div class="material-icono">🎮</div>
+                <h3 class="material-nombre">Joystick Analógico</h3>
+                <p class="material-descripcion">
+                    Control de dos ejes (X, Y) con botón integrado. Devuelve valores analógicos 0-1023 en cada eje. Perfecto para control de robots.
+                </p>
+            </div>
+        </div>
+
+        <!-- Sección: Otros Componentes -->
+        <h2 class="seccion-titulo">Componentes Adicionales</h2>
+        <div class="inventario-grid">
+            <div class="material-card">
+                <div class="cantidad">x32</div>
+                <div class="material-icono">⚫</div>
+                <h3 class="material-nombre">Transistores</h3>
+                <p class="material-descripcion">
+                    NPN (2N2222, BC547) o PNP para amplificar señales y controlar componentes de alto consumo como motores. Actúan como interruptores electrónicos.
+                </p>
+            </div>
+
+            <div class="material-card">
+                <div class="cantidad">x24</div>
+                <div class="material-icono">🔋</div>
+                <h3 class="material-nombre">Condensadores</h3>
+                <p class="material-descripcion">
+                    Almacenan energía temporalmente. Electrolíticos (10µF-1000µF) para fuente de poder, cerámicos (100nF) para filtrado de ruido.
+                </p>
+            </div>
+
+            <div class="material-card">
+                <div class="cantidad">x16</div>
+                <div class="material-icono">🔺</div>
+                <h3 class="material-nombre">Diodos</h3>
+                <p class="material-descripcion">
+                    1N4007 o 1N4148 permiten flujo de corriente en una dirección. Usados para protección contra inversión de polaridad y en circuitos rectificadores.
+                </p>
+            </div>
+
+            <div class="material-card">
+                <div class="cantidad">x1</div>
+                <div class="material-icono">🔌</div>
+                <h3 class="material-nombre">Fuente de Alimentación</h3>
+                <p class="material-descripcion">
+                    Adaptador de 9V-12V DC con conector Jack para alimentar Arduino externamente. Necesario cuando el USB no provee suficiente corriente.
+                </p>
+            </div>
+
+            <div class="material-card">
+                <div class="cantidad">x1</div>
+                <div class="material-icono">🔧</div>
+                <h3 class="material-nombre">Multímetro Digital</h3>
+                <p class="material-descripcion">
+                    Herramienta esencial para medir voltaje, corriente y resistencia. Indispensable para diagnosticar problemas y verificar conexiones.
+                </p>
+            </div>
+
+            <div class="material-card">
+                <div class="cantidad">x1</div>
+                <div class="material-icono">📦</div>
+                <h3 class="material-nombre">Caja Organizadora</h3>
+                <p class="material-descripcion">
+                    Contenedor con compartimentos para mantener todos los componentes ordenados y protegidos. Facilita encontrar piezas rápidamente.
+                </p>
+            </div>
+        </div>
+
+        <center>
+            <a href="index.html" class="btn-volver">← Volver al Menú Principal</a>
+        </center>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>⛏ Principios de Electrónica con Arduino ⛏</p>
+        <p>Craftea tus conocimientos y construye proyectos increíbles</p>
+    </footer>
+
+    <script>
+        // Crear partículas cayendo estilo Minecraft
+        function createParticles() {
+            const body = document.body;
+            const colors = ['#4caf50', '#8bc34a', '#cddc39', '#ffeb3b'];
+            
+            for (let i = 0; i < 20; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                particle.style.animationDelay = Math.random() * 5 + 's';
+                particle.style.animationDuration = (Math.random() * 10 + 10) + 's';
+                body.appendChild(particle);
+            }
+        }
+
+        // Ejecutar al cargar la página
+        window.addEventListener('load', createParticles);
+
+        // Efecto de sonido al hacer hover (simulado visualmente)
+        document.querySelectorAll('.material-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.borderColor = '#4caf50';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.borderColor = '#000';
+            });
+        });
+
+        // Efecto de clic en botones
+        document.querySelectorAll('.btn-volver').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                this.style.transform = 'translateY(2px)';
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 100);
+            });
+        });
+    </script>
+</body>
+</html>
