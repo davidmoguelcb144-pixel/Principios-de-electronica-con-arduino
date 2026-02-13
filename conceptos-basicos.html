@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conceptos Básicos de Arduino</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', 'Arial Rounded MT Bold', cursive, sans-serif;
+            background: linear-gradient(135deg, #ffcb05 0%, #ff3d00 50%, #3d7dca 100%);
+            color: #2a3f5f;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Patrón de Pokéballs en el fondo */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.1) 2px, transparent 2px),
+                radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.1) 2px, transparent 2px),
+                radial-gradient(circle at 40% 80%, rgba(255, 255, 255, 0.1) 2px, transparent 2px);
+            background-size: 100px 100px;
+            animation: float 20s linear infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-100px); }
+        }
+
+        /* Header estilo Pokémon */
+        .header {
+            background: linear-gradient(180deg, #cc0000 0%, #ff3d00 100%);
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+            border-bottom: 8px solid #fff;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            right: 0;
+            height: 8px;
+            background: linear-gradient(90deg, 
+                #cc0000 0%, #cc0000 50%, 
+                #2a3f5f 50%, #2a3f5f 100%);
+        }
+
+        .pokeball-decoration {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(180deg, #cc0000 0%, #cc0000 50%, #ffffff 50%, #ffffff 100%);
+            border-radius: 50%;
+            border: 4px solid #2a3f5f;
+            top: 50%;
+            transform: translateY(-50%);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        .pokeball-decoration::before {
+            content: '';
+            position: absolute;
+            width: 25px;
+            height: 25px;
+            background: white;
+            border: 4px solid #2a3f5f;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .pokeball-left {
+            left: 5%;
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        .pokeball-right {
+            right: 5%;
+            animation: bounce 2s ease-in-out infinite 1s;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(-50%) scale(1); }
+            50% { transform: translateY(-60%) scale(1.1); }
+        }
+
+        .titulo-principal {
+            font-size: clamp(2rem, 6vw, 4rem);
+            font-weight: 900;
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            text-shadow: 
+                4px 4px 0 #2a3f5f,
+                -2px -2px 0 #ffcb05,
+                0 0 20px rgba(255, 203, 5, 0.5);
+            margin: 0;
+            position: relative;
+            z-index: 2;
+            animation: titlePulse 2s ease-in-out infinite;
+        }
+
+        @keyframes titlePulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        /* Contenedor principal */
+        .contenido {
+            max-width: 1200px;
+            margin: 3rem auto;
+            padding: 0 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Cards de conceptos */
+        .concepto-card {
+            background: linear-gradient(145deg, #ffffff 0%, #f0f0f0 100%);
+            border-radius: 25px;
+            padding: 2rem;
+            margin: 2rem 0;
+            box-shadow: 
+                0 10px 40px rgba(0, 0, 0, 0.2),
+                inset 0 -5px 15px rgba(0, 0, 0, 0.1);
+            border: 5px solid #2a3f5f;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .concepto-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 203, 5, 0.1) 0%, transparent 70%);
+            animation: rotate 10s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .concepto-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 
+                0 15px 50px rgba(255, 61, 0, 0.4),
+                inset 0 -5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .concepto-numero {
+            position: absolute;
+            top: -15px;
+            right: 20px;
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #ffcb05 0%, #ff3d00 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: 900;
+            color: #fff;
+            border: 5px solid #2a3f5f;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .concepto-titulo {
+            font-size: clamp(1.5rem, 3vw, 2rem);
+            font-weight: 900;
+            color: #cc0000;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            text-shadow: 2px 2px 0 #ffcb05;
+            position: relative;
+            padding-bottom: 0.5rem;
+        }
+
+        .concepto-titulo::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100px;
+            height: 4px;
+            background: linear-gradient(90deg, #cc0000 0%, #ffcb05 100%);
+            border-radius: 2px;
+        }
+
+        .concepto-descripcion {
+            font-size: clamp(1rem, 2vw, 1.1rem);
+            line-height: 1.8;
+            color: #2a3f5f;
+            margin-top: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .concepto-lista {
+            list-style: none;
+            margin-top: 1rem;
+            padding-left: 0;
+        }
+
+        .concepto-lista li {
+            padding: 0.8rem;
+            margin: 0.5rem 0;
+            background: linear-gradient(90deg, rgba(255, 203, 5, 0.2) 0%, transparent 100%);
+            border-left: 4px solid #ffcb05;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .concepto-lista li:hover {
+            background: linear-gradient(90deg, rgba(255, 203, 5, 0.4) 0%, rgba(255, 61, 0, 0.1) 100%);
+            transform: translateX(10px);
+            border-left-color: #ff3d00;
+        }
+
+        .concepto-lista li::before {
+            content: '⚡';
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+
+        /* Sección destacada estilo badge */
+        .badge {
+            background: linear-gradient(135deg, #3d7dca 0%, #2a3f5f 100%);
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 20px;
+            display: inline-block;
+            font-weight: bold;
+            margin: 0.5rem 0;
+            box-shadow: 0 4px 15px rgba(61, 125, 202, 0.4);
+            border: 3px solid #ffcb05;
+        }
+
+        /* Estrellas decorativas */
+        .stars {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .star {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #ffcb05;
+            border-radius: 50%;
+            animation: twinkle 3s ease-in-out infinite;
+            box-shadow: 0 0 10px #ffcb05;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.5); }
+        }
+
+        /* Footer */
+        .footer {
+            background: linear-gradient(180deg, #2a3f5f 0%, #1a2332 100%);
+            color: #fff;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 4rem;
+            border-top: 8px solid #ffcb05;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .pokeball-decoration {
+                width: 50px;
+                height: 50px;
+            }
+
+            .pokeball-decoration::before {
+                width: 15px;
+                height: 15px;
+            }
+
+            .concepto-card {
+                padding: 1.5rem;
+                margin: 1.5rem 0;
+            }
+
+            .concepto-numero {
+                width: 50px;
+                height: 50px;
+                font-size: 1.5rem;
+                top: -10px;
+                right: 10px;
+            }
+        }
+
+        /* Botón de regreso */
+        .btn-volver {
+            display: inline-block;
+            background: linear-gradient(135deg, #cc0000 0%, #ff3d00 100%);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 900;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            box-shadow: 0 5px 20px rgba(204, 0, 0, 0.4);
+            border: 4px solid #2a3f5f;
+            transition: all 0.3s ease;
+            margin: 2rem 0;
+        }
+
+        .btn-volver:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(204, 0, 0, 0.6);
+            background: linear-gradient(135deg, #ff3d00 0%, #cc0000 100%);
+        }
+    </style>
+</head>
+<body>
+    <!-- Estrellas decorativas -->
+    <div class="stars" id="stars"></div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="pokeball-decoration pokeball-left"></div>
+        <h1 class="titulo-principal">Conceptos Básicos de Arduino</h1>
+        <div class="pokeball-decoration pokeball-right"></div>
+    </header>
+
+    <!-- Contenido principal -->
+    <main class="contenido">
+        <center>
+            <a href="index.html" class="btn-volver">← Volver al Inicio</a>
+        </center>
+
+        <!-- Concepto 1: ¿Qué es Arduino? -->
+        <div class="concepto-card">
+            <div class="concepto-numero">1</div>
+            <h2 class="concepto-titulo">¿Qué es Arduino?</h2>
+            <p class="concepto-descripcion">
+                Arduino es una plataforma de código abierto basada en hardware y software flexible y fácil de usar. Permite crear diferentes tipos de proyectos electrónicos mediante una placa con un microcontrolador y un entorno de programación sencillo. Es ideal tanto para principiantes como para desarrolladores experimentados.
+            </p>
+            <ul class="concepto-lista">
+                <li><strong>Plataforma de código abierto:</strong> Hardware y software accesibles para todos</li>
+                <li><strong>Microcontrolador:</strong> Cerebro de la placa que ejecuta instrucciones</li>
+                <li><strong>Fácil de programar:</strong> Utiliza un lenguaje basado en C++</li>
+                <li><strong>Comunidad global:</strong> Miles de proyectos y tutoriales disponibles</li>
+            </ul>
+        </div>
+
+        <!-- Concepto 2: Componentes de la placa -->
+        <div class="concepto-card">
+            <div class="concepto-numero">2</div>
+            <h2 class="concepto-titulo">Componentes de la Placa Arduino</h2>
+            <p class="concepto-descripcion">
+                La placa Arduino está compuesta por varios elementos esenciales que trabajan juntos para hacer funcionar tus proyectos:
+            </p>
+            <ul class="concepto-lista">
+                <li><strong>Microcontrolador:</strong> Generalmente ATmega328 o ATmega32u4, el procesador principal</li>
+                <li><strong>Pines digitales:</strong> Entradas y salidas que pueden estar en estado HIGH (5V) o LOW (0V)</li>
+                <li><strong>Pines analógicos:</strong> Leen valores variables entre 0 y 5V (0-1023 en código)</li>
+                <li><strong>Puerto USB:</strong> Para programar y alimentar la placa</li>
+                <li><strong>Regulador de voltaje:</strong> Convierte voltajes externos a los 5V que necesita Arduino</li>
+                <li><strong>LED integrado (Pin 13):</strong> Para pruebas rápidas sin componentes externos</li>
+                <li><strong>Botón de reset:</strong> Reinicia el programa actual</li>
+            </ul>
+        </div>
+
+        <!-- Concepto 3: Entorno de programación -->
+        <div class="concepto-card">
+            <div class="concepto-numero">3</div>
+            <h2 class="concepto-titulo">Arduino IDE - Entorno de Desarrollo</h2>
+            <p class="concepto-descripcion">
+                El Arduino IDE (Integrated Development Environment) es el software donde escribes y subes tus programas a la placa. Funciona en Windows, macOS y Linux.
+            </p>
+            <span class="badge">💻 Software Gratuito</span>
+            <ul class="concepto-lista">
+                <li><strong>Editor de código:</strong> Donde escribes tus programas (sketches)</li>
+                <li><strong>Compilador:</strong> Traduce tu código a lenguaje que entiende el microcontrolador</li>
+                <li><strong>Monitor serie:</strong> Para comunicación y depuración en tiempo real</li>
+                <li><strong>Bibliotecas:</strong> Código pre-escrito para funciones complejas</li>
+                <li><strong>Verificar:</strong> Revisa errores en el código sin subir a la placa</li>
+                <li><strong>Subir:</strong> Envía el programa compilado a Arduino</li>
+            </ul>
+        </div>
+
+        <!-- Concepto 4: Estructura de un programa -->
+        <div class="concepto-card">
+            <div class="concepto-numero">4</div>
+            <h2 class="concepto-titulo">Estructura de un Programa Arduino</h2>
+            <p class="concepto-descripcion">
+                Todo programa Arduino (sketch) tiene una estructura básica con dos funciones principales:
+            </p>
+            <span class="badge">📝 setup() y loop()</span>
+            <ul class="concepto-lista">
+                <li><strong>setup():</strong> Se ejecuta una sola vez al inicio, configura pines y variables</li>
+                <li><strong>loop():</strong> Se ejecuta continuamente en bucle infinito</li>
+                <li><strong>Variables:</strong> Almacenan datos (int, float, boolean, etc.)</li>
+                <li><strong>Funciones:</strong> Bloques de código reutilizable</li>
+                <li><strong>Comentarios:</strong> // para una línea, /* */ para múltiples líneas</li>
+                <li><strong>Punto y coma:</strong> Cada instrucción termina con ;</li>
+                <li><strong>Llaves { }:</strong> Delimitan bloques de código</li>
+            </ul>
+        </div>
+
+        <!-- Concepto 5: Comandos básicos -->
+        <div class="concepto-card">
+            <div class="concepto-numero">5</div>
+            <h2 class="concepto-titulo">Comandos y Funciones Básicas</h2>
+            <p class="concepto-descripcion">
+                Estos son los comandos fundamentales que utilizarás en tus primeros proyectos:
+            </p>
+            <span class="badge">⚡ Entrada/Salida Digital</span>
+            <ul class="concepto-lista">
+                <li><strong>pinMode(pin, modo):</strong> Configura un pin como INPUT o OUTPUT</li>
+                <li><strong>digitalWrite(pin, valor):</strong> Escribe HIGH o LOW en un pin digital</li>
+                <li><strong>digitalRead(pin):</strong> Lee el estado de un pin digital</li>
+            </ul>
+            <span class="badge">📊 Entrada Analógica</span>
+            <ul class="concepto-lista">
+                <li><strong>analogRead(pin):</strong> Lee valores de 0 a 1023 de un pin analógico</li>
+                <li><strong>analogWrite(pin, valor):</strong> Genera señal PWM (0-255) para control de intensidad</li>
+            </ul>
+            <span class="badge">⏱️ Control de Tiempo</span>
+            <ul class="concepto-lista">
+                <li><strong>delay(ms):</strong> Pausa el programa por milisegundos</li>
+                <li><strong>millis():</strong> Devuelve el tiempo transcurrido desde que inició el programa</li>
+            </ul>
+            <span class="badge">💬 Comunicación</span>
+            <ul class="concepto-lista">
+                <li><strong>Serial.begin(9600):</strong> Inicia comunicación serial</li>
+                <li><strong>Serial.println(dato):</strong> Envía datos al monitor serie</li>
+            </ul>
+        </div>
+
+        <!-- Concepto 6: Voltaje y alimentación -->
+        <div class="concepto-card">
+            <div class="concepto-numero">6</div>
+            <h2 class="concepto-titulo">Voltaje y Alimentación</h2>
+            <p class="concepto-descripcion">
+                Es fundamental entender cómo alimentar correctamente tu Arduino y los componentes:
+            </p>
+            <span class="badge">⚠️ ¡Importante para la seguridad!</span>
+            <ul class="concepto-lista">
+                <li><strong>Voltaje lógico:</strong> Arduino trabaja con 5V (algunos modelos con 3.3V)</li>
+                <li><strong>Alimentación USB:</strong> Proporciona 5V para programar y proyectos pequeños</li>
+                <li><strong>Jack de alimentación:</strong> Acepta 7-12V (recomendado 9V), regulado internamente a 5V</li>
+                <li><strong>Pin Vin:</strong> Para alimentación externa directa</li>
+                <li><strong>Corriente máxima por pin:</strong> 40mA (20mA recomendado)</li>
+                <li><strong>Protección:</strong> Muchas placas incluyen fusibles reseteable para USB</li>
+            </ul>
+        </div>
+
+        <!-- Concepto 7: Shields y módulos -->
+        <div class="concepto-card">
+            <div class="concepto-numero">7</div>
+            <h2 class="concepto-titulo">Shields y Módulos de Expansión</h2>
+            <p class="concepto-descripcion">
+                Los Shields son placas adicionales que se conectan sobre Arduino para añadir funcionalidades:
+            </p>
+            <span class="badge">🔌 Expandiendo capacidades</span>
+            <ul class="concepto-lista">
+                <li><strong>Shield Ethernet/WiFi:</strong> Conectividad a internet e IoT</li>
+                <li><strong>Shield Motor:</strong> Control de motores DC y servomotores</li>
+                <li><strong>Shield LCD:</strong> Pantallas para mostrar información</li>
+                <li><strong>Shield GPS:</strong> Posicionamiento geográfico</li>
+                <li><strong>Módulos sensores:</strong> Temperatura, humedad, distancia, movimiento, etc.</li>
+                <li><strong>Módulos de comunicación:</strong> Bluetooth, RF, NFC</li>
+            </ul>
+        </div>
+
+        <!-- Concepto 8: Proyecto básico -->
+        <div class="concepto-card">
+            <div class="concepto-numero">8</div>
+            <h2 class="concepto-titulo">Tu Primer Proyecto: Blink LED</h2>
+            <p class="concepto-descripcion">
+                El proyecto "Hola Mundo" de Arduino es hacer parpadear un LED. Es perfecto para verificar que todo funciona correctamente:
+            </p>
+            <span class="badge">✨ Proyecto Inicial</span>
+            <ul class="concepto-lista">
+                <li><strong>Objetivo:</strong> Encender y apagar un LED repetidamente</li>
+                <li><strong>Componentes:</strong> Arduino + LED (el integrado en pin 13 es suficiente)</li>
+                <li><strong>Concepto aprendido:</strong> Salidas digitales y control de tiempo</li>
+                <li><strong>Siguiente paso:</strong> Variar velocidades, múltiples LEDs, secuencias</li>
+            </ul>
+        </div>
+
+        <center>
+            <a href="index.html" class="btn-volver">← Volver al Inicio</a>
+        </center>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>⚡ Principios de Electrónica con Arduino ⚡</p>
+        <p>¡Atrapa todos los conocimientos!</p>
+    </footer>
+
+    <script>
+        // Crear estrellas decorativas
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            const numberOfStars = 50;
+
+            for (let i = 0; i < numberOfStars; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 3 + 's';
+                starsContainer.appendChild(star);
+            }
+        }
+
+        // Ejecutar al cargar la página
+        window.addEventListener('load', () => {
+            createStars();
+        });
+
+        // Efecto de paralaje suave en las cards
+        document.addEventListener('mousemove', (e) => {
+            const cards = document.querySelectorAll('.concepto-card');
+            const mouseX = e.clientX / window.innerWidth;
+            const mouseY = e.clientY / window.innerHeight;
+
+            cards.forEach((card, index) => {
+                const speed = (index + 1) * 2;
+                const x = (mouseX - 0.5) * speed;
+                const y = (mouseY - 0.5) * speed;
+                
+                card.style.transform = `perspective(1000px) rotateY(${x}deg) rotateX(${-y}deg)`;
+            });
+        });
+    </script>
+</body>
+</html>
