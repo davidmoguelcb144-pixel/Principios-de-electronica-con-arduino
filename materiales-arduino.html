@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Materiales de Arduino - Expansión de Dominio</title>
+    <title>Principios de Electrónica con Arduino - Minecraft Edition</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&display=swap');
-
         * {
             margin: 0;
             padding: 0;
@@ -14,1102 +15,840 @@
         }
 
         body {
-            font-family: 'Noto Sans JP', sans-serif;
-            background: #000;
-            color: #fff;
+            font-family: 'Press Start 2P', cursive;
+            background: linear-gradient(135deg, #87CEEB 0%, #FFD700 100%);
+            min-height: 100vh;
             overflow-x: hidden;
-            position: relative;
+            color: #333;
         }
 
-        /* Fondo del dominio infinito */
-        body::before {
-            content: '';
+        /* Animación de fondo con nubes */
+        @keyframes floatClouds {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(20px); }
+        }
+
+        .cloud {
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: 
-                radial-gradient(ellipse at center, transparent 0%, #000 70%),
-                radial-gradient(circle at 20% 50%, rgba(0, 150, 255, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 80% 50%, rgba(138, 43, 226, 0.1) 0%, transparent 50%);
-            z-index: 0;
-            animation: domainPulse 4s ease-in-out infinite;
-        }
-
-        @keyframes domainPulse {
-            0%, 100% { opacity: 0.8; }
-            50% { opacity: 1; }
-        }
-
-        /* Líneas infinitas del dominio */
-        .infinite-lines {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            perspective: 1000px;
-            overflow: hidden;
-            z-index: 0;
-            pointer-events: none;
-        }
-
-        .line {
-            position: absolute;
-            width: 2px;
-            height: 200%;
-            background: linear-gradient(180deg, 
-                transparent 0%, 
-                rgba(0, 150, 255, 0.3) 20%,
-                rgba(138, 43, 226, 0.5) 50%,
-                rgba(0, 150, 255, 0.3) 80%,
-                transparent 100%);
-            animation: lineFlow 3s linear infinite;
-            transform-style: preserve-3d;
-        }
-
-        @keyframes lineFlow {
-            0% { transform: translateY(-50%) translateZ(0); }
-            100% { transform: translateY(0%) translateZ(1000px); }
-        }
-
-        /* Partículas flotantes del dominio */
-        .particle {
-            position: fixed;
-            width: 3px;
-            height: 3px;
-            background: #00d4ff;
-            border-radius: 50%;
-            box-shadow: 
-                0 0 10px #00d4ff,
-                0 0 20px #00d4ff,
-                0 0 30px rgba(0, 212, 255, 0.5);
-            animation: particleFloat 8s ease-in-out infinite;
-            pointer-events: none;
+            top: 20px;
+            width: 100px;
+            height: 40px;
+            background: white;
+            border-radius: 50px;
+            opacity: 0.8;
+            animation: floatClouds 4s ease-in-out infinite;
             z-index: 1;
         }
 
-        @keyframes particleFloat {
-            0%, 100% { 
-                transform: translate(0, 0) scale(1);
-                opacity: 0.3;
-            }
-            50% { 
-                transform: translate(100px, -50px) scale(1.5);
-                opacity: 1;
-            }
-        }
+        .cloud:nth-child(2) { left: 15%; animation-delay: 0s; }
+        .cloud:nth-child(3) { left: 50%; animation-delay: 1s; }
+        .cloud:nth-child(4) { left: 80%; animation-delay: 2s; }
 
-        /* Header con efecto de dominio */
-        .header {
-            background: linear-gradient(135deg, 
-                rgba(0, 150, 255, 0.2) 0%, 
-                rgba(138, 43, 226, 0.3) 50%,
-                rgba(0, 150, 255, 0.2) 100%);
-            backdrop-filter: blur(20px);
-            border: 2px solid rgba(0, 212, 255, 0.3);
-            border-radius: 0 0 30px 30px;
-            padding: 3rem 2rem;
+        /* Header con temática Minecraft */
+        header {
+            background: linear-gradient(to bottom, #2f472f, #1a2e1a);
+            padding: 40px 20px;
             text-align: center;
-            box-shadow: 
-                0 0 50px rgba(0, 212, 255, 0.4),
-                inset 0 0 50px rgba(138, 43, 226, 0.2);
+            border-bottom: 5px solid #FFD700;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
             position: relative;
             z-index: 10;
-            margin-bottom: 3rem;
-            overflow: hidden;
         }
 
-        .header::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(0, 212, 255, 0.1) 0%, transparent 70%);
-            animation: headerRotate 10s linear infinite;
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
         }
 
-        @keyframes headerRotate {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        h1 {
+            font-size: 2.5em;
+            color: #FFD700;
+            text-shadow: 3px 3px 0px #000, -3px -3px 0px #000;
+            margin-bottom: 15px;
+            animation: bounce 1s ease-in-out infinite;
+            letter-spacing: 2px;
         }
 
-        /* Símbolo de los Seis Ojos */
-        .six-eyes {
-            position: absolute;
-            width: 80px;
-            height: 80px;
-            border: 3px solid #00d4ff;
-            border-radius: 50%;
-            box-shadow: 
-                0 0 20px #00d4ff,
-                inset 0 0 20px rgba(0, 212, 255, 0.3);
-            animation: eyesGlow 2s ease-in-out infinite;
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
         }
 
-        .six-eyes::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 30px;
-            height: 30px;
-            background: radial-gradient(circle, #00d4ff 0%, transparent 70%);
-            border-radius: 50%;
+        .subtitle {
+            font-size: 0.9em;
+            color: #00FF00;
+            text-shadow: 2px 2px 0px #000;
+            margin: 10px 0;
         }
 
-        .eyes-left {
-            left: 5%;
-            top: 50%;
-            transform: translateY(-50%);
+        .teacher-info {
+            font-size: 0.8em;
+            color: #87CEEB;
+            text-shadow: 2px 2px 0px #000;
+            margin: 8px 0;
         }
 
-        .eyes-right {
-            right: 5%;
-            top: 50%;
-            transform: translateY(-50%);
+        .students-info {
+            font-size: 0.7em;
+            color: #FFB6C1;
+            text-shadow: 2px 2px 0px #000;
+            margin-top: 15px;
+            text-align: left;
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px 25px;
+            border: 3px solid #FFD700;
         }
 
-        @keyframes eyesGlow {
-            0%, 100% { 
-                box-shadow: 
-                    0 0 20px #00d4ff,
-                    inset 0 0 20px rgba(0, 212, 255, 0.3);
-            }
-            50% { 
-                box-shadow: 
-                    0 0 40px #00d4ff,
-                    0 0 60px rgba(0, 212, 255, 0.5),
-                    inset 0 0 30px rgba(0, 212, 255, 0.5);
-            }
-        }
-
-        .titulo-principal {
-            font-size: clamp(2rem, 6vw, 4.5rem);
-            font-weight: 900;
-            color: #fff;
-            text-transform: uppercase;
-            letter-spacing: 4px;
-            text-shadow: 
-                0 0 10px #00d4ff,
-                0 0 20px #00d4ff,
-                0 0 40px rgba(0, 212, 255, 0.8),
-                0 0 80px rgba(138, 43, 226, 0.6);
-            margin: 0;
-            position: relative;
-            z-index: 2;
-            animation: titleGlow 3s ease-in-out infinite;
-        }
-
-        @keyframes titleGlow {
-            0%, 100% { 
-                text-shadow: 
-                    0 0 10px #00d4ff,
-                    0 0 20px #00d4ff,
-                    0 0 40px rgba(0, 212, 255, 0.8);
-            }
-            50% { 
-                text-shadow: 
-                    0 0 20px #00d4ff,
-                    0 0 40px #00d4ff,
-                    0 0 80px rgba(0, 212, 255, 1),
-                    0 0 120px rgba(138, 43, 226, 0.8);
-            }
-        }
-
-        .subtitulo {
-            font-size: clamp(1rem, 3vw, 1.5rem);
-            color: #00d4ff;
-            margin-top: 1rem;
-            text-shadow: 0 0 10px rgba(0, 212, 255, 0.8);
-            position: relative;
-            z-index: 2;
+        .students-info li {
+            list-style: none;
+            margin: 5px 0;
         }
 
         /* Contenedor principal */
-        .contenido {
+        .container {
             max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 2rem 4rem;
-            position: relative;
-            z-index: 10;
+            margin: 40px auto;
+            padding: 0 20px;
         }
 
-        /* Grid de materiales */
-        .materiales-grid {
+        /* Sección Catálogos */
+        .catalog-title {
+            font-size: 2em;
+            color: #FFD700;
+            text-shadow: 3px 3px 0px #000;
+            text-align: center;
+            margin: 50px 0 30px 0;
+            background: #2f472f;
+            padding: 20px;
+            border: 5px solid #FFD700;
+            border-radius: 10px;
+        }
+
+        /* Tarjetas de temas */
+        .theme-section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-size: 1.8em;
+            color: #00FF00;
+            text-shadow: 2px 2px 0px #000;
+            background: #1a2e1a;
+            padding: 15px 20px;
+            border-left: 5px solid #FFD700;
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+
+        .cards-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 2rem;
-            margin: 2rem 0;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
         }
 
-        /* Card de material con efecto de dominio */
-        .material-card {
-            background: linear-gradient(135deg, 
-                rgba(0, 20, 40, 0.8) 0%, 
-                rgba(20, 0, 40, 0.8) 100%);
-            backdrop-filter: blur(10px);
-            border: 2px solid rgba(0, 212, 255, 0.3);
-            border-radius: 20px;
-            padding: 1.5rem;
+        .card {
+            background: linear-gradient(135deg, #87CEEB 0%, #E0FFFF 100%);
+            border: 5px solid #2f472f;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
             position: relative;
             overflow: hidden;
-            transition: all 0.4s ease;
-            box-shadow: 
-                0 8px 32px rgba(0, 0, 0, 0.6),
-                inset 0 0 20px rgba(0, 212, 255, 0.1);
         }
 
-        .material-card::before {
+        .card::before {
             content: '';
             position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(0, 212, 255, 0.1) 0%, transparent 70%);
-            opacity: 0;
-            transition: opacity 0.4s ease;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s ease;
         }
 
-        .material-card:hover {
-            transform: translateY(-10px) scale(1.03);
-            border-color: #00d4ff;
-            box-shadow: 
-                0 12px 48px rgba(0, 212, 255, 0.4),
-                0 0 60px rgba(138, 43, 226, 0.3),
-                inset 0 0 30px rgba(0, 212, 255, 0.2);
+        .card:hover::before {
+            left: 100%;
         }
 
-        .material-card:hover::before {
-            opacity: 1;
-            animation: cardGlow 2s ease-in-out infinite;
+        .card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.5);
         }
 
-        @keyframes cardGlow {
-            0%, 100% { transform: rotate(0deg); }
-            50% { transform: rotate(180deg); }
-        }
-
-        /* Imagen del material */
-        .material-imagen {
+        .card-image {
             width: 100%;
             height: 200px;
-            object-fit: contain;
-            border-radius: 15px;
-            margin-bottom: 1rem;
-            background: rgba(0, 0, 0, 0.4);
-            padding: 1rem;
-            border: 2px solid rgba(0, 212, 255, 0.2);
-            transition: all 0.4s ease;
-            filter: drop-shadow(0 0 10px rgba(0, 212, 255, 0.3));
+            object-fit: cover;
+            border: 3px solid #2f472f;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            background: #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8em;
+            color: #666;
         }
 
-        .material-card:hover .material-imagen {
-            border-color: #00d4ff;
-            filter: drop-shadow(0 0 20px rgba(0, 212, 255, 0.6));
-            transform: scale(1.05);
+        .card-title {
+            font-size: 1.2em;
+            color: #2f472f;
+            text-shadow: 1px 1px 0px #FFD700;
+            margin-bottom: 10px;
         }
 
-        .material-nombre {
-            font-size: 1.5rem;
-            font-weight: 900;
-            color: #00d4ff;
-            margin-bottom: 1rem;
-            text-transform: uppercase;
-            text-shadow: 0 0 10px rgba(0, 212, 255, 0.8);
-            letter-spacing: 1px;
+        .card-description {
+            font-size: 0.65em;
+            color: #333;
+            margin-bottom: 12px;
+            line-height: 1.6;
         }
 
-        .material-descripcion {
-            font-size: 1rem;
-            line-height: 1.7;
-            color: #ccc;
-            margin-bottom: 1rem;
+        .card-specs {
+            font-size: 0.6em;
+            color: #2f472f;
+            background: rgba(255, 215, 0, 0.2);
+            padding: 10px;
+            border-left: 3px solid #FFD700;
+            margin-top: 10px;
+            line-height: 1.5;
         }
 
-        /* Especificaciones con estilo técnico */
-        .specs {
-            background: rgba(0, 0, 0, 0.4);
-            border-left: 3px solid #00d4ff;
-            padding: 1rem;
-            margin-top: 1rem;
-            border-radius: 8px;
-            box-shadow: inset 0 0 10px rgba(0, 212, 255, 0.1);
+        /* Sección de Conceptos Básicos */
+        .concepts-container {
+            background: linear-gradient(135deg, #87CEEB 0%, #E0FFFF 100%);
+            padding: 30px;
+            border: 5px solid #2f472f;
+            border-radius: 10px;
+            margin-bottom: 40px;
         }
 
-        .specs-titulo {
-            color: #00d4ff;
-            font-size: 0.9rem;
-            font-weight: bold;
-            margin-bottom: 0.5rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+        .concepts-image {
+            width: 100%;
+            max-width: 400px;
+            height: 300px;
+            margin: 0 auto 20px;
+            background: #ddd;
+            border: 3px solid #2f472f;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8em;
+            color: #666;
         }
 
-        .specs-lista {
-            list-style: none;
-            padding: 0;
-            margin: 0;
+        .concepts-text {
+            font-size: 0.75em;
+            color: #333;
+            line-height: 1.8;
         }
 
-        .specs-lista li {
-            padding: 0.4rem 0;
-            color: #aaa;
-            font-size: 0.9rem;
-            border-bottom: 1px solid rgba(0, 212, 255, 0.1);
-        }
-
-        .specs-lista li:last-child {
-            border-bottom: none;
-        }
-
-        .specs-lista li::before {
-            content: '◆';
-            color: #00d4ff;
-            margin-right: 0.5rem;
-            text-shadow: 0 0 5px rgba(0, 212, 255, 0.8);
-        }
-
-        /* Sección de título */
-        .seccion-titulo {
-            background: linear-gradient(90deg, 
-                transparent 0%, 
-                rgba(0, 212, 255, 0.3) 50%, 
-                transparent 100%);
-            border-top: 2px solid #00d4ff;
-            border-bottom: 2px solid #00d4ff;
-            color: #fff;
-            padding: 1.5rem 2rem;
-            margin: 4rem 0 2rem;
-            font-size: 2rem;
-            font-weight: 900;
-            text-transform: uppercase;
-            text-shadow: 
-                0 0 10px #00d4ff,
-                0 0 20px rgba(0, 212, 255, 0.6);
-            letter-spacing: 3px;
-            position: relative;
-            text-align: center;
-        }
-
-        .seccion-titulo::before {
-            content: '∞';
-            position: absolute;
-            left: 2rem;
-            color: #00d4ff;
-            font-size: 2.5rem;
-            text-shadow: 0 0 20px #00d4ff;
-            animation: spin 4s linear infinite;
-        }
-
-        .seccion-titulo::after {
-            content: '∞';
-            position: absolute;
-            right: 2rem;
-            color: #00d4ff;
-            font-size: 2.5rem;
-            text-shadow: 0 0 20px #00d4ff;
-            animation: spin 4s linear infinite reverse;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* Botón con efecto de técnica maldita */
-        .btn-volver {
-            display: inline-block;
-            background: linear-gradient(135deg, 
-                rgba(0, 150, 255, 0.3) 0%, 
-                rgba(138, 43, 226, 0.3) 100%);
-            backdrop-filter: blur(10px);
-            color: white;
-            padding: 1.2rem 3rem;
-            border: 2px solid #00d4ff;
-            border-radius: 50px;
-            text-decoration: none;
-            font-weight: 900;
-            font-size: 1.1rem;
-            text-transform: uppercase;
-            box-shadow: 
-                0 0 20px rgba(0, 212, 255, 0.4),
-                inset 0 0 20px rgba(0, 212, 255, 0.1);
-            transition: all 0.3s ease;
-            margin: 2rem 0;
-            letter-spacing: 2px;
-            text-shadow: 0 0 10px rgba(0, 212, 255, 0.8);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .btn-volver::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(0, 212, 255, 0.3) 0%, transparent 70%);
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .btn-volver:hover {
-            transform: translateY(-5px);
-            border-color: #fff;
-            box-shadow: 
-                0 0 40px rgba(0, 212, 255, 0.8),
-                0 0 60px rgba(138, 43, 226, 0.6),
-                inset 0 0 30px rgba(0, 212, 255, 0.3);
-        }
-
-        .btn-volver:hover::before {
-            opacity: 1;
-            animation: buttonPulse 1s ease-in-out infinite;
-        }
-
-        @keyframes buttonPulse {
-            0%, 100% { transform: scale(1) rotate(0deg); }
-            50% { transform: scale(1.5) rotate(180deg); }
+        .concept-item {
+            margin: 15px 0;
+            padding: 10px;
+            background: rgba(255, 215, 0, 0.15);
+            border-left: 3px solid #FFD700;
         }
 
         /* Footer */
-        .footer {
-            background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.8) 100%);
-            color: #666;
+        footer {
+            background: #2f472f;
+            color: #FFD700;
             text-align: center;
-            padding: 3rem 2rem;
-            margin-top: 4rem;
-            border-top: 2px solid rgba(0, 212, 255, 0.2);
-            position: relative;
-            z-index: 10;
+            padding: 20px;
+            border-top: 5px solid #FFD700;
+            font-size: 0.8em;
+            margin-top: 50px;
         }
 
-        .footer-text {
-            color: #00d4ff;
-            text-shadow: 0 0 10px rgba(0, 212, 255, 0.6);
-            font-weight: bold;
-            font-size: 1.1rem;
-            margin-bottom: 0.5rem;
+        /* Animaciones */
+        @keyframes pixelBounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .pixel-decoration {
+            display: inline-block;
+            animation: pixelBounce 0.5s ease-in-out infinite;
         }
 
         /* Responsive */
         @media (max-width: 768px) {
-            .six-eyes {
-                width: 50px;
-                height: 50px;
+            h1 {
+                font-size: 1.5em;
             }
 
-            .materiales-grid {
+            .cards-grid {
                 grid-template-columns: 1fr;
-                gap: 1.5rem;
             }
 
-            .seccion-titulo {
-                font-size: 1.5rem;
-                padding: 1rem;
+            .subtitle, .teacher-info, .students-info {
+                font-size: 0.7em;
             }
 
-            .seccion-titulo::before,
-            .seccion-titulo::after {
-                font-size: 1.5rem;
+            .section-title {
+                font-size: 1.2em;
             }
 
-            .material-imagen {
-                height: 180px;
+            .card-title {
+                font-size: 1em;
             }
-        }
 
-        /* Efecto de carga del dominio */
-        @keyframes domainExpand {
-            0% {
-                transform: scale(0);
-                opacity: 0;
+            .card-description {
+                font-size: 0.6em;
             }
-            50% {
-                opacity: 1;
-            }
-            100% {
-                transform: scale(1);
-                opacity: 1;
-            }
-        }
-
-        .contenido {
-            animation: domainExpand 0.8s ease-out;
         }
     </style>
 </head>
 <body>
-    <!-- Líneas infinitas del dominio -->
-    <div class="infinite-lines" id="lines"></div>
-
-    <!-- Partículas flotantes -->
-    <div id="particles"></div>
+    <!-- Nubes decorativas -->
+    <div class="cloud"></div>
+    <div class="cloud"></div>
+    <div class="cloud"></div>
 
     <!-- Header -->
-    <header class="header">
-        <div class="six-eyes eyes-left"></div>
-        <h1 class="titulo-principal">領域展開<br>Materiales de Arduino</h1>
-        <p class="subtitulo">Expansión de Dominio: Conocimiento Infinito</p>
-        <div class="six-eyes eyes-right"></div>
+    <header>
+        <div class="header-content">
+            <h1>⛏️ PRINCIPIOS DE ELECTRÓNICA CON ARDUINO ⛏️</h1>
+            <p class="subtitle">RECURSO DE SUBMÓDULO 1 Y 2 DE 4TO SEMESTRE DE IA</p>
+            <p class="teacher-info">👨‍🏫 Docente: Jordy Chirino Balcazar</p>
+            <div class="students-info">
+                <p style="margin-bottom: 10px;">👥 Alumnos:</p>
+                <ul>
+                    <li>1. David Yael Gutiérrez Moguel</li>
+                    <li>2. Alde Elishua Ruiz Pérez</li>
+                    <li>3. Valeria Michell Velasco Maza</li>
+                    <li>4. Ervin Alexander Gonzales Meneces</li>
+                </ul>
+            </div>
+        </div>
     </header>
 
-    <!-- Contenido principal -->
-    <main class="contenido">
-        <center>
-            <a href="index.html" class="btn-volver">← Retornar al Mundo Real</a>
-        </center>
+    <!-- Contenedor principal -->
+    <div class="container">
+        <!-- TÍTULO CATÁLOGOS -->
+        <h2 class="catalog-title">📚 CATÁLOGOS DE TEMAS 📚</h2>
 
-        <!-- Sección: Placas Arduino -->
-        <h2 class="seccion-titulo">Placas Arduino</h2>
-        <div class="materiales-grid">
-            <div class="material-card">
-                <img src="https://images.unsplash.com/photo-1553406830-ef2513450d76?w=600&h=400&fit=crop&q=80" alt="Arduino UNO" class="material-imagen">
-                <h3 class="material-nombre">Arduino UNO</h3>
-                <p class="material-descripcion">
-                    La placa más popular y versátil. Cuenta con microcontrolador ATmega328P, perfecta para principiantes y proyectos educativos.
-                </p>
-                <div class="specs">
-                    <div class="specs-titulo">Especificaciones Técnicas</div>
-                    <ul class="specs-lista">
-                        <li>Microcontrolador: ATmega328P</li>
-                        <li>14 pines digitales I/O</li>
-                        <li>6 entradas analógicas</li>
-                        <li>Voltaje de operación: 5V</li>
-                        <li>Memoria Flash: 32KB</li>
-                    </ul>
+        <!-- SECCIÓN 1: CONCEPTOS BÁSICOS DE ARDUINO -->
+        <div class="theme-section">
+            <h3 class="section-title">🎮 CONCEPTOS BÁSICOS DE ARDUINO</h3>
+            <div class="concepts-container">
+                <div class="concepts-image">
+                    🖼️ Imagen Arduino UNO (Temática Minecraft)
                 </div>
-            </div>
+                <div class="concepts-text">
+                    <p style="margin-bottom: 15px; font-size: 1em; color: #2f472f;"><strong>Arduino UNO - Placa de Control Programable</strong></p>
+                    
+                    <div class="concept-item">
+                        <strong>¿Qué es Arduino?</strong><br>
+                        Arduino es una plataforma de electrónica abierta basada en hardware y software fácil de usar. Permite crear prototipos interactivos.
+                    </div>
 
-            <div class="material-card">
-                <img src="https://images.unsplash.com/photo-1608564697071-ddf911d81370?w=600&h=400&fit=crop&q=80" alt="Arduino MEGA" class="material-imagen">
-                <h3 class="material-nombre">Arduino MEGA</h3>
-                <p class="material-descripcion">
-                    Versión más grande con ATmega2560, ideal para proyectos complejos que requieren más entradas/salidas y memoria adicional.
-                </p>
-                <div class="specs">
-                    <div class="specs-titulo">Especificaciones Técnicas</div>
-                    <ul class="specs-lista">
-                        <li>Microcontrolador: ATmega2560</li>
-                        <li>54 pines digitales I/O</li>
-                        <li>16 entradas analógicas</li>
-                        <li>Memoria Flash: 256KB</li>
-                        <li>4 puertos UART</li>
-                    </ul>
-                </div>
-            </div>
+                    <div class="concept-item">
+                        <strong>Microcontrolador ATmega328P:</strong><br>
+                        Cerebro de Arduino UNO. Procesa información y controla los componentes conectados.
+                    </div>
 
-            <div class="material-card">
-                <img src="https://images.unsplash.com/photo-1586920666398-e8e739d33a33?w=600&h=400&fit=crop&q=80" alt="Arduino NANO" class="material-imagen">
-                <h3 class="material-nombre">Arduino NANO</h3>
-                <p class="material-descripcion">
-                    Versión compacta con las mismas capacidades del UNO pero en formato reducido. Perfecta para proyectos donde el espacio es limitado.
-                </p>
-                <div class="specs">
-                    <div class="specs-titulo">Especificaciones Técnicas</div>
-                    <ul class="specs-lista">
-                        <li>Microcontrolador: ATmega328P</li>
-                        <li>Tamaño compacto: 18x45mm</li>
-                        <li>Conexión: Mini-USB</li>
-                        <li>Compatible con breadboard</li>
-                        <li>Voltaje: 5V</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
+                    <div class="concept-item">
+                        <strong>Pines de Entrada (Input):</strong><br>
+                        Reciben señales de sensores y componentes externos (0-5V).
+                    </div>
 
-        <!-- Sección: Componentes Básicos -->
-        <h2 class="seccion-titulo">Componentes Básicos</h2>
-        <div class="materiales-grid">
-            <div class="material-card">
-                <img src="https://images.unsplash.com/photo-1601524909162-ae8725290836?w=600&h=400&fit=crop&q=80" alt="LEDs" class="material-imagen">
-                <h3 class="material-nombre">LEDs</h3>
-                <p class="material-descripcion">
-                    Diodos emisores de luz en varios colores. Componentes fundamentales para indicadores visuales y proyectos de iluminación.
-                </p>
-                <div class="specs">
-                    <div class="specs-titulo">Características</div>
-                    <ul class="specs-lista">
-                        <li>Voltaje: 2-3.3V según color</li>
-                        <li>Corriente: 20mA máximo</li>
-                        <li>Colores: rojo, verde, azul, RGB</li>
-                        <li>Requiere resistencia limitadora</li>
-                    </ul>
-                </div>
-            </div>
+                    <div class="concept-item">
+                        <strong>Pines de Salida (Output):</strong><br>
+                        Envían señales a actuadores para controlar LEDs, motores, buzzer, etc.
+                    </div>
 
-            <div class="material-card">
-                <img src="https://images.unsplash.com/photo-1621905251918-48416bd8575a?w=600&h=400&fit=crop&q=80" alt="Resistencias" class="material-imagen">
-                <h3 class="material-nombre">Resistencias</h3>
-                <p class="material-descripcion">
-                    Limitan el flujo de corriente en el circuito. Esenciales para proteger componentes. Se identifican por bandas de colores.
-                </p>
-                <div class="specs">
-                    <div class="specs-titulo">Valores Comunes</div>
-                    <ul class="specs-lista">
-                        <li>220Ω - 330Ω para LEDs</li>
-                        <li>1kΩ - 10kΩ para pull-up/down</li>
-                        <li>Potencia: 1/4W o 1/2W</li>
-                        <li>Tolerancia: ±5%</li>
-                    </ul>
-                </div>
-            </div>
+                    <div class="concept-item">
+                        <strong>Puerto Serial USB:</strong><br>
+                        Permite comunicación entre Arduino y computadora para programación y monitoreo.
+                    </div>
 
-            <div class="material-card">
-                <img src="https://images.unsplash.com/photo-1591135906892-4018da4a8b0c?w=600&h=400&fit=crop&q=80" alt="Pulsadores" class="material-imagen">
-                <h3 class="material-nombre">Pulsadores</h3>
-                <p class="material-descripcion">
-                    Interruptores momentáneos que permiten la entrada de usuario. Se usan con resistencias pull-up o pull-down.
-                </p>
-                <div class="specs">
-                    <div class="specs-titulo">Tipos</div>
-                    <ul class="specs-lista">
-                        <li>Tactile switch (común)</li>
-                        <li>Push button con retención</li>
-                        <li>Conexión: normalmente abierto</li>
-                        <li>Vida útil: 1 millón de ciclos</li>
-                    </ul>
-                </div>
-            </div>
+                    <div class="concept-item">
+                        <strong>Pines Analógicos (A0-A5):</strong><br>
+                        Leen valores variables (0-1023) desde sensores analógicos.
+                    </div>
 
-            <div class="material-card">
-                <img src="https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=600&h=400&fit=crop&q=80" alt="Potenciómetros" class="material-imagen">
-                <h3 class="material-nombre">Potenciómetros</h3>
-                <p class="material-descripcion">
-                    Resistencias variables que permiten leer valores analógicos. Perfectos para controles de velocidad, volumen o ajustes.
-                </p>
-                <div class="specs">
-                    <div class="specs-titulo">Especificaciones</div>
-                    <ul class="specs-lista">
-                        <li>Valores: 1kΩ, 10kΩ, 100kΩ</li>
-                        <li>3 terminales: VCC, GND, señal</li>
-                        <li>Rotación: 270° típico</li>
-                        <li>Lectura: 0-1023 en Arduino</li>
-                    </ul>
-                </div>
-            </div>
+                    <div class="concept-item">
+                        <strong>Pines Digitales (0-13):</strong><br>
+                        Leen/escriben valores binarios (HIGH=5V, LOW=0V).
+                    </div>
 
-            <div class="material-card">
-                <img src="https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=600&h=400&fit=crop&q=80" alt="Cables Jumper" class="material-imagen">
-                <h3 class="material-nombre">Cables Jumper</h3>
-                <p class="material-descripcion">
-                    Cables de conexión con diferentes terminaciones. Esenciales para conectar componentes en el protoboard.
-                </p>
-                <div class="specs">
-                    <div class="specs-titulo">Tipos</div>
-                    <ul class="specs-lista">
-                        <li>Macho-Macho (breadboard)</li>
-                        <li>Macho-Hembra (Arduino-sensor)</li>
-                        <li>Hembra-Hembra (módulos)</li>
-                        <li>Longitud: 10-30cm</li>
-                    </ul>
-                </div>
-            </div>
+                    <div class="concept-item">
+                        <strong>Pines PWM (3,5,6,9,10,11):</strong><br>
+                        Modulación por ancho de pulso para control de intensidad/velocidad.
+                    </div>
 
-            <div class="material-card">
-                <img src="https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=600&h=400&fit=crop&q=80" alt="Protoboard" class="material-imagen">
-                <h3 class="material-nombre">Protoboard</h3>
-                <p class="material-descripcion">
-                    Placa de pruebas sin soldadura. Permite crear circuitos temporales conectando filas y columnas.
-                </p>
-                <div class="specs">
-                    <div class="specs-titulo">Características</div>
-                    <ul class="specs-lista">
-                        <li>Puntos de contacto: 400-830</li>
-                        <li>Líneas de alimentación</li>
-                        <li>Canal central para chips</li>
-                        <li>Sin soldadura requerida</li>
-                    </ul>
+                    <div class="concept-item">
+                        <strong>Lenguaje Arduino:</strong><br>
+                        Basado en C++. Funciones básicas: setup(), loop(), pinMode(), digitalWrite(), analogRead().
+                    </div>
+
+                    <div class="concept-item">
+                        <strong>Alimentación:</strong><br>
+                        5V (USB) o 7-12V (fuente externa). Regulador integrado mantiene voltaje estable.
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Sección: Sensores -->
-        <h2 class="seccion-titulo">Sensores</h2>
-        <div class="materiales-grid">
-            <div class="material-card">
-                <img src="https://images.unsplash.com/photo-1620503374956-c942862f0372?w=600&h=400&fit=crop&q=80" alt="Sensor de Temperatura" class="material-imagen">
-                <h3 class="material-nombre">Sensor de Temperatura</h3>
-                <p class="material-descripcion">
-                    DHT11 o DHT22 para medir temperatura y humedad. Esencial para proyectos de domótica y monitoreo ambiental.
-                </p>
-                <div class="specs">
-                    <div class="specs-titulo">Especificaciones</div>
-                    <ul class="specs-lista">
-                        <li>Rango temperatura: -40°C a 80°C</li>
-                        <li>Humedad: 0-100% RH</li>
-                        <li>Precisión: ±0.5°C (DHT22)</li>
-                        <li>Comunicación: 1-Wire digital</li>
-                    </ul>
+        <!-- SECCIÓN 2: MATERIALES DE ARDUINO -->
+        <div class="theme-section">
+            <h3 class="section-title">🔧 MATERIALES DE ARDUINO</h3>
+
+            <!-- Subsección 2.1: PLACAS DE ARDUINO -->
+            <h4 style="font-size: 1.4em; color: #00FF00; text-shadow: 2px 2px 0px #000; margin: 30px 0 20px 0; background: #1a2e1a; padding: 10px 15px; border-left: 3px solid #FFD700; display: inline-block;">
+                🖥️ PLACAS DE ARDUINO
+            </h4>
+            <div class="cards-grid">
+                <!-- Arduino UNO -->
+                <div class="card">
+                    <div class="card-image">🖼️ Arduino UNO</div>
+                    <h5 class="card-title">Arduino UNO</h5>
+                    <p class="card-description">
+                        La placa más popular y versátil. Ideal para principiantes y proyectos educativos. Tamaño compacto con 14 pines digitales y 6 analógicos.
+                    </p>
+                    <div class="card-specs">
+                        <strong>Especificaciones:</strong><br>
+                        ⚡ Microcontrolador: ATmega328P<br>
+                        ⏱️ Velocidad: 16 MHz<br>
+                        💾 Memoria Flash: 32 KB<br>
+                        🧠 RAM: 2 KB<br>
+                        📍 Pines Digitales: 14<br>
+                        📊 Pines Analógicos: 6<br>
+                        🔋 Voltaje: 5V<br>
+                        ⚖️ Peso: ~25g
+                    </div>
+                </div>
+
+                <!-- Arduino MEGA -->
+                <div class="card">
+                    <div class="card-image">🖼️ Arduino MEGA</div>
+                    <h5 class="card-title">Arduino MEGA 2560</h5>
+                    <p class="card-description">
+                        Versión potenciada del UNO. Ideal para proyectos complejos con múltiples sensores y actuadores. Mayor capacidad de memoria y más pines.
+                    </p>
+                    <div class="card-specs">
+                        <strong>Especificaciones:</strong><br>
+                        ⚡ Microcontrolador: ATmega2560<br>
+                        ⏱️ Velocidad: 16 MHz<br>
+                        💾 Memoria Flash: 256 KB<br>
+                        🧠 RAM: 8 KB<br>
+                        📍 Pines Digitales: 54<br>
+                        📊 Pines Analógicos: 16<br>
+                        🔋 Voltaje: 5V<br>
+                        ⚖️ Peso: ~40g
+                    </div>
+                </div>
+
+                <!-- Arduino NANO -->
+                <div class="card">
+                    <div class="card-image">🖼️ Arduino NANO</div>
+                    <h5 class="card-title">Arduino NANO</h5>
+                    <p class="card-description">
+                        La más pequeña de las tres. Perfecta para proyectos portátiles y espacios reducidos. Características similares al UNO en formato compacto.
+                    </p>
+                    <div class="card-specs">
+                        <strong>Especificaciones:</strong><br>
+                        ⚡ Microcontrolador: ATmega328P<br>
+                        ⏱️ Velocidad: 16 MHz<br>
+                        💾 Memoria Flash: 32 KB<br>
+                        🧠 RAM: 2 KB<br>
+                        📍 Pines Digitales: 14<br>
+                        📊 Pines Analógicos: 8<br>
+                        🔋 Voltaje: 5V<br>
+                        ⚖️ Peso: ~7g
+                    </div>
                 </div>
             </div>
 
-            <div class="material-card">
-                <img src="https://images.unsplash.com/photo-1625314887424-9f190599bd56?w=600&h=400&fit=crop&q=80" alt="Sensor Ultrasónico" class="material-imagen">
-                <h3 class="material-nombre">Sensor Ultrasónico HC-SR04</h3>
-                <p class="material-descripcion">
-                    Mide distancias mediante ondas ultrasónicas. Ideal para robots, sistemas anti-colisión y detección de objetos.
-                </p>
-                <div class="specs">
-                    <div class="specs-titulo">Especificaciones</div>
-                    <ul class="specs-lista">
-                        <li>Rango: 2cm a 4 metros</li>
-                        <li>Precisión: 3mm</li>
-                        <li>Ángulo: 15 grados</li>
-                        <li>Pines: VCC, Trig, Echo, GND</li>
-                    </ul>
+            <!-- Subsección 2.2: COMPONENTES BÁSICOS -->
+            <h4 style="font-size: 1.4em; color: #00FF00; text-shadow: 2px 2px 0px #000; margin: 30px 0 20px 0; background: #1a2e1a; padding: 10px 15px; border-left: 3px solid #FFD700; display: inline-block;">
+                ⚙️ COMPONENTES BÁSICOS
+            </h4>
+            <div class="cards-grid">
+                <!-- LED -->
+                <div class="card">
+                    <div class="card-image">🖼️ LED</div>
+                    <h5 class="card-title">LED (Diodo Emisor de Luz)</h5>
+                    <p class="card-description">
+                        Componente que emite luz al recibir corriente. Requiere resistencia limitadora de corriente. Tiene polaridad: ánodo (+) y cátodo (-).
+                    </p>
+                    <div class="card-specs">
+                        <strong>Especificaciones:</strong><br>
+                        💡 Voltaje: 2-3.3V<br>
+                        ⚡ Corriente: 10-20 mA<br>
+                        🌈 Colores: Rojo, Verde, Azul, Amarillo<br>
+                        📏 Tamaño: 5mm (estándar)<br>
+                        🔌 Polaridad: Ánodo largo (+)
+                    </div>
+                </div>
+
+                <!-- Resistencia -->
+                <div class="card">
+                    <div class="card-image">🖼️ Resistencia</div>
+                    <h5 class="card-title">Resistencia</h5>
+                    <p class="card-description">
+                        Limita el flujo de corriente en un circuito. Se mide en Ohms (Ω). Se utiliza para proteger componentes como LEDs y controlar tensión.
+                    </p>
+                    <div class="card-specs">
+                        <strong>Especificaciones:</strong><br>
+                        📊 Valores: 220Ω a 10kΩ (común)<br>
+                        ⚡ Potencia: 0.25W, 0.5W, 1W<br>
+                        🎨 Código de Colores: Bandas de colores<br>
+                        📏 Tamaño: 6.3mm x 2.5mm<br>
+                        🔝 Tolerancia: ±5%
+                    </div>
+                </div>
+
+                <!-- Pulsador -->
+                <div class="card">
+                    <div class="card-image">🖼️ Pulsador</div>
+                    <h5 class="card-title">Pulsador (Push Button)</h5>
+                    <p class="card-description">
+                        Interruptor momentáneo que cierra un circuito al presionarlo. Ampliamente usado en proyectos para entrada de usuario.
+                    </p>
+                    <div class="card-specs">
+                        <strong>Especificaciones:</strong><br>
+                        ⏱️ Tipo: Momentáneo (N.O.)<br>
+                        ⚡ Voltaje: 5V DC (máximo)<br>
+                        🔌 Contactos: 4 pines<br>
+                        💪 Presión: ~150g<br>
+                        🎨 Colores: Negro, Rojo, Azul
+                    </div>
+                </div>
+
+                <!-- Potenciómetro -->
+                <div class="card">
+                    <div class="card-image">🖼️ Potenciómetro</div>
+                    <h5 class="card-title">Potenciómetro</h5>
+                    <p class="card-description">
+                        Resistencia variable que cambia su valor al girar. Produce un voltaje analógico proporcional al giro. Ideal para controlar intensidad, velocidad, etc.
+                    </p>
+                    <div class="card-specs">
+                        <strong>Especificaciones:</strong><br>
+                        📊 Rango: 1kΩ a 100kΩ<br>
+                        ⚡ Voltaje: 5V DC<br>
+                        🔄 Ángulo: 270° típico<br>
+                        📏 Tamaño: 20mm x 20mm<br>
+                        🔌 Pines: 3
+                    </div>
+                </div>
+
+                <!-- Cable Jumper -->
+                <div class="card">
+                    <div class="card-image">🖼️ Cables Jumper</div>
+                    <h5 class="card-title">Cables Jumper</h5>
+                    <p class="card-description">
+                        Cables de cobre estañado para conectar componentes en la protoboard y con Arduino. Disponibles en diferentes longitudes y colores.
+                    </p>
+                    <div class="card-specs">
+                        <strong>Especificaciones:</strong><br>
+                        📏 Longitud: 10cm - 20cm<br>
+                        🔌 Conectores: Macho-Macho, Macho-Hembra<br>
+                        🎨 Colores: Rojo, Negro, Azul, Verde<br>
+                        ⚡ Calibre: 22 AWG<br>
+                        💾 Empaque: Tira de 40 cables
+                    </div>
+                </div>
+
+                <!-- Protoboard -->
+                <div class="card">
+                    <div class="card-image">🖼️ Protoboard</div>
+                    <h5 class="card-title">Protoboard (Breadboard)</h5>
+                    <p class="card-description">
+                        Placa con agujeros y conexiones internas para montaje temporal de circuitos. No requiere soldadura. Excelente para prototipos y pruebas.
+                    </p>
+                    <div class="card-specs">
+                        <strong>Especificaciones:</strong><br>
+                        📏 Tamaño: 830, 400, 170 agujeros (común)<br>
+                        🔌 Capacidad: 830 componentes (830 holes)<br>
+                        ⚡ Voltaje: 5V (típico)<br>
+                        🎨 Material: Plástico ABS<br>
+                        🏷️ Rieles: 2 positivos, 2 negativos
+                    </div>
+                </div>
+
+                <!-- Transistor -->
+                <div class="card">
+                    <div class="card-image">🖼️ Transistor</div>
+                    <h5 class="card-title">Transistor</h5>
+                    <p class="card-description">
+                        Componente semiconductor que actúa como amplificador o interruptor. Controla circuitos de mayor potencia desde Arduino con corrientes pequeñas.
+                    </p>
+                    <div class="card-specs">
+                        <strong>Especificaciones:</strong><br>
+                        🔤 Tipo: NPN (2N2222) o PNP<br>
+                        ⚡ Voltaje Colector-Emisor: 30V<br>
+                        💪 Corriente: 500mA típica<br>
+                        🌡️ Temperatura: -55°C a +150°C<br>
+                        🔌 Pines: 3 (Base, Colector, Emisor)
+                    </div>
+                </div>
+
+                <!-- Condensador -->
+                <div class="card">
+                    <div class="card-image">🖼️ Condensador</div>
+                    <h5 class="card-title">Condensador (Capacitor)</h5>
+                    <p class="card-description">
+                        Almacena carga eléctrica. Se usa para filtrado, acoplamiento de señales y eliminación de ruido en circuitos.
+                    </p>
+                    <div class="card-specs">
+                        <strong>Especificaciones:</strong><br>
+                        📊 Capacitancia: 1µF a 1000µF<br>
+                        ⚡ Voltaje: 16V a 50V (común)<br>
+                        🎨 Tipos: Electrolítico, Cerámico<br>
+                        🔌 Polaridad: Positivo/Negativo<br>
+                        📏 Tamaño: Variado según capacitancia
+                    </div>
+                </div>
+
+                <!-- Multímetro Digital -->
+                <div class="card">
+                    <div class="card-image">🖼️ Multímetro Digital</div>
+                    <h5 class="card-title">Multímetro Digital</h5>
+                    <p class="card-description">
+                        Instrumento de medición que detecta voltaje (V), corriente (A) y resistencia (Ω). Esencial para diagnosticar y verificar circuitos.
+                    </p>
+                    <div class="card-specs">
+                        <strong>Especificaciones:</strong><br>
+                        📊 Medidas: Voltaje AC/DC, Corriente, Resistencia<br>
+                        📈 Rango: 200mV a 600V<br>
+                        🔌 Conectores: COM, V/Ω/mA, A<br>
+                        📱 Pantalla: LCD 3.5 dígitos<br>
+                        🔋 Batería: 9V
+                    </div>
                 </div>
             </div>
 
-            <div class="material-card">
-                <img src="https://images.unsplash.com/photo-1614935151651-0bea6508db6b?w=600&h=400&fit=crop&q=80" alt="Fotoresistencia LDR" class="material-imagen">
-                <h3 class="material-nombre">Fotoresistencia LDR</h3>
-                <p class="material-descripcion">
-                    Sensor de luz que varía su resistencia según la iluminación. Usado en sistemas de iluminación automática.
-                </p>
-                <div class="specs">
-                    <div class="specs-titulo">Características</div>
-                    <ul class="specs-lista">
-                        <li>Resistencia: 1MΩ (oscuridad)</li>
-                        <li>Resistencia: 1-10kΩ (luz)</li>
-                        <li>Tiempo de respuesta: 8-12ms</li>
-                        <li>Requiere divisor de voltaje</li>
-                    </ul>
+            <!-- Subsección 2.3: SENSORES -->
+            <h4 style="font-size: 1.4em; color: #00FF00; text-shadow: 2px 2px 0px #000; margin: 30px 0 20px 0; background: #1a2e1a; padding: 10px 15px; border-left: 3px solid #FFD700; display: inline-block;">
+                📡 SENSORES
+            </h4>
+            <div class="cards-grid">
+                <!-- Sensor de Temperatura -->
+                <div class="card">
+                    <div class="card-image">🖼️ Sensor de Temperatura</div>
+                    <h5 class="card-title">Sensor de Temperatura (DHT11/DHT22)</h5>
+                    <p class="card-description">
+                        Mide temperatura y humedad relativa del ambiente. Comunica digitalmente con Arduino usando protocolo 1-Wire. Ideal para estaciones climáticas.
+                    </p>
+                    <div class="card-specs">
+                        <strong>Especificaciones:</strong><br>
+                        🌡️ Rango Temperatura: -40°C a +50°C<br>
+                        💧 Rango Humedad: 0% a 100%<br>
+                        ⚡ Voltaje: 3.3V a 5V<br>
+                        📊 Precisión: ±2°C (DHT11)<br>
+                        🔌 Salida: Digital 1-Wire<br>
+                        ⏱️ Tiempo lectura: 2 segundos
+                    </div>
+                </div>
+
+                <!-- Sensor Ultrasónico HC-SR04 -->
+                <div class="card">
+                    <div class="card-image">🖼️ Sensor Ultrasónico HC-SR04</div>
+                    <h5 class="card-title">Sensor Ultrasónico HC-SR04</h5>
+                    <p class="card-description">
+                        Mide distancias usando ondas ultrasónicas. Envía pulsos y calcula distancia por tiempo de retorno. Ideal para robots y sistemas de seguridad.
+                    </p>
+                    <div class="card-specs">
+                        <strong>Especificaciones:</strong><br>
+                        📏 Rango: 2cm a 400cm<br>
+                        ⚡ Voltaje: 5V DC<br>
+                        🔌 Pines: VCC, GND, TRIG, ECHO<br>
+                        ⏱️ Frecuencia: 40 kHz<br>
+                        📊 Precisión: ±0.3cm<br>
+                        🔋 Corriente: 15mA (típica)
+                    </div>
                 </div>
             </div>
 
-            <div class="material-card">
-                <img src="https://images.unsplash.com/photo-1614935151651-0bea6508db6b?w=600&h=400&fit=crop&q=80&sat=-50" alt="Sensor PIR" class="material-imagen">
-                <h3 class="material-nombre">Sensor PIR</h3>
-                <p class="material-descripcion">
-                    Detector de movimiento infrarrojo pasivo. Detecta cambios de calor por movimiento humano.
-                </p>
-                <div class="specs">
-                    <div class="specs-titulo">Especificaciones</div>
-                    <ul class="specs-lista">
-                        <li>Rango: 3-7 metros ajustable</li>
-                        <li>Ángulo: 120 grados</li>
-                        <li>Delay ajustable: 0.3s-5min</li>
-                        <li>Salida: Digital HIGH/LOW</li>
-                    </ul>
+            <!-- Subsección 2.4: ACTUADORES -->
+            <h4 style="font-size: 1.4em; color: #00FF00; text-shadow: 2px 2px 0px #000; margin: 30px 0 20px 0; background: #1a2e1a; padding: 10px 15px; border-left: 3px solid #FFD700; display: inline-block;">
+                ⚡ ACTUADORES
+            </h4>
+            <div class="cards-grid">
+                <!-- Servomotor SG90 -->
+                <div class="card">
+                    <div class="card-image">🖼️ Servomotor SG90</div>
+                    <h5 class="card-title">Servomotor SG90</h5>
+                    <p class="card-description">
+                        Motor de rotación controlada (0-180°). Ideal para proyectos que requieren posicionamiento preciso. Muy popular en robótica y proyectos educativos.
+                    </p>
+                    <div class="card-specs">
+                        <strong>Especificaciones:</strong><br>
+                        ⚡ Voltaje: 4.8V a 6V<br>
+                        🔄 Rango: 0° a 180°<br>
+                        ⏱️ Velocidad: 0.1s/60° (sin carga)<br>
+                        💪 Torque: 1.6kg·cm (4.8V)<br>
+                        📊 Peso: 9g<br>
+                        🔌 Pines: Rojo (VCC), Negro (GND), Amarillo (Signal)
+                    </div>
+                </div>
+
+                <!-- Servomotor MG90S -->
+                <div class="card">
+                    <div class="card-image">🖼️ Servomotor MG90S</div>
+                    <h5 class="card-title">Servomotor MG90S</h5>
+                    <p class="card-description">
+                        Versión mejorada del SG90 con mayor torque y velocidad. Metal gear para mayor durabilidad. Ideal para aplicaciones más exigentes.
+                    </p>
+                    <div class="card-specs">
+                        <strong>Especificaciones:</strong><br>
+                        ⚡ Voltaje: 4.8V a 6V<br>
+                        🔄 Rango: 0° a 180°<br>
+                        ⏱️ Velocidad: 0.08s/60°<br>
+                        💪 Torque: 2.2kg·cm (4.8V)<br>
+                        📊 Peso: 13.4g<br>
+                        🔧 Engranajes: Metal gear
+                    </div>
+                </div>
+
+                <!-- Buzzer Piezoeléctrico -->
+                <div class="card">
+                    <div class="card-image">🖼️ Buzzer Piezoeléctrico</div>
+                    <h5 class="card-title">Buzzer Piezoeléctrico</h5>
+                    <p class="card-description">
+                        Genera sonidos y tonos. Se controla con señales digitales o PWM. Usado en alarmas, notificaciones y sistemas de retroalimentación auditiva.
+                    </p>
+                    <div class="card-specs">
+                        <strong>Especificaciones:</strong><br>
+                        ⚡ Voltaje: 5V DC<br>
+                        📢 Frecuencia: 2.5kHz (típica)<br>
+                        🔊 Volumen: 85dB (a 10cm)<br>
+                        💪 Corriente: 25mA<br>
+                        🎵 Tipo: Activo (con oscilador)<br>
+                        🔌 Pines: 2 (+ y -)
+                    </div>
+                </div>
+
+                <!-- Módulo Relé -->
+                <div class="card">
+                    <div class="card-image">🖼️ Módulo Relé</div>
+                    <h5 class="card-title">Módulo Relé</h5>
+                    <p class="card-description">
+                        Interruptor electromecánico controlado por Arduino. Permite conmutación de circuitos de mayor potencia y voltaje. Ideal para controlar electrodomésticos.
+                    </p>
+                    <div class="card-specs">
+                        <strong>Especificaciones:</strong><br>
+                        ⚡ Voltaje Control: 5V DC<br>
+                        💡 Capacidad Conmutación: 250V AC / 30A<br>
+                        🔄 Tipo: SPDT (1 canal común)<br>
+                        📊 Consumo: 80mA (bobina)<br>
+                        🔧 Tiempo Conmutación: 10ms<br>
+                        🔌 Pines: IN (control), VCC, GND
+                    </div>
+                </div>
+            </div>
+
+            <!-- Subsección 2.5: COMUNICACIÓN Y DISPLAYS -->
+            <h4 style="font-size: 1.4em; color: #00FF00; text-shadow: 2px 2px 0px #000; margin: 30px 0 20px 0; background: #1a2e1a; padding: 10px 15px; border-left: 3px solid #FFD700; display: inline-block;">
+                📱 COMUNICACIÓN Y DISPLAYS
+            </h4>
+            <div class="cards-grid">
+                <!-- Módulo Bluetooth HC-05 -->
+                <div class="card">
+                    <div class="card-image">🖼️ Módulo Bluetooth HC-05</div>
+                    <h5 class="card-title">Módulo Bluetooth HC-05</h5>
+                    <p class="card-description">
+                        Comunica Arduino con dispositivos móviles vía Bluetooth. Permite control y monitoreo remoto. Rango de hasta 10-100 metros.
+                    </p>
+                    <div class="card-specs">
+                        <strong>Especificaciones:</strong><br>
+                        📡 Protocolo: Bluetooth 2.0/2.1<br>
+                        ⚡ Voltaje: 5V (módulo 3.3V)<br>
+                        📶 Rango: 10-100 metros<br>
+                        ⏱️ Velocidad: 9600 baud (típica)<br>
+                        🔌 Pines: VCC, GND, TX, RX<br>
+                        🎯 Clase: 2 (10 metros)
+                    </div>
+                </div>
+
+                <!-- Display LCD 16x2 -->
+                <div class="card">
+                    <div class="card-image">🖼️ Display LCD 16x2</div>
+                    <h5 class="card-title">Display LCD 16x2 con I2C</h5>
+                    <p class="card-description">
+                        Pantalla de cristal líquido que muestra texto. Conexión simplificada con módulo I2C de 4 pines. Ideal para mostrar datos y menús.
+                    </p>
+                    <div class="card-specs">
+                        <strong>Especificaciones:</strong><br>
+                        📺 Resolución: 16 columnas x 2 filas<br>
+                        🔤 Caracteres: 5x8 puntos<br>
+                        ⚡ Voltaje: 5V<br>
+                        🎨 Backlight: Azul/Verde<br>
+                        🔌 Conexión: I2C (SDA, SCL)<br>
+                        📊 Contraste: Ajustable por potenciómetro
+                    </div>
+                </div>
+
+                <!-- Módulo WiFi ESP8266 -->
+                <div class="card">
+                    <div class="card-image">🖼️ Módulo WiFi ESP8266</div>
+                    <h5 class="card-title">Módulo WiFi ESP8266</h5>
+                    <p class="card-description">
+                        Microcontrolador con WiFi integrado. Permite conectar Arduino a internet. Ideal para IoT y proyectos en la nube.
+                    </p>
+                    <div class="card-specs">
+                        <strong>Especificaciones:</strong><br>
+                        📡 WiFi: 802.11 b/g/n<br>
+                        ⚡ Voltaje: 3.3V<br>
+                        🔄 Velocidad CPU: 80 MHz<br>
+                        💾 RAM: 160 KB<br>
+                        📶 Rango: Hasta 100 metros<br>
+                        🔌 Conectores: TX, RX, VCC, GND
+                    </div>
+                </div>
+
+                <!-- Módulo WiFi ESP32 -->
+                <div class="card">
+                    <div class="card-image">🖼️ Módulo WiFi ESP32</div>
+                    <h5 class="card-title">Módulo WiFi ESP32</h5>
+                    <p class="card-description">
+                        Versión mejorada del ESP8266. Dual-core, WiFi + Bluetooth. Mayor capacidad de procesamiento y memoria para aplicaciones complejas.
+                    </p>
+                    <div class="card-specs">
+                        <strong>Especificaciones:</strong><br>
+                        📡 WiFi: 802.11 a/b/g/n<br>
+                        🔵 Bluetooth: 4.2 LE<br>
+                        ⚡ Voltaje: 3.3V<br>
+                        🔄 Velocidad CPU: 240 MHz (dual-core)<br>
+                        💾 RAM: 520 KB<br>
+                        📊 Pines GPIO: 34
+                    </div>
+                </div>
+
+                <!-- Joystick Analógico -->
+                <div class="card">
+                    <div class="card-image">🖼️ Joystick Analógico</div>
+                    <h5 class="card-title">Joystick Analógico</h5>
+                    <p class="card-description">
+                        Control de dos ejes (X, Y) con botón integrado. Produce salidas analógicas (0-1023) proporcionales al movimiento. Ideal para juegos y robots.
+                    </p>
+                    <div class="card-specs">
+                        <strong>Especificaciones:</strong><br>
+                        🕹️ Ejes: X, Y analógicos<br>
+                        ⚡ Voltaje: 5V<br>
+                        📊 Salida: 0-1023 (10 bits)<br>
+                        🔘 Botón: Integrado (SW)<br>
+                        🔌 Pines: VRx, VRy, SW, +5V, GND<br>
+                        📏 Tamaño: 20mm x 20mm
+                    </div>
                 </div>
             </div>
         </div>
-
-        <!-- Sección: Actuadores -->
-        <h2 class="seccion-titulo">Actuadores</h2>
-        <div class="materiales-grid">
-            <div class="material-card">
-                <img src="https://images.unsplash.com/photo-1580894894513-541e068a3e2b?w=600&h=400&fit=crop&q=80" alt="Servomotor" class="material-imagen">
-                <h3 class="material-nombre">Servomotor SG90</h3>
-                <p class="material-descripcion">
-                    Motor con control de posición preciso. Gira 180° mediante señales PWM. Ideal para robótica y mecanismos.
-                </p>
-                <div class="specs">
-                    <div class="specs-titulo">Especificaciones</div>
-                    <ul class="specs-lista">
-                        <li>Voltaje: 4.8V - 6V</li>
-                        <li>Torque: 1.8 kg/cm a 4.8V</li>
-                        <li>Velocidad: 0.12 seg/60°</li>
-                        <li>Ángulo: 0° a 180°</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="material-card">
-                <img src="https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=600&h=400&fit=crop&q=80" alt="Motor DC" class="material-imagen">
-                <h3 class="material-nombre">Motor DC</h3>
-                <p class="material-descripcion">
-                    Motor de corriente continua para rotación continua. Requiere driver L298N para control desde Arduino.
-                </p>
-                <div class="specs">
-                    <div class="specs-titulo">Especificaciones</div>
-                    <ul class="specs-lista">
-                        <li>Voltaje: 3V - 12V</li>
-                        <li>Velocidad: 3000-6000 RPM</li>
-                        <li>Control: PWM para velocidad</li>
-                        <li>Requiere driver de potencia</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="material-card">
-                <img src="https://images.unsplash.com/photo-1614935151651-0bea6508db6b?w=600&h=400&fit=crop&q=80&brightness=10" alt="Buzzer" class="material-imagen">
-                <h3 class="material-nombre">Buzzer Piezoeléctrico</h3>
-                <p class="material-descripcion">
-                    Zumbador para emitir sonidos. El pasivo permite control de frecuencia para tonos musicales y melodías.
-                </p>
-                <div class="specs">
-                    <div class="specs-titulo">Tipos</div>
-                    <ul class="specs-lista">
-                        <li>Activo: tono fijo al energizar</li>
-                        <li>Pasivo: control de frecuencia</li>
-                        <li>Voltaje: 3.5V - 5V</li>
-                        <li>Rango: 2kHz - 4kHz</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="material-card">
-                <img src="https://images.unsplash.com/photo-1608564697071-ddf911d81370?w=600&h=400&fit=crop&q=80&brightness=-20" alt="Relé" class="material-imagen">
-                <h3 class="material-nombre">Módulo Relé</h3>
-                <p class="material-descripcion">
-                    Interruptor electromagnético para controlar circuitos de alta potencia (110V/220V) con señal de 5V.
-                </p>
-                <div class="specs">
-                    <div class="specs-titulo">Especificaciones</div>
-                    <ul class="specs-lista">
-                        <li>Control: 5V DC</li>
-                        <li>Carga máx: 10A a 250V AC</li>
-                        <li>Tipos: 1, 2, 4, 8 canales</li>
-                        <li>LED indicador incluido</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-
-        <!-- Sección: Comunicación -->
-        <h2 class="seccion-titulo">Comunicación y Displays</h2>
-        <div class="materiales-grid">
-            <div class="material-card">
-                <img src="https://images.unsplash.com/photo-1553406830-ef2513450d76?w=600&h=400&fit=crop&q=80&brightness=-10" alt="Módulo Bluetooth" class="material-imagen">
-                <h3 class="material-nombre">Módulo Bluetooth HC-05</h3>
-                <p class="material-descripcion">
-                    Comunicación inalámbrica con smartphones y computadoras. Usa comunicación serial UART.
-                </p>
-                <div class="specs">
-                    <div class="specs-titulo">Especificaciones</div>
-                    <ul class="specs-lista">
-                        <li>Versión: Bluetooth 2.0</li>
-                        <li>Alcance: hasta 10 metros</li>
-                        <li>Velocidad: 9600 bps default</li>
-                        <li>Voltaje: 3.3V (incluye regulador)</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="material-card">
-                <img src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=600&h=400&fit=crop&q=80" alt="Display LCD" class="material-imagen">
-                <h3 class="material-nombre">Display LCD 16x2</h3>
-                <p class="material-descripcion">
-                    Pantalla de cristal líquido de 2 líneas y 16 caracteres. Con módulo I2C solo requiere 2 pines.
-                </p>
-                <div class="specs">
-                    <div class="specs-titulo">Características</div>
-                    <ul class="specs-lista">
-                        <li>Caracteres: 16 columnas x 2 filas</li>
-                        <li>Con backlight ajustable</li>
-                        <li>Módulo I2C opcional</li>
-                        <li>Voltaje: 5V</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="material-card">
-                <img src="https://images.unsplash.com/photo-1614935151651-0bea6508db6b?w=600&h=400&fit=crop&q=80" alt="Módulo WiFi" class="material-imagen">
-                <h3 class="material-nombre">Módulo WiFi ESP8266</h3>
-                <p class="material-descripcion">
-                    Conectividad WiFi para proyectos IoT. Puede funcionar standalone o como shield de Arduino.
-                </p>
-                <div class="specs">
-                    <div class="specs-titulo">Especificaciones</div>
-                    <ul class="specs-lista">
-                        <li>WiFi: 802.11 b/g/n</li>
-                        <li>Procesador: 80MHz</li>
-                        <li>Memoria: 4MB Flash</li>
-                        <li>Pines GPIO: 17 disponibles</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="material-card">
-                <img src="https://images.unsplash.com/photo-1598550476439-6847785fcea6?w=600&h=400&fit=crop&q=80" alt="Joystick" class="material-imagen">
-                <h3 class="material-nombre">Joystick Analógico</h3>
-                <p class="material-descripcion">
-                    Control de dos ejes (X, Y) con botón integrado. Devuelve valores analógicos 0-1023 en cada eje.
-                </p>
-                <div class="specs">
-                    <div class="specs-titulo">Especificaciones</div>
-                    <ul class="specs-lista">
-                        <li>Ejes: X e Y analógicos</li>
-                        <li>Botón: pulsador digital</li>
-                        <li>Valores: 0-1023 por eje</li>
-                        <li>Voltaje: 5V</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-
-        <!-- Sección: Componentes Adicionales -->
-        <h2 class="seccion-titulo">Componentes Adicionales</h2>
-        <div class="materiales-grid">
-            <div class="material-card">
-                <img src="https://images.unsplash.com/photo-1621905251918-48416bd8575a?w=600&h=400&fit=crop&q=80&brightness=-20" alt="Transistores" class="material-imagen">
-                <h3 class="material-nombre">Transistores</h3>
-                <p class="material-descripcion">
-                    NPN (2N2222, BC547) para amplificar señales y controlar componentes de alto consumo. Actúan como interruptores electrónicos.
-                </p>
-                <div class="specs">
-                    <div class="specs-titulo">Modelos Comunes</div>
-                    <ul class="specs-lista">
-                        <li>2N2222: NPN, 600mA, 40V</li>
-                        <li>BC547: NPN, 100mA, 45V</li>
-                        <li>TIP120: NPN Darlington, 5A</li>
-                        <li>Para control de motores y LEDs</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="material-card">
-                <img src="https://images.unsplash.com/photo-1621905251918-48416bd8575a?w=600&h=400&fit=crop&q=80" alt="Condensadores" class="material-imagen">
-                <h3 class="material-nombre">Condensadores</h3>
-                <p class="material-descripcion">
-                    Almacenan energía temporalmente. Electrolíticos para fuente de poder, cerámicos para filtrado de ruido.
-                </p>
-                <div class="specs">
-                    <div class="specs-titulo">Tipos</div>
-                    <ul class="specs-lista">
-                        <li>Electrolíticos: 10µF-1000µF</li>
-                        <li>Cerámicos: 100nF para filtrado</li>
-                        <li>Polarizados: respetar + y -</li>
-                        <li>Voltaje: según aplicación</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="material-card">
-                <img src="https://images.unsplash.com/photo-1609091839311-d5365f9ff1c5?w=600&h=400&fit=crop&q=80" alt="Fuente de Alimentación" class="material-imagen">
-                <h3 class="material-nombre">Fuente de Alimentación</h3>
-                <p class="material-descripcion">
-                    Adaptador de 9V-12V DC para alimentar Arduino externamente. Necesario para proyectos con alto consumo.
-                </p>
-                <div class="specs">
-                    <div class="specs-titulo">Especificaciones</div>
-                    <ul class="specs-lista">
-                        <li>Voltaje: 9V-12V DC</li>
-                        <li>Corriente: 1A-2A típico</li>
-                        <li>Conector: Jack 2.1mm</li>
-                        <li>Polaridad: centro positivo</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="material-card">
-                <img src="https://images.unsplash.com/photo-1606838704997-c56dc1a4b57c?w=600&h=400&fit=crop&q=80" alt="Multímetro" class="material-imagen">
-                <h3 class="material-nombre">Multímetro Digital</h3>
-                <p class="material-descripcion">
-                    Herramienta esencial para medir voltaje, corriente y resistencia. Indispensable para diagnosticar problemas.
-                </p>
-                <div class="specs">
-                    <div class="specs-titulo">Funciones</div>
-                    <ul class="specs-lista">
-                        <li>Voltaje AC/DC</li>
-                        <li>Corriente AC/DC</li>
-                        <li>Resistencia (Ω)</li>
-                        <li>Continuidad y diodos</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-
-        <center>
-            <a href="index.html" class="btn-volver">← Retornar al Mundo Real</a>
-        </center>
-    </main>
+    </div>
 
     <!-- Footer -->
-    <footer class="footer">
-        <p class="footer-text">∞ Dominio Infinito de Conocimiento ∞</p>
-        <p>Principios de Electrónica con Arduino</p>
-        <p style="margin-top: 1rem; color: #00d4ff; font-size: 0.9rem;">領域展開 - Ryōiki Tenkai</p>
+    <footer>
+        <p>⛏️ Creado con ❤️ para el Aprendizaje de Arduino y Electrónica ⛏️</p>
+        <p>4to Semestre de Inteligencia Artificial | 2026</p>
     </footer>
-
-    <script>
-        // Crear líneas infinitas del dominio
-        function createDomainLines() {
-            const linesContainer = document.getElementById('lines');
-            const numberOfLines = 30;
-
-            for (let i = 0; i < numberOfLines; i++) {
-                const line = document.createElement('div');
-                line.className = 'line';
-                line.style.left = (i * (100 / numberOfLines)) + '%';
-                line.style.animationDelay = (i * 0.1) + 's';
-                line.style.animationDuration = (2 + Math.random() * 2) + 's';
-                linesContainer.appendChild(line);
-            }
-        }
-
-        // Crear partículas flotantes
-        function createParticles() {
-            const particlesContainer = document.getElementById('particles');
-            const numberOfParticles = 50;
-
-            for (let i = 0; i < numberOfParticles; i++) {
-                const particle = document.createElement('div');
-                particle.className = 'particle';
-                particle.style.left = Math.random() * 100 + '%';
-                particle.style.top = Math.random() * 100 + '%';
-                particle.style.animationDelay = Math.random() * 8 + 's';
-                particle.style.animationDuration = (5 + Math.random() * 5) + 's';
-                
-                // Variar colores entre azul y violeta
-                const colors = ['#00d4ff', '#8a2be2', '#00bfff', '#9370db'];
-                particle.style.background = colors[Math.floor(Math.random() * colors.length)];
-                particle.style.boxShadow = `0 0 10px ${particle.style.background}, 0 0 20px ${particle.style.background}`;
-                
-                particlesContainer.appendChild(particle);
-            }
-        }
-
-        // Efecto de parallax en las cards
-        document.addEventListener('mousemove', (e) => {
-            const cards = document.querySelectorAll('.material-card');
-            const mouseX = e.clientX / window.innerWidth - 0.5;
-            const mouseY = e.clientY / window.innerHeight - 0.5;
-
-            cards.forEach((card, index) => {
-                const speed = (index % 3 + 1) * 5;
-                const x = mouseX * speed;
-                const y = mouseY * speed;
-                
-                card.style.transform = `perspective(1000px) rotateY(${x}deg) rotateX(${-y}deg)`;
-            });
-        });
-
-        // Resetear transformación al salir del viewport
-        document.addEventListener('mouseleave', () => {
-            const cards = document.querySelectorAll('.material-card');
-            cards.forEach(card => {
-                card.style.transform = 'perspective(1000px) rotateY(0deg) rotateX(0deg)';
-            });
-        });
-
-        // Ejecutar al cargar la página
-        window.addEventListener('load', () => {
-            createDomainLines();
-            createParticles();
-        });
-
-        // Efecto de expansión del dominio al hacer scroll
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.animation = 'domainExpand 0.6s ease-out';
-                }
-            });
-        }, { threshold: 0.1 });
-
-        document.querySelectorAll('.material-card').forEach(card => {
-            observer.observe(card);
-        });
-    </script>
 </body>
 </html>
