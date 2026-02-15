@@ -1,6 +1,19 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Principios de Electrónica con Arduino - Minecraft Edition</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Press Start 2P', cursive;
             background: linear-gradient(135deg, #87CEEB 0%, #FFD700 100%);
@@ -67,6 +80,31 @@
             text-shadow: 2px 2px 0px #000;
             margin: 10px 0;
         }
+
+        .teacher-info {
+            font-size: 0.8em;
+            color: #87CEEB;
+            text-shadow: 2px 2px 0px #000;
+            margin: 8px 0;
+        }
+
+        .students-info {
+            font-size: 0.7em;
+            color: #FFB6C1;
+            text-shadow: 2px 2px 0px #000;
+            margin-top: 15px;
+            text-align: left;
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px 25px;
+            border: 3px solid #FFD700;
+        }
+
+        .students-info li {
+            list-style: none;
+            margin: 5px 0;
+        }
+
         /* Contenedor principal */
         .container {
             max-width: 1400px;
@@ -260,16 +298,103 @@
     <div class="cloud"></div>
     <div class="cloud"></div>
     <div class="cloud"></div>
-       
 
-            <!-- Subsección 1.1: PLACAS DE ARDUINO -->
+    <!-- Header -->
+    <header>
+        <div class="header-content">
+            <h1>⛏️ PRINCIPIOS DE ELECTRÓNICA CON ARDUINO ⛏️</h1>
+            <p class="subtitle">RECURSO DE SUBMÓDULO 1 Y 2 DE 4TO SEMESTRE DE IA</p>
+            <p class="teacher-info">👨‍🏫 Docente: Jordy Chirino Balcazar</p>
+            <div class="students-info">
+                <p style="margin-bottom: 10px;">👥 Alumnos:</p>
+                <ul>
+                    <li>1. David Yael Gutiérrez Moguel</li>
+                    <li>2. Alde Elishua Ruiz Pérez</li>
+                    <li>3. Valeria Michell Velasco Maza</li>
+                    <li>4. Ervin Alexander Gonzales Meneces</li>
+                </ul>
+            </div>
+        </div>
+    </header>
+
+    <!-- Contenedor principal -->
+    <div class="container">
+        <!-- TÍTULO CATÁLOGOS -->
+        <h2 class="catalog-title">📚 CATÁLOGOS DE TEMAS 📚</h2>
+
+        <!-- SECCIÓN 1: CONCEPTOS BÁSICOS DE ARDUINO -->
+        <div class="theme-section">
+            <h3 class="section-title">🎮 CONCEPTOS BÁSICOS DE ARDUINO</h3>
+            <div class="concepts-container">
+                <img src="https://raw.githubusercontent.com/arduino/arduino-boards-manager-files/main/package_index.json" onerror="this.src='https://content.arduino.cc/assets/Arduino_UNO_Rev3_Front_450px.png'" alt="Arduino UNO" class="concepts-image">
+                <div class="concepts-text">
+                    <p style="margin-bottom: 15px; font-size: 1em; color: #2f472f;"><strong>Arduino UNO - Placa de Control Programable</strong></p>
+                    
+                    <div class="concept-item">
+                        <strong>¿Qué es Arduino?</strong><br>
+                        Arduino es una plataforma de electrónica abierta basada en hardware y software fácil de usar. Permite crear prototipos interactivos.
+                    </div>
+
+                    <div class="concept-item">
+                        <strong>Microcontrolador ATmega328P:</strong><br>
+                        Cerebro de Arduino UNO. Procesa información y controla los componentes conectados.
+                    </div>
+
+                    <div class="concept-item">
+                        <strong>Pines de Entrada (Input):</strong><br>
+                        Reciben señales de sensores y componentes externos (0-5V).
+                    </div>
+
+                    <div class="concept-item">
+                        <strong>Pines de Salida (Output):</strong><br>
+                        Envían señales a actuadores para controlar LEDs, motores, buzzer, etc.
+                    </div>
+
+                    <div class="concept-item">
+                        <strong>Puerto Serial USB:</strong><br>
+                        Permite comunicación entre Arduino y computadora para programación y monitoreo.
+                    </div>
+
+                    <div class="concept-item">
+                        <strong>Pines Analógicos (A0-A5):</strong><br>
+                        Leen valores variables (0-1023) desde sensores analógicos.
+                    </div>
+
+                    <div class="concept-item">
+                        <strong>Pines Digitales (0-13):</strong><br>
+                        Leen/escriben valores binarios (HIGH=5V, LOW=0V).
+                    </div>
+
+                    <div class="concept-item">
+                        <strong>Pines PWM (3,5,6,9,10,11):</strong><br>
+                        Modulación por ancho de pulso para control de intensidad/velocidad.
+                    </div>
+
+                    <div class="concept-item">
+                        <strong>Lenguaje Arduino:</strong><br>
+                        Basado en C++. Funciones básicas: setup(), loop(), pinMode(), digitalWrite(), analogRead().
+                    </div>
+
+                    <div class="concept-item">
+                        <strong>Alimentación:</strong><br>
+                        5V (USB) o 7-12V (fuente externa). Regulador integrado mantiene voltaje estable.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 2: MATERIALES DE ARDUINO -->
+        <div class="theme-section">
+            <h3 class="section-title">🔧 MATERIALES DE ARDUINO</h3>
+
+            <!-- Subsección 2.1: PLACAS DE ARDUINO -->
             <h4 style="font-size: 1.4em; color: #00FF00; text-shadow: 2px 2px 0px #000; margin: 30px 0 20px 0; background: #1a2e1a; padding: 10px 15px; border-left: 3px solid #FFD700; display: inline-block;">
                 🖥️ PLACAS DE ARDUINO
             </h4>
             <div class="cards-grid">
                 <!-- Arduino UNO -->
                 <div class="card">
-                    <img src="https://www.anypcba.com/upfile/blogs/articles/506/arduino-uno-board.webp" alt="Arduino UNO" class="card-image">
+                    <img src="https://content.arduino.cc/assets/Arduino_UNO_Rev3_Front_450px.png" alt="Arduino UNO" class="card-image">
                     <h5 class="card-title">Arduino UNO</h5>
                     <p class="card-description">
                         La placa más popular y versátil. Ideal para principiantes y proyectos educativos. Tamaño compacto con 14 pines digitales y 6 analógicos.
