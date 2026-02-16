@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Circuitos en Serie y Paralelo</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            background: #000;
+            color: #fff;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Fondo del dominio infinito */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(ellipse at center, transparent 0%, #000 70%),
+                radial-gradient(circle at 20% 50%, rgba(0, 150, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 50%, rgba(138, 43, 226, 0.1) 0%, transparent 50%);
+            z-index: 0;
+            animation: domainPulse 4s ease-in-out infinite;
+        }
+
+        @keyframes domainPulse {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 1; }
+        }
+
+        /* Líneas infinitas del dominio */
+        .infinite-lines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            perspective: 1000px;
+            overflow: hidden;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .line {
+            position: absolute;
+            width: 2px;
+            height: 200%;
+            background: linear-gradient(180deg, 
+                transparent 0%, 
+                rgba(0, 150, 255, 0.3) 20%,
+                rgba(138, 43, 226, 0.5) 50%,
+                rgba(0, 150, 255, 0.3) 80%,
+                transparent 100%);
+            animation: lineFlow 3s linear infinite;
+            transform-style: preserve-3d;
+        }
+
+        @keyframes lineFlow {
+            0% { transform: translateY(-50%) translateZ(0); }
+            100% { transform: translateY(0%) translateZ(1000px); }
+        }
+
+        /* Partículas flotantes */
+        .particle {
+            position: fixed;
+            width: 3px;
+            height: 3px;
+            background: #00d4ff;
+            border-radius: 50%;
+            box-shadow: 
+                0 0 10px #00d4ff,
+                0 0 20px #00d4ff,
+                0 0 30px rgba(0, 212, 255, 0.5);
+            animation: particleFloat 8s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        @keyframes particleFloat {
+            0%, 100% { 
+                transform: translate(0, 0) scale(1);
+                opacity: 0.3;
+            }
+            50% { 
+                transform: translate(100px, -50px) scale(1.5);
+                opacity: 1;
+            }
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, 
+                rgba(0, 150, 255, 0.2) 0%, 
+                rgba(138, 43, 226, 0.3) 50%,
+                rgba(0, 150, 255, 0.2) 100%);
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(0, 212, 255, 0.3);
+            border-radius: 0 0 30px 30px;
+            padding: 3rem 2rem;
+            text-align: center;
+            box-shadow: 
+                0 0 50px rgba(0, 212, 255, 0.4),
+                inset 0 0 50px rgba(138, 43, 226, 0.2);
+            position: relative;
+            z-index: 10;
+            margin-bottom: 3rem;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0, 212, 255, 0.1) 0%, transparent 70%);
+            animation: headerRotate 10s linear infinite;
+        }
+
+        @keyframes headerRotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .six-eyes {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            border: 3px solid #00d4ff;
+            border-radius: 50%;
+            box-shadow: 
+                0 0 20px #00d4ff,
+                inset 0 0 20px rgba(0, 212, 255, 0.3);
+            animation: eyesGlow 2s ease-in-out infinite;
+        }
+
+        .six-eyes::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 30px;
+            height: 30px;
+            background: radial-gradient(circle, #00d4ff 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .eyes-left {
+            left: 5%;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .eyes-right {
+            right: 5%;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        @keyframes eyesGlow {
+            0%, 100% { 
+                box-shadow: 
+                    0 0 20px #00d4ff,
+                    inset 0 0 20px rgba(0, 212, 255, 0.3);
+            }
+            50% { 
+                box-shadow: 
+                    0 0 40px #00d4ff,
+                    0 0 60px rgba(0, 212, 255, 0.5),
+                    inset 0 0 30px rgba(0, 212, 255, 0.5);
+            }
+        }
+
+        .titulo-principal {
+            font-size: clamp(2rem, 6vw, 4.5rem);
+            font-weight: 900;
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            text-shadow: 
+                0 0 10px #00d4ff,
+                0 0 20px #00d4ff,
+                0 0 40px rgba(0, 212, 255, 0.8),
+                0 0 80px rgba(138, 43, 226, 0.6);
+            margin: 0;
+            position: relative;
+            z-index: 2;
+            animation: titleGlow 3s ease-in-out infinite;
+        }
+
+        @keyframes titleGlow {
+            0%, 100% { 
+                text-shadow: 
+                    0 0 10px #00d4ff,
+                    0 0 20px #00d4ff,
+                    0 0 40px rgba(0, 212, 255, 0.8);
+            }
+            50% { 
+                text-shadow: 
+                    0 0 20px #00d4ff,
+                    0 0 40px #00d4ff,
+                    0 0 80px rgba(0, 212, 255, 1),
+                    0 0 120px rgba(138, 43, 226, 0.8);
+            }
+        }
+
+        .subtitulo {
+            font-size: clamp(1rem, 3vw, 1.5rem);
+            color: #00d4ff;
+            margin-top: 1rem;
+            text-shadow: 0 0 10px rgba(0, 212, 255, 0.8);
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Contenedor principal */
+        .contenido {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem 4rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Sección de título */
+        .seccion-titulo {
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                rgba(0, 212, 255, 0.3) 50%, 
+                transparent 100%);
+            border-top: 2px solid #00d4ff;
+            border-bottom: 2px solid #00d4ff;
+            color: #fff;
+            padding: 1.5rem 2rem;
+            margin: 4rem 0 2rem;
+            font-size: 2rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            text-shadow: 
+                0 0 10px #00d4ff,
+                0 0 20px rgba(0, 212, 255, 0.6);
+            letter-spacing: 3px;
+            position: relative;
+            text-align: center;
+        }
+
+        .seccion-titulo::before {
+            content: '∞';
+            position: absolute;
+            left: 2rem;
+            color: #00d4ff;
+            font-size: 2.5rem;
+            text-shadow: 0 0 20px #00d4ff;
+            animation: spin 4s linear infinite;
+        }
+
+        .seccion-titulo::after {
+            content: '∞';
+            position: absolute;
+            right: 2rem;
+            color: #00d4ff;
+            font-size: 2.5rem;
+            text-shadow: 0 0 20px #00d4ff;
+            animation: spin 4s linear infinite reverse;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Container de imágenes */
+        .imagenes-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 3rem;
+            margin: 3rem 0;
+        }
+
+        /* Card de imagen */
+        .imagen-card {
+            background: linear-gradient(135deg, 
+                rgba(0, 20, 40, 0.8) 0%, 
+                rgba(20, 0, 40, 0.8) 100%);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(0, 212, 255, 0.3);
+            border-radius: 20px;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.6),
+                inset 0 0 20px rgba(0, 212, 255, 0.1);
+        }
+
+        .imagen-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0, 212, 255, 0.1) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .imagen-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            border-color: #00d4ff;
+            box-shadow: 
+                0 12px 48px rgba(0, 212, 255, 0.4),
+                0 0 60px rgba(138, 43, 226, 0.3),
+                inset 0 0 30px rgba(0, 212, 255, 0.2);
+        }
+
+        .imagen-card:hover::before {
+            opacity: 1;
+            animation: cardGlow 2s ease-in-out infinite;
+        }
+
+        @keyframes cardGlow {
+            0%, 100% { transform: rotate(0deg); }
+            50% { transform: rotate(180deg); }
+        }
+
+        .imagen-titulo {
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: #00d4ff;
+            margin-bottom: 1.5rem;
+            text-transform: uppercase;
+            text-shadow: 0 0 10px rgba(0, 212, 255, 0.8);
+            letter-spacing: 1px;
+            text-align: center;
+        }
+
+        .imagen-wrapper {
+            width: 100%;
+            border-radius: 15px;
+            overflow: hidden;
+            border: 2px solid rgba(0, 212, 255, 0.3);
+            transition: all 0.4s ease;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
+        }
+
+        .imagen-card:hover .imagen-wrapper {
+            border-color: #00d4ff;
+            box-shadow: 0 0 40px rgba(0, 212, 255, 0.5);
+        }
+
+        .imagen-content {
+            width: 100%;
+            height: auto;
+            display: block;
+            transition: transform 0.4s ease;
+        }
+
+        .imagen-card:hover .imagen-content {
+            transform: scale(1.05);
+        }
+
+        .imagen-descripcion {
+            margin-top: 1.5rem;
+            font-size: 1.1rem;
+            line-height: 1.7;
+            color: #ccc;
+            text-align: center;
+        }
+
+        /* Botón */
+        .btn-volver {
+            display: inline-block;
+            background: linear-gradient(135deg, 
+                rgba(0, 150, 255, 0.3) 0%, 
+                rgba(138, 43, 226, 0.3) 100%);
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 1.2rem 3rem;
+            border: 2px solid #00d4ff;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 900;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            box-shadow: 
+                0 0 20px rgba(0, 212, 255, 0.4),
+                inset 0 0 20px rgba(0, 212, 255, 0.1);
+            transition: all 0.3s ease;
+            margin: 2rem 0;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(0, 212, 255, 0.8);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-volver::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0, 212, 255, 0.3) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .btn-volver:hover {
+            transform: translateY(-5px);
+            border-color: #fff;
+            box-shadow: 
+                0 0 40px rgba(0, 212, 255, 0.8),
+                0 0 60px rgba(138, 43, 226, 0.6),
+                inset 0 0 30px rgba(0, 212, 255, 0.3);
+        }
+
+        .btn-volver:hover::before {
+            opacity: 1;
+            animation: buttonPulse 1s ease-in-out infinite;
+        }
+
+        @keyframes buttonPulse {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.5) rotate(180deg); }
+        }
+
+        /* Footer */
+        .footer {
+            background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.8) 100%);
+            color: #666;
+            text-align: center;
+            padding: 3rem 2rem;
+            margin-top: 4rem;
+            border-top: 2px solid rgba(0, 212, 255, 0.2);
+            position: relative;
+            z-index: 10;
+        }
+
+        .footer-text {
+            color: #00d4ff;
+            text-shadow: 0 0 10px rgba(0, 212, 255, 0.6);
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .six-eyes {
+                width: 50px;
+                height: 50px;
+            }
+
+            .imagenes-container {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .seccion-titulo {
+                font-size: 1.5rem;
+                padding: 1rem;
+            }
+
+            .seccion-titulo::before,
+            .seccion-titulo::after {
+                font-size: 1.5rem;
+            }
+        }
+
+        /* Efecto de carga */
+        @keyframes domainExpand {
+            0% {
+                transform: scale(0);
+                opacity: 0;
+            }
+            50% {
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .contenido {
+            animation: domainExpand 0.8s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <!-- Líneas infinitas del dominio -->
+    <div class="infinite-lines" id="lines"></div>
+
+    <!-- Partículas flotantes -->
+    <div id="particles"></div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="six-eyes eyes-left"></div>
+        <h1 class="titulo-principal">領域展開<br>Circuito en Serie y Paralelo</h1>
+        <p class="subtitulo">Expansión de Dominio: Conexiones Infinitas</p>
+        <div class="six-eyes eyes-right"></div>
+    </header>
+
+    <!-- Contenido principal -->
+    <main class="contenido">
+        <center>
+            <a href="index.html" class="btn-volver">← Retornar al Mundo Real</a>
+        </center>
+
+        <!-- Sección: Diagramas -->
+        <h2 class="seccion-titulo">Diagramas de Circuitos</h2>
+        <div class="imagenes-container">
+            <div class="imagen-card">
+                <h3 class="imagen-titulo">Circuito en Serie - Diagrama 1</h3>
+                <div class="imagen-wrapper">
+                    <img src="/mnt/user-data/uploads/Captura_de_pantalla_2026-02-16_122137.png" alt="Circuito en Serie Diagrama 1" class="imagen-content">
+                </div>
+                <p class="imagen-descripcion">
+                    En un circuito en serie, los componentes están conectados uno tras otro. La corriente es la misma en todos los componentes, pero el voltaje se divide entre ellos.
+                </p>
+            </div>
+
+            <div class="imagen-card">
+                <h3 class="imagen-titulo">Circuito en Paralelo - Diagrama 2</h3>
+                <div class="imagen-wrapper">
+                    <img src="/mnt/user-data/uploads/Captura_de_pantalla_2026-02-16_122232.png" alt="Circuito en Paralelo Diagrama 2" class="imagen-content">
+                </div>
+                <p class="imagen-descripcion">
+                    En un circuito paralelo, los componentes comparten los mismos puntos de conexión. El voltaje es el mismo en todos los componentes, pero la corriente se divide.
+                </p>
+            </div>
+        </div>
+
+        <!-- Sección: Implementaciones Reales -->
+        <h2 class="seccion-titulo">Implementaciones Prácticas</h2>
+        <div class="imagenes-container">
+            <div class="imagen-card">
+                <h3 class="imagen-titulo">Protoboard - Implementación 1</h3>
+                <div class="imagen-wrapper">
+                    <img src="/mnt/user-data/uploads/IMG_20260216_122358.jpg" alt="Circuito en Protoboard 1" class="imagen-content">
+                </div>
+                <p class="imagen-descripcion">
+                    Implementación física del circuito en protoboard con LEDs, resistencias y cables jumper. Se observan las conexiones básicas y la distribución de componentes.
+                </p>
+            </div>
+
+            <div class="imagen-card">
+                <h3 class="imagen-titulo">Protoboard - Implementación 2</h3>
+                <div class="imagen-wrapper">
+                    <img src="/mnt/user-data/uploads/IMG_20260216_122429.jpg" alt="Circuito en Protoboard 2" class="imagen-content">
+                </div>
+                <p class="imagen-descripcion">
+                    Vista del circuito funcionando con LEDs encendidos. Se muestra la batería de 9V conectada y la iluminación de los componentes en el circuito activo.
+                </p>
+            </div>
+        </div>
+
+        <center>
+            <a href="index.html" class="btn-volver">← Retornar al Mundo Real</a>
+        </center>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p class="footer-text">∞ Dominio Infinito de Circuitos ∞</p>
+        <p>Principios de Electrónica con Arduino</p>
+        <p style="margin-top: 1rem; color: #00d4ff; font-size: 0.9rem;">領域展開 - Ryōiki Tenkai</p>
+    </footer>
+
+    <script>
+        // Crear líneas infinitas del dominio
+        function createDomainLines() {
+            const linesContainer = document.getElementById('lines');
+            const numberOfLines = 30;
+
+            for (let i = 0; i < numberOfLines; i++) {
+                const line = document.createElement('div');
+                line.className = 'line';
+                line.style.left = (i * (100 / numberOfLines)) + '%';
+                line.style.animationDelay = (i * 0.1) + 's';
+                line.style.animationDuration = (2 + Math.random() * 2) + 's';
+                linesContainer.appendChild(line);
+            }
+        }
+
+        // Crear partículas flotantes
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const numberOfParticles = 50;
+
+            for (let i = 0; i < numberOfParticles; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 8 + 's';
+                particle.style.animationDuration = (5 + Math.random() * 5) + 's';
+                
+                const colors = ['#00d4ff', '#8a2be2', '#00bfff', '#9370db'];
+                particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+                particle.style.boxShadow = `0 0 10px ${particle.style.background}, 0 0 20px ${particle.style.background}`;
+                
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // Efecto de parallax en las cards
+        document.addEventListener('mousemove', (e) => {
+            const cards = document.querySelectorAll('.imagen-card');
+            const mouseX = e.clientX / window.innerWidth - 0.5;
+            const mouseY = e.clientY / window.innerHeight - 0.5;
+
+            cards.forEach((card, index) => {
+                const speed = (index % 2 + 1) * 5;
+                const x = mouseX * speed;
+                const y = mouseY * speed;
+                
+                card.style.transform = `perspective(1000px) rotateY(${x}deg) rotateX(${-y}deg)`;
+            });
+        });
+
+        // Resetear transformación al salir
+        document.addEventListener('mouseleave', () => {
+            const cards = document.querySelectorAll('.imagen-card');
+            cards.forEach(card => {
+                card.style.transform = 'perspective(1000px) rotateY(0deg) rotateX(0deg)';
+            });
+        });
+
+        // Ejecutar al cargar la página
+        window.addEventListener('load', () => {
+            createDomainLines();
+            createParticles();
+        });
+
+        // Efecto de expansión del dominio al hacer scroll
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animation = 'domainExpand 0.6s ease-out';
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.imagen-card').forEach(card => {
+            observer.observe(card);
+        });
+    </script>
+</body>
+</html>
