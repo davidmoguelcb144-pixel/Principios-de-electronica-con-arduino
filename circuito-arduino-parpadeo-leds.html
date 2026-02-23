@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Circuito Arduino - Parpadeo LEDs</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;500;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            background: #000;
+            color: #fff;
+            overflow-x: hidden;
+            position: relative;
+            font-weight: 300;
+        }
+
+        /* Fondo minimalista con gradiente sutil */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(ellipse at top, rgba(0, 150, 255, 0.05) 0%, transparent 60%),
+                radial-gradient(ellipse at bottom, rgba(138, 43, 226, 0.05) 0%, transparent 60%);
+            z-index: 0;
+        }
+
+        /* Líneas sutiles minimalistas */
+        .background-lines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.15;
+        }
+
+        .bg-line {
+            position: absolute;
+            width: 1px;
+            height: 100%;
+            background: linear-gradient(180deg, 
+                transparent 0%, 
+                rgba(0, 212, 255, 0.3) 50%,
+                transparent 100%);
+        }
+
+        /* Header minimalista */
+        .header {
+            padding: 4rem 2rem 3rem;
+            text-align: center;
+            position: relative;
+            z-index: 10;
+            border-bottom: 1px solid rgba(0, 212, 255, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .titulo-principal {
+            font-size: clamp(1.8rem, 5vw, 3.5rem);
+            font-weight: 300;
+            color: #fff;
+            letter-spacing: 8px;
+            text-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+            margin: 0;
+            line-height: 1.4;
+        }
+
+        .titulo-japones {
+            font-size: clamp(0.8rem, 2vw, 1rem);
+            color: rgba(0, 212, 255, 0.6);
+            letter-spacing: 4px;
+            margin-top: 1rem;
+            font-weight: 300;
+        }
+
+        /* Símbolo minimalista */
+        .symbol {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border: 1px solid rgba(0, 212, 255, 0.4);
+            border-radius: 50%;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .symbol::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 12px;
+            height: 12px;
+            background: rgba(0, 212, 255, 0.6);
+            border-radius: 50%;
+        }
+
+        .symbol-left { left: 10%; }
+        .symbol-right { right: 10%; }
+
+        /* Contenedor principal */
+        .contenido {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Línea decorativa */
+        .divider {
+            width: 100px;
+            height: 1px;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                rgba(0, 212, 255, 0.6) 50%, 
+                transparent 100%);
+            margin: 3rem auto;
+        }
+
+        /* Container de imágenes minimalista */
+        .imagenes-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 4rem;
+            margin: 4rem 0;
+        }
+
+        /* Card de imagen minimalista */
+        .imagen-card {
+            position: relative;
+            transition: all 0.4s ease;
+        }
+
+        .imagen-card::before {
+            content: '';
+            position: absolute;
+            top: -20px;
+            left: -20px;
+            right: -20px;
+            bottom: -20px;
+            border: 1px solid rgba(0, 212, 255, 0);
+            border-radius: 4px;
+            transition: all 0.4s ease;
+            pointer-events: none;
+        }
+
+        .imagen-card:hover::before {
+            border-color: rgba(0, 212, 255, 0.3);
+            box-shadow: 0 0 40px rgba(0, 212, 255, 0.1);
+        }
+
+        .imagen-numero {
+            font-size: 0.75rem;
+            color: rgba(0, 212, 255, 0.5);
+            letter-spacing: 4px;
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+
+        .imagen-titulo {
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: #fff;
+            margin-bottom: 1.5rem;
+            letter-spacing: 2px;
+        }
+
+        .imagen-wrapper {
+            width: 100%;
+            border: 1px solid rgba(0, 212, 255, 0.15);
+            overflow: hidden;
+            transition: all 0.4s ease;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .imagen-card:hover .imagen-wrapper {
+            border-color: rgba(0, 212, 255, 0.4);
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.1);
+        }
+
+        .imagen-content {
+            width: 100%;
+            height: auto;
+            display: block;
+            transition: transform 0.4s ease, opacity 0.4s ease;
+            opacity: 0.9;
+        }
+
+        .imagen-card:hover .imagen-content {
+            transform: scale(1.02);
+            opacity: 1;
+        }
+
+        .imagen-descripcion {
+            margin-top: 1.5rem;
+            font-size: 0.95rem;
+            line-height: 1.8;
+            color: rgba(255, 255, 255, 0.6);
+            letter-spacing: 0.5px;
+        }
+
+        /* Botón minimalista */
+        .btn-volver {
+            display: inline-block;
+            background: transparent;
+            color: rgba(0, 212, 255, 0.8);
+            padding: 1rem 2.5rem;
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            text-decoration: none;
+            font-weight: 300;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            transition: all 0.3s ease;
+            margin: 2rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-volver::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 212, 255, 0.1);
+            transition: left 0.3s ease;
+        }
+
+        .btn-volver:hover {
+            border-color: rgba(0, 212, 255, 0.6);
+            color: #fff;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
+        }
+
+        .btn-volver:hover::before {
+            left: 0;
+        }
+
+        /* Footer minimalista */
+        .footer {
+            text-align: center;
+            padding: 3rem 2rem;
+            margin-top: 6rem;
+            border-top: 1px solid rgba(0, 212, 255, 0.1);
+            position: relative;
+            z-index: 10;
+        }
+
+        .footer-text {
+            color: rgba(0, 212, 255, 0.4);
+            font-size: 0.75rem;
+            letter-spacing: 4px;
+            font-weight: 300;
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-subtitle {
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .symbol {
+                width: 30px;
+                height: 30px;
+            }
+
+            .symbol::before {
+                width: 8px;
+                height: 8px;
+            }
+
+            .imagenes-container {
+                grid-template-columns: 1fr;
+                gap: 3rem;
+            }
+
+            .imagen-card::before {
+                top: -10px;
+                left: -10px;
+                right: -10px;
+                bottom: -10px;
+            }
+        }
+
+        /* Animación de entrada suave */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .imagen-card {
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .imagen-card:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+    </style>
+</head>
+<body>
+    <!-- Líneas de fondo minimalistas -->
+    <div class="background-lines" id="bgLines"></div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="symbol symbol-left"></div>
+        <p class="titulo-japones">領域展開</p>
+        <h1 class="titulo-principal">CIRCUITO CON ARDUINO<br>DE PARPADEO DE LEDS<br>EN PARALELO</h1>
+        <div class="symbol symbol-right"></div>
+    </header>
+
+    <!-- Contenido principal -->
+    <main class="contenido">
+        <center>
+            <a href="index.html" class="btn-volver">← Volver</a>
+        </center>
+
+        <div class="divider"></div>
+
+        <!-- Imágenes -->
+        <div class="imagenes-container">
+            <div class="imagen-card">
+                <div class="imagen-numero">01 / VISTA SUPERIOR</div>
+                <h3 class="imagen-titulo">Arduino UNO con Protoboard</h3>
+                <div class="imagen-wrapper">
+                    <img src="/mnt/user-data/uploads/WhatsApp_Image_2026-02-22_at_3_06_32_PM.jpeg" alt="Arduino con circuito de LEDs vista superior" class="imagen-content">
+                </div>
+                <p class="imagen-descripcion">
+                    Vista superior del circuito completo donde se observa la placa Arduino UNO conectada mediante cable USB para programación y alimentación. En el protoboard se aprecian tres LEDs transparentes conectados en paralelo con sus respectivas resistencias limitadoras de corriente (azules). El Arduino controla el encendido y apagado de los LEDs mediante programación, generando el efecto de parpadeo sincronizado. Cable rojo para alimentación positiva y negro para tierra (GND).
+                </p>
+            </div>
+
+            <div class="imagen-card">
+                <div class="imagen-numero">02 / VISTA LATERAL</div>
+                <h3 class="imagen-titulo">Conexión Arduino-Protoboard</h3>
+                <div class="imagen-wrapper">
+                    <img src="/mnt/user-data/uploads/WhatsApp_Image_2026-02-22_at_3_08_41_PM.jpeg" alt="Arduino con circuito de LEDs vista lateral" class="imagen-content">
+                </div>
+                <p class="imagen-descripcion">
+                    Perspectiva lateral que muestra claramente la conexión entre el Arduino UNO y el protoboard. Se observan dos protoboards conectadas, con LEDs y resistencias organizados de manera simétrica. Los cables jumper (rojo y negro) conectan los pines digitales del Arduino con el circuito en el protoboard. Esta configuración permite que el microcontrolador controle el estado de los LEDs mediante señales digitales HIGH (5V) y LOW (0V), creando patrones de parpadeo programables.
+                </p>
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <center>
+            <a href="index.html" class="btn-volver">← Volver</a>
+        </center>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p class="footer-text">∞ DOMINIO INFINITO ∞</p>
+        <p class="footer-subtitle">Principios de Electrónica con Arduino</p>
+        <p class="footer-subtitle" style="margin-top: 1rem;">Ryōiki Tenkai</p>
+    </footer>
+
+    <script>
+        // Crear líneas de fondo minimalistas
+        function createBackgroundLines() {
+            const container = document.getElementById('bgLines');
+            const numberOfLines = 8;
+
+            for (let i = 0; i < numberOfLines; i++) {
+                const line = document.createElement('div');
+                line.className = 'bg-line';
+                line.style.left = (i * (100 / (numberOfLines - 1))) + '%';
+                container.appendChild(line);
+            }
+        }
+
+        // Efecto parallax suave
+        document.addEventListener('mousemove', (e) => {
+            const cards = document.querySelectorAll('.imagen-card');
+            const mouseX = (e.clientX / window.innerWidth - 0.5) * 10;
+            const mouseY = (e.clientY / window.innerHeight - 0.5) * 10;
+
+            cards.forEach((card, index) => {
+                const speed = (index + 1) * 0.5;
+                card.style.transform = `translate(${mouseX * speed}px, ${mouseY * speed}px)`;
+            });
+        });
+
+        // Ejecutar al cargar
+        window.addEventListener('load', () => {
+            createBackgroundLines();
+        });
+
+        // Animación de entrada para las cards
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.imagen-card').forEach(card => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            observer.observe(card);
+        });
+    </script>
+</body>
+</html>
