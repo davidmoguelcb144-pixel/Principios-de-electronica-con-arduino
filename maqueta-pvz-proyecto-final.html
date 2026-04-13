@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maqueta PvZ - Proyecto Final</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Fredoka', sans-serif;
+            background: linear-gradient(180deg, #87CEEB 0%, #4A90A4 50%, #2B5F75 100%);
+            color: #2d1b00;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Patrón de césped de fondo */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                repeating-linear-gradient(0deg, transparent, transparent 10px, rgba(76, 175, 80, 0.05) 10px, rgba(76, 175, 80, 0.05) 20px);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Header estilo PvZ */
+        .header {
+            background: linear-gradient(180deg, #7CB342 0%, #558B2F 100%);
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 
+                0 8px 0 #33691E,
+                0 8px 30px rgba(0, 0, 0, 0.5);
+            border-bottom: 6px solid #33691E;
+            position: relative;
+            z-index: 10;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            animation: shine 3s ease-in-out infinite;
+        }
+
+        @keyframes shine {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(20px, 20px); }
+        }
+
+        .titulo-principal {
+            font-size: clamp(2.5rem, 7vw, 5rem);
+            font-weight: 700;
+            color: #fff;
+            text-transform: uppercase;
+            text-shadow: 
+                4px 4px 0 #33691E,
+                6px 6px 0 rgba(0, 0, 0, 0.3),
+                2px 2px 10px rgba(255, 255, 255, 0.3);
+            margin: 0;
+            position: relative;
+            z-index: 2;
+            letter-spacing: 2px;
+        }
+
+        .subtitulo {
+            font-size: clamp(1.2rem, 3vw, 2rem);
+            color: #FFEB3B;
+            margin-top: 0.5rem;
+            text-shadow: 
+                2px 2px 0 #33691E,
+                3px 3px 5px rgba(0, 0, 0, 0.5);
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Contenedor principal */
+        .contenido {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Sección */
+        .seccion {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 2.5rem;
+            margin: 2rem 0;
+            box-shadow: 
+                0 10px 30px rgba(0, 0, 0, 0.3),
+                inset 0 2px 0 rgba(255, 255, 255, 0.8);
+            border: 4px solid #795548;
+            position: relative;
+        }
+
+        .seccion::before {
+            content: '';
+            position: absolute;
+            top: -4px;
+            left: -4px;
+            right: -4px;
+            bottom: -4px;
+            background: linear-gradient(135deg, #8D6E63, #5D4037);
+            border-radius: 20px;
+            z-index: -1;
+        }
+
+        .seccion-titulo {
+            font-size: clamp(1.8rem, 4vw, 2.8rem);
+            font-weight: 700;
+            color: #4CAF50;
+            text-shadow: 
+                3px 3px 0 #2E7D32,
+                5px 5px 10px rgba(0, 0, 0, 0.2);
+            margin-bottom: 1.5rem;
+            text-transform: uppercase;
+            border-bottom: 4px solid #4CAF50;
+            padding-bottom: 0.5rem;
+        }
+
+        .seccion-texto {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #3E2723;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Grid de imágenes */
+        .imagenes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        /* Card de imagen estilo PvZ */
+        .imagen-card {
+            background: #F5F5DC;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 
+                0 6px 0 #8D6E63,
+                0 6px 20px rgba(0, 0, 0, 0.3);
+            border: 3px solid #6D4C41;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .imagen-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 
+                0 12px 0 #8D6E63,
+                0 12px 30px rgba(76, 175, 80, 0.4);
+        }
+
+        .imagen-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #4CAF50, #FFEB3B, #FF9800, #4CAF50);
+            background-size: 200% 100%;
+            animation: rainbowSlide 3s linear infinite;
+        }
+
+        @keyframes rainbowSlide {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 200% 0%; }
+        }
+
+        .imagen-titulo {
+            background: linear-gradient(180deg, #7CB342 0%, #558B2F 100%);
+            color: #fff;
+            padding: 1rem;
+            font-size: 1.3rem;
+            font-weight: 700;
+            text-shadow: 2px 2px 0 #33691E;
+            text-align: center;
+        }
+
+        .imagen-wrapper {
+            width: 100%;
+            height: 250px;
+            overflow: hidden;
+            background: #000;
+        }
+
+        .imagen-content {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .imagen-card:hover .imagen-content {
+            transform: scale(1.1);
+        }
+
+        .imagen-descripcion {
+            padding: 1rem;
+            font-size: 0.95rem;
+            color: #4E342E;
+            line-height: 1.6;
+        }
+
+        /* Video wrapper */
+        .video-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 900px;
+            margin: 2rem auto;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 
+                0 10px 0 #8D6E63,
+                0 10px 40px rgba(0, 0, 0, 0.5);
+            border: 5px solid #6D4C41;
+        }
+
+        .video-wrapper::before {
+            content: '▶ GAMEPLAY';
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(255, 87, 34, 0.9);
+            color: #fff;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-shadow: 2px 2px 0 #BF360C;
+            z-index: 2;
+            box-shadow: 0 4px 0 #BF360C;
+        }
+
+        video {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        /* Botón estilo PvZ */
+        .btn-volver {
+            display: inline-block;
+            background: linear-gradient(180deg, #8BC34A 0%, #689F38 100%);
+            color: #fff;
+            padding: 1.2rem 3rem;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.3rem;
+            text-transform: uppercase;
+            box-shadow: 
+                0 6px 0 #33691E,
+                0 6px 20px rgba(0, 0, 0, 0.4);
+            transition: all 0.2s ease;
+            margin: 2rem 0;
+            text-shadow: 2px 2px 0 #33691E;
+            border: 3px solid #7CB342;
+        }
+
+        .btn-volver:hover {
+            transform: translateY(-4px);
+            box-shadow: 
+                0 10px 0 #33691E,
+                0 10px 30px rgba(76, 175, 80, 0.6);
+        }
+
+        .btn-volver:active {
+            transform: translateY(2px);
+            box-shadow: 
+                0 2px 0 #33691E,
+                0 2px 10px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Lista de pasos */
+        .pasos-lista {
+            list-style: none;
+            padding: 0;
+            margin: 2rem 0;
+        }
+
+        .pasos-lista li {
+            background: linear-gradient(90deg, rgba(76, 175, 80, 0.1) 0%, transparent 100%);
+            padding: 1rem 1.5rem;
+            margin: 1rem 0;
+            border-left: 5px solid #4CAF50;
+            border-radius: 10px;
+            font-size: 1.05rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .pasos-lista li:hover {
+            background: linear-gradient(90deg, rgba(76, 175, 80, 0.2) 0%, rgba(255, 235, 59, 0.1) 100%);
+            transform: translateX(10px);
+            border-left-color: #FFEB3B;
+        }
+
+        .pasos-lista li strong {
+            color: #2E7D32;
+            font-size: 1.15rem;
+        }
+
+        /* Footer */
+        .footer {
+            background: linear-gradient(180deg, #558B2F 0%, #33691E 100%);
+            color: #fff;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 4rem;
+            border-top: 6px solid #1B5E20;
+            box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .footer-text {
+            font-size: 1.2rem;
+            font-weight: 700;
+            text-shadow: 2px 2px 0 #1B5E20;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Badge de tecnología */
+        .tech-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #FF9800, #F57C00);
+            color: #fff;
+            padding: 0.5rem 1.5rem;
+            border-radius: 20px;
+            font-weight: 700;
+            margin: 0.5rem;
+            box-shadow: 
+                0 4px 0 #E65100,
+                0 4px 10px rgba(0, 0, 0, 0.3);
+            text-shadow: 1px 1px 0 #BF360C;
+            border: 2px solid #FFB74D;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .imagenes-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .seccion {
+                padding: 1.5rem;
+            }
+
+            .imagen-wrapper {
+                height: 200px;
+            }
+        }
+
+        /* Animación de entrada */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .seccion {
+            animation: fadeInUp 0.6s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <h1 class="titulo-principal">🌱 MAQUETA PLANTS VS ZOMBIES 🧟</h1>
+        <p class="subtitulo">Proyecto Final con Arduino</p>
+    </header>
+
+    <!-- Contenido principal -->
+    <main class="contenido">
+        <center>
+            <a href="index.html" class="btn-volver">⬅ Volver al Inicio</a>
+        </center>
+
+        <!-- Sección: Introducción -->
+        <section class="seccion">
+            <h2 class="seccion-titulo">🎮 Descripción del Proyecto</h2>
+            <p class="seccion-texto">
+                Este proyecto representa una maqueta interactiva del icónico videojuego <strong>Plants vs Zombies</strong>, 
+                desarrollada con tecnología Arduino. La maqueta recrea fielmente el campo de batalla del juego, 
+                incorporando iluminación LED controlada por fotoresistencias (LDR), que simula el ciclo día-noche 
+                característico del juego original de PopCap.
+            </p>
+            <div style="text-align: center; margin-top: 1.5rem;">
+                <span class="tech-badge">🔌 Arduino UNO</span>
+                <span class="tech-badge">💡 LEDs RGB</span>
+                <span class="tech-badge">📡 Fotoresistencias</span>
+                <span class="tech-badge">🎨 Diseño 3D</span>
+            </div>
+        </section>
+
+        <!-- Sección: Resultado Final -->
+        <section class="seccion">
+            <h2 class="seccion-titulo">🎬 Resultado Final - Gameplay</h2>
+            <p class="seccion-texto">
+                Observa la maqueta completa en funcionamiento, mostrando todos los efectos de iluminación y 
+                el sistema de control automático con fotoresistencias.
+            </p>
+            <div class="video-wrapper">
+                <video controls>
+                    <source src="/mnt/user-data/uploads/Gameplay.mp4" type="video/mp4">
+                    Tu navegador no soporta videos HTML5.
+                </video>
+            </div>
+        </section>
+
+        <!-- Sección: Proceso de Elaboración -->
+        <section class="seccion">
+            <h2 class="seccion-titulo">🔨 Proceso de Elaboración</h2>
+            <p class="seccion-texto">
+                La construcción de esta maqueta involucró múltiples etapas, desde el diseño inicial hasta 
+                el ensamblaje final con todos los componentes electrónicos. A continuación se muestra el 
+                proceso completo paso a paso:
+            </p>
+            <ul class="pasos-lista">
+                <li><strong>Paso 1 - Diseño y Planificación:</strong> Boceto inicial del campo de batalla con ubicación de LEDs y componentes</li>
+                <li><strong>Paso 2 - Construcción de la Base:</strong> Elaboración de la estructura de madera con dimensiones del tablero del juego</li>
+                <li><strong>Paso 3 - Creación de Personajes:</strong> Diseño y construcción de plantas y zombis en materiales diversos</li>
+                <li><strong>Paso 4 - Sistema Eléctrico:</strong> Instalación de LEDs, resistencias y fotoresistencias</li>
+                <li><strong>Paso 5 - Programación Arduino:</strong> Código para control automático de iluminación según luz ambiental</li>
+                <li><strong>Paso 6 - Decoración y Detalles:</strong> Pintura, pasto sintético, casa y zombis con efectos especiales</li>
+            </ul>
+        </section>
+
+        <!-- Sección: Imágenes del Proceso -->
+        <section class="seccion">
+            <h2 class="seccion-titulo">📸 Galería del Proceso</h2>
+            
+            <div class="imagenes-grid">
+                <div class="imagen-card">
+                    <div class="imagen-titulo">Boceto Inicial</div>
+                    <div class="imagen-wrapper">
+                        <img src="/mnt/user-data/uploads/Boceto.jpeg" alt="Boceto del proyecto" class="imagen-content">
+                    </div>
+                    <div class="imagen-descripcion">
+                        Diseño en papel con la distribución del campo de batalla, posiciones de plantas, zombis y ubicación de los LEDs.
+                    </div>
+                </div>
+
+                <div class="imagen-card">
+                    <div class="imagen-titulo">Sistema de Cableado</div>
+                    <div class="imagen-wrapper">
+                        <img src="/mnt/user-data/uploads/Cableado.jpeg" alt="Cableado eléctrico" class="imagen-content">
+                    </div>
+                    <div class="imagen-descripcion">
+                        Vista del cableado completo en la parte trasera de la maqueta, mostrando todas las conexiones de LEDs y resistencias.
+                    </div>
+                </div>
+
+                <div class="imagen-card">
+                    <div class="imagen-titulo">Aplicación de Pasto</div>
+                    <div class="imagen-wrapper">
+                        <img src="/mnt/user-data/uploads/Pasto.jpeg" alt="Pasto sintético" class="imagen-content">
+                    </div>
+                    <div class="imagen-descripcion">
+                        Proceso de aplicación del pasto sintético que simula el jardín característico del juego Plants vs Zombies.
+                    </div>
+                </div>
+
+                <div class="imagen-card">
+                    <div class="imagen-titulo">Lanzaguisantes con LED</div>
+                    <div class="imagen-wrapper">
+                        <img src="/mnt/user-data/uploads/Guisante_B.jpeg" alt="Lanzaguisantes blanco" class="imagen-content">
+                    </div>
+                    <div class="imagen-descripcion">
+                        Detalle del lanzaguisantes con LED blanco integrado, mostrando el efecto de disparo de guisantes.
+                    </div>
+                </div>
+
+                <div class="imagen-card">
+                    <div class="imagen-titulo">Lanzaguisantes Verde</div>
+                    <div class="imagen-wrapper">
+                        <img src="/mnt/user-data/uploads/WhatsApp_Image_2026-04-13_at_3_03_49_PM__1_.jpeg" alt="Lanzaguisantes verde" class="imagen-content">
+                    </div>
+                    <div class="imagen-descripcion">
+                        Lanzaguisantes con LED verde, recreando fielmente el personaje icónico del juego con iluminación.
+                    </div>
+                </div>
+
+                <div class="imagen-card">
+                    <div class="imagen-titulo">Girasoles</div>
+                    <div class="imagen-wrapper">
+                        <img src="/mnt/user-data/uploads/Guisantes.jpeg" alt="Girasoles" class="imagen-content">
+                    </div>
+                    <div class="imagen-descripcion">
+                        Girasoles de cartón con LEDs amarillos integrados, representando a las plantas generadoras de soles.
+                    </div>
+                </div>
+
+                <div class="imagen-card">
+                    <div class="imagen-titulo">LED del Guisante</div>
+                    <div class="imagen-wrapper">
+                        <img src="/mnt/user-data/uploads/WhatsApp_Image_2026-04-13_at_3_03_48_PM__1_.jpeg" alt="LED guisante detalle" class="imagen-content">
+                    </div>
+                    <div class="imagen-descripcion">
+                        Acercamiento al LED integrado en el lanzaguisantes con su resistencia limitadora de corriente.
+                    </div>
+                </div>
+
+                <div class="imagen-card">
+                    <div class="imagen-titulo">Maqueta Completa Luz</div>
+                    <div class="imagen-wrapper">
+                        <img src="/mnt/user-data/uploads/Maqueta_completa.jpeg" alt="Maqueta completa con luz" class="imagen-content">
+                    </div>
+                    <div class="imagen-descripcion">
+                        Vista general de la maqueta completa con todos los elementos: casa, plantas, zombis y decoración.
+                    </div>
+                </div>
+
+                <div class="imagen-card">
+                    <div class="imagen-titulo">Todo Encendido</div>
+                    <div class="imagen-wrapper">
+                        <img src="/mnt/user-data/uploads/Todo_Encendido.jpeg" alt="Todos los LEDs encendidos" class="imagen-content">
+                    </div>
+                    <div class="imagen-descripcion">
+                        Maqueta con todos los LEDs encendidos mostrando el efecto completo de iluminación en modo nocturno.
+                    </div>
+                </div>
+
+                <div class="imagen-card">
+                    <div class="imagen-titulo">Vista Nocturna Mejorada</div>
+                    <div class="imagen-wrapper">
+                        <img src="/mnt/user-data/uploads/Todo_encendido_mejor_vision.jpeg" alt="Mejor visión nocturna" class="imagen-content">
+                    </div>
+                    <div class="imagen-descripcion">
+                        Detalle de la iluminación nocturna con mejor contraste, mostrando el brillo de plantas y zombis.
+                    </div>
+                </div>
+
+                <div class="imagen-card">
+                    <div class="imagen-titulo">Presentación Final</div>
+                    <div class="imagen-wrapper">
+                        <img src="/mnt/user-data/uploads/Complete_PVZ.jpeg" alt="Maqueta final completa" class="imagen-content">
+                    </div>
+                    <div class="imagen-descripcion">
+                        Presentación final con pantalla de fondo mostrando el logo de Plants vs Zombies y toda la iluminación activada.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sección: Control con Fotoresistencias -->
+        <section class="seccion">
+            <h2 class="seccion-titulo">💡 Práctica de Control de LEDs con Fotoresistencia</h2>
+            <p class="seccion-texto">
+                El sistema de control automático utiliza <strong>fotoresistencias (LDR)</strong> para detectar 
+                los niveles de luz ambiental. Cuando la fotoresistencia detecta oscuridad (nivel bajo de luz), 
+                el Arduino activa automáticamente todos los LEDs de la maqueta, simulando el modo nocturno del juego.
+            </p>
+            
+            <h3 style="color: #2E7D32; font-size: 1.5rem; margin: 2rem 0 1rem;">⚙️ Funcionamiento del Sistema:</h3>
+            <ul class="pasos-lista">
+                <li><strong>Fotoresistencia LDR:</strong> Sensor que varía su resistencia según la cantidad de luz que recibe</li>
+                <li><strong>Entrada Analógica:</strong> Arduino lee el valor de la fotoresistencia (0-1023)</li>
+                <li><strong>Umbral de Activación:</strong> Si el valor es menor al umbral programado, se considera "noche"</li>
+                <li><strong>Control de LEDs:</strong> En modo nocturno, todos los LEDs se encienden automáticamente</li>
+                <li><strong>Efecto Dinámico:</strong> Los LEDs RGB cambian de color simulando diferentes estados del juego</li>
+            </ul>
+
+            <p class="seccion-texto" style="margin-top: 2rem;">
+                Esta implementación demuestra el concepto de <strong>entrada analógica y salida digital</strong> 
+                en Arduino, una de las aplicaciones fundamentales en proyectos de automatización e IoT. 
+                El sistema responde en tiempo real a los cambios de iluminación del ambiente, creando 
+                una experiencia interactiva y autónoma.
+            </p>
+        </section>
+
+        <center>
+            <a href="index.html" class="btn-volver">⬅ Volver al Inicio</a>
+        </center>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p class="footer-text">🌻 Plants vs Zombies - Proyecto Final Arduino 🧟</p>
+        <p>Principios de Electrónica - Maqueta Interactiva</p>
+    </footer>
+
+    <script>
+        // Animación de entrada para las cards
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.imagen-card').forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(30px)';
+            card.style.transition = `all 0.6s ease ${index * 0.1}s`;
+            observer.observe(card);
+        });
+    </script>
+</body>
+</html>
