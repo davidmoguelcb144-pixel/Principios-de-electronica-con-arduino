@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Práctica LED RGB - Electrónica Digital</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+            color: #e2e8f0;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Circuit Pattern Background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                repeating-linear-gradient(0deg, transparent, transparent 50px, rgba(59, 130, 246, 0.03) 50px, rgba(59, 130, 246, 0.03) 51px),
+                repeating-linear-gradient(90deg, transparent, transparent 50px, rgba(59, 130, 246, 0.03) 50px, rgba(59, 130, 246, 0.03) 51px);
+            opacity: 0.5;
+            z-index: 0;
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Header */
+        .header {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(59, 130, 246, 0.3);
+            border-radius: 20px;
+            padding: 3rem 2rem;
+            margin-bottom: 3rem;
+            box-shadow: 0 0 40px rgba(59, 130, 246, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .back-link {
+            color: #60a5fa;
+            text-decoration: none;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .back-link:hover {
+            background: rgba(59, 130, 246, 0.2);
+            transform: translateX(-5px);
+        }
+
+        .header h1 {
+            font-size: clamp(2rem, 6vw, 3.5rem);
+            font-weight: 700;
+            background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+        }
+
+        .header .subtitle {
+            font-size: clamp(1rem, 2vw, 1.2rem);
+            color: #94a3b8;
+        }
+
+        .author {
+            margin-top: 1rem;
+            font-size: 0.95rem;
+            color: #60a5fa;
+            font-weight: 500;
+        }
+
+        /* Circuit Diagram Section */
+        .circuit-section {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(59, 130, 246, 0.3);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .section-title {
+            font-size: clamp(1.5rem, 4vw, 2rem);
+            color: #ffffff;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .section-title::before {
+            content: '';
+            width: 4px;
+            height: 2rem;
+            background: linear-gradient(180deg, #60a5fa 0%, #a78bfa 100%);
+            border-radius: 2px;
+        }
+
+        .circuit-images {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .circuit-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 2px solid rgba(59, 130, 246, 0.2);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .circuit-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(59, 130, 246, 0.5);
+            box-shadow: 0 10px 40px rgba(59, 130, 246, 0.2);
+        }
+
+        .circuit-card img {
+            width: 100%;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+        }
+
+        .circuit-card h3 {
+            color: #60a5fa;
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .circuit-card p {
+            color: #cbd5e1;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        /* Explanation Section */
+        .explanation-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .explanation-card {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(167, 139, 250, 0.1) 100%);
+            border: 2px solid rgba(59, 130, 246, 0.3);
+            border-radius: 16px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .explanation-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #60a5fa 0%, #a78bfa 100%);
+        }
+
+        .explanation-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 40px rgba(59, 130, 246, 0.3);
+            border-color: rgba(59, 130, 246, 0.6);
+        }
+
+        .card-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .card-title {
+            font-size: 1.3rem;
+            color: #60a5fa;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .card-text {
+            color: #cbd5e1;
+            line-height: 1.7;
+            font-size: 0.95rem;
+        }
+
+        /* Components List */
+        .components-list {
+            background: rgba(30, 58, 138, 0.2);
+            border: 2px solid rgba(59, 130, 246, 0.3);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+
+        .component-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: rgba(59, 130, 246, 0.05);
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .component-item:hover {
+            background: rgba(59, 130, 246, 0.15);
+            transform: translateX(10px);
+        }
+
+        .component-icon {
+            font-size: 2rem;
+            min-width: 50px;
+            text-align: center;
+        }
+
+        .component-info h4 {
+            color: #60a5fa;
+            font-size: 1.1rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .component-info p {
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+
+        /* Technical Specs */
+        .specs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .spec-box {
+            background: rgba(59, 130, 246, 0.1);
+            border: 2px solid rgba(59, 130, 246, 0.3);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .spec-box:hover {
+            background: rgba(59, 130, 246, 0.2);
+            transform: scale(1.05);
+        }
+
+        .spec-value {
+            font-size: 2rem;
+            color: #60a5fa;
+            font-weight: 700;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .spec-label {
+            color: #cbd5e1;
+            font-size: 0.9rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .header {
+                padding: 2rem 1.5rem;
+            }
+
+            .circuit-section {
+                padding: 1.5rem;
+            }
+
+            .circuit-images {
+                grid-template-columns: 1fr;
+            }
+
+            .explanation-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .specs-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <a href="index.html" class="back-link">
+                    <span>←</span> Volver al catálogo
+                </a>
+                <h1>⚡ Práctica LED RGB</h1>
+                <p class="subtitle">Control de Iluminación con Microcontrolador A6</p>
+                <p class="author">Por: Valeria Michell Velasco Maza</p>
+            </div>
+        </header>
+
+        <!-- Circuit Diagrams -->
+        <section class="circuit-section">
+            <h2 class="section-title">Diagrama del Circuito</h2>
+            <div class="circuit-images">
+                <div class="circuit-card">
+                    <img src="circuit1.jpg" alt="Configuración 1 LED RGB">
+                    <h3>Configuración 1</h3>
+                    <p>LED RGB con resistencias conectadas al microcontrolador A6. Configuración básica para control de colores.</p>
+                </div>
+                <div class="circuit-card">
+                    <img src="circuit2.jpg" alt="Configuración 2 LED RGB">
+                    <h3>Configuración 2</h3>
+                    <p>Variante del circuito con distribución optimizada de componentes en la protoboard.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- How it Works -->
+        <section class="circuit-section">
+            <h2 class="section-title">¿Por Qué Funciona?</h2>
+            <div class="explanation-grid">
+                <div class="explanation-card">
+                    <span class="card-icon">🔴</span>
+                    <h3 class="card-title">Teoría de Color RGB</h3>
+                    <p class="card-text">
+                        El LED RGB contiene tres diodos emisores de luz: Rojo (Red), Verde (Green) y Azul (Blue). 
+                        Al combinar estos tres colores primarios en diferentes intensidades, podemos crear millones de colores diferentes.
+                    </p>
+                </div>
+
+                <div class="explanation-card">
+                    <span class="card-icon">⚡</span>
+                    <h3 class="card-title">Control PWM</h3>
+                    <p class="card-text">
+                        El microcontrolador A6 utiliza modulación por ancho de pulso (PWM) para controlar la intensidad de cada color. 
+                        Variando el ciclo de trabajo entre 0% y 100%, regulamos el brillo de cada LED interno.
+                    </p>
+                </div>
+
+                <div class="explanation-card">
+                    <span class="card-icon">🔌</span>
+                    <h3 class="card-title">Resistencias Limitadoras</h3>
+                    <p class="card-text">
+                        Las resistencias (código de colores: naranja-naranja-café) protegen cada LED limitando la corriente. 
+                        Sin ellas, el exceso de corriente destruiría los diodos. Calculamos su valor usando la Ley de Ohm.
+                    </p>
+                </div>
+
+                <div class="explanation-card">
+                    <span class="card-icon">🔄</span>
+                    <h3 class="card-title">Cátodo Común</h3>
+                    <p class="card-text">
+                        Este LED RGB tiene configuración de cátodo común (pin central a tierra). 
+                        Los pines externos se conectan a las salidas digitales del microcontrolador a través de las resistencias, 
+                        permitiendo controlar cada color independientemente.
+                    </p>
+                </div>
+
+                <div class="explanation-card">
+                    <span class="card-icon">💾</span>
+                    <h3 class="card-title">Programación Digital</h3>
+                    <p class="card-text">
+                        El código cargado en el A6 define secuencias de colores mediante valores digitales (0-255) para cada canal RGB. 
+                        Esta señal digital se convierte en una señal analógica mediante PWM.
+                    </p>
+                </div>
+
+                <div class="explanation-card">
+                    <span class="card-icon">🌈</span>
+                    <h3 class="card-title">Mezcla Aditiva</h3>
+                    <p class="card-text">
+                        A diferencia de la mezcla de pinturas, la luz sigue el modelo aditivo: 
+                        Rojo + Verde = Amarillo, Verde + Azul = Cian, Rojo + Azul = Magenta, 
+                        y los tres juntos crean blanco.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Components -->
+        <section class="circuit-section">
+            <h2 class="section-title">Componentes Utilizados</h2>
+            <div class="components-list">
+                <div class="component-item">
+                    <span class="component-icon">🎛️</span>
+                    <div class="component-info">
+                        <h4>Microcontrolador A6</h4>
+                        <p>Cerebro del circuito, genera señales PWM para controlar el LED RGB</p>
+                    </div>
+                </div>
+
+                <div class="component-item">
+                    <span class="component-icon">💡</span>
+                    <div class="component-info">
+                        <h4>LED RGB Cátodo Común</h4>
+                        <p>Componente emisor de luz con tres colores integrados (Rojo, Verde, Azul)</p>
+                    </div>
+                </div>
+
+                <div class="component-item">
+                    <span class="component-icon">📊</span>
+                    <div class="component-info">
+                        <h4>Resistencias 330Ω</h4>
+                        <p>Tres resistencias (naranja-naranja-café) para limitar corriente en cada canal</p>
+                    </div>
+                </div>
+
+                <div class="component-item">
+                    <span class="component-icon">🔲</span>
+                    <div class="component-info">
+                        <h4>Protoboard</h4>
+                        <p>Placa de pruebas para ensamblar el circuito sin soldadura</p>
+                    </div>
+                </div>
+
+                <div class="component-item">
+                    <span class="component-icon">🔗</span>
+                    <div class="component-info">
+                        <h4>Cables Jumper</h4>
+                        <p>Cables de conexión: rojos (positivo), negro (tierra), azul y amarillo (señales)</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Technical Specs -->
+        <section class="circuit-section">
+            <h2 class="section-title">Especificaciones Técnicas</h2>
+            <div class="specs-grid">
+                <div class="spec-box">
+                    <span class="spec-value">3.3V</span>
+                    <span class="spec-label">Voltaje de Operación</span>
+                </div>
+                <div class="spec-box">
+                    <span class="spec-value">330Ω</span>
+                    <span class="spec-label">Resistencia Limitadora</span>
+                </div>
+                <div class="spec-box">
+                    <span class="spec-value">~10mA</span>
+                    <span class="spec-label">Corriente por LED</span>
+                </div>
+                <div class="spec-box">
+                    <span class="spec-value">PWM</span>
+                    <span class="spec-label">Tipo de Control</span>
+                </div>
+                <div class="spec-box">
+                    <span class="spec-value">16.7M</span>
+                    <span class="spec-label">Colores Posibles</span>
+                </div>
+                <div class="spec-box">
+                    <span class="spec-value">3</span>
+                    <span class="spec-label">Canales de Color</span>
+                </div>
+            </div>
+        </section>
+    </div>
+</body>
+</html>
