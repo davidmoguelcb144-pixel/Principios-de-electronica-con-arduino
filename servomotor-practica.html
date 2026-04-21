@@ -702,7 +702,7 @@
                             eléctricas del sistema.
                         </p>
                         <div class="paso-imagen">
-                            <img src="/mnt/user-data/uploads/Cable_Cafe_Serv.jpg" alt="Cable café GND">
+                            <img src="Cable_Cafe_Serv.jpg" alt="Cable café GND">
                         </div>
                     </div>
                 </div>
@@ -719,7 +719,7 @@
                             máxima del SG90 es de aproximadamente 500mA en movimiento.
                         </p>
                         <div class="paso-imagen">
-                            <img src="/mnt/user-data/uploads/Cable_Rojo_Serv.jpg" alt="Cable rojo 5V">
+                            <img src="Cable_Rojo_Serv.jpg" alt="Cable rojo 5V">
                         </div>
                     </div>
                 </div>
@@ -737,7 +737,7 @@
                             de 1-2ms de duración.
                         </p>
                         <div class="paso-imagen">
-                            <img src="/mnt/user-data/uploads/Cable_Naranja_Serv.jpg" alt="Cable naranja PWM">
+                            <img src="Cable_Naranja_Serv.jpg" alt="Cable naranja PWM">
                         </div>
                     </div>
                 </div>
@@ -757,8 +757,7 @@
                 <div class="video-wrapper">
                     <div class="video-badge">▶ FUNCIONAMIENTO</div>
                     <video controls>
-                        <source src="/mnt/user-data/uploads/Funcionamiento_Serv.mp4" type="video/mp4">
-                        Tu navegador no soporta videos HTML5.
+                        <source src="Funcionamiento_Serv.mp4" type="video/mp4">
                     </video>
                 </div>
             </div>
@@ -812,6 +811,42 @@
                         necesaria tanto para el circuito de control como para el motor. La corriente puede variar 
                         entre 100mA (en reposo) hasta 500-800mA (bajo carga máxima). Para aplicaciones con múltiples 
                         servos o cargas pesadas, se recomienda usar una fuente de alimentación externa.
+                    </li>
+                    <li>
+                        <strong>Codigo usado:</strong>
+                            // C++ code
+                            //usamos librería para servo
+                            #include <Servo.h>
+                            
+                            Servo grados;
+                            //declaración de variables
+                            int pinservo=9;	//pin para comunicar el servo
+                            //definimos las posiciones
+                            int pos1=0;//0 grados
+                            int pos2=90;//90 grados
+                            int pos3=180;//180 grados
+                            int posicion=0;//posicion inicial
+                            
+                            void setup()
+                            {
+                              //conectando el servo
+                              grados.attach(pinservo);//indicamos en que pin se conecta
+                            }
+                            
+                            void loop()
+                            {
+                              posicion=pos1;//0 grados
+                              grados.write(posicion);//ajustamos la posicion indicada
+                              delay(2000); //pausa antes del siguiente movimiento
+                              
+                              posicion=pos2;
+                              grados.write(posicion);
+                              delay(2000);
+                              
+                              posicion=pos3;
+                              grados.write(posicion);
+                              delay(2000);
+                            }
                     </li>
                 </ul>
             </div>
