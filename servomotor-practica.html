@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Servomotor - Práctica</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;600;700&family=Exo+2:wght@300;500;700;900&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Exo 2', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: #e8e8e8;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Patrón de fondo técnico */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(220, 38, 38, 0.03) 2px, rgba(220, 38, 38, 0.03) 4px),
+                repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(37, 99, 235, 0.03) 2px, rgba(37, 99, 235, 0.03) 4px);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Gradientes animados de fondo */
+        .bg-gradient {
+            position: fixed;
+            width: 500px;
+            height: 500px;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.15;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .gradient-1 {
+            top: -200px;
+            left: -200px;
+            background: radial-gradient(circle, #dc2626, transparent);
+            animation: float 15s ease-in-out infinite;
+        }
+
+        .gradient-2 {
+            bottom: -200px;
+            right: -200px;
+            background: radial-gradient(circle, #2563eb, transparent);
+            animation: float 20s ease-in-out infinite reverse;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(100px, 100px); }
+        }
+
+        /* Header dinámico */
+        .header {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 50%, #991b1b 100%);
+            padding: 3rem 2rem;
+            text-align: center;
+            position: relative;
+            z-index: 10;
+            border-bottom: 4px solid #f87171;
+            box-shadow: 
+                0 10px 40px rgba(220, 38, 38, 0.4),
+                inset 0 -1px 0 rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 200%;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                rgba(255, 255, 255, 0.1) 50%, 
+                transparent 100%);
+            animation: shine 3s ease-in-out infinite;
+        }
+
+        @keyframes shine {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        /* Decoración geométrica */
+        .header-deco {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            border: 3px solid rgba(248, 113, 113, 0.5);
+            transform: rotate(45deg);
+        }
+
+        .deco-tl {
+            top: -50px;
+            left: 50px;
+        }
+
+        .deco-tr {
+            top: -50px;
+            right: 50px;
+        }
+
+        .titulo-principal {
+            font-family: 'Exo 2', sans-serif;
+            font-size: clamp(2.5rem, 7vw, 5rem);
+            font-weight: 900;
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 6px;
+            text-shadow: 
+                0 0 30px rgba(220, 38, 38, 0.8),
+                0 4px 6px rgba(0, 0, 0, 0.4),
+                0 8px 20px rgba(0, 0, 0, 0.3);
+            margin: 0;
+            position: relative;
+            z-index: 2;
+        }
+
+        .subtitulo {
+            font-family: 'Roboto Mono', monospace;
+            font-size: clamp(1rem, 2.5vw, 1.4rem);
+            color: #fecaca;
+            margin-top: 1rem;
+            letter-spacing: 4px;
+            text-shadow: 0 2px 10px rgba(254, 202, 202, 0.5);
+        }
+
+        /* Contenedor principal */
+        .contenido {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Sección */
+        .seccion {
+            background: linear-gradient(135deg, 
+                rgba(30, 41, 59, 0.8) 0%, 
+                rgba(15, 23, 42, 0.9) 100%);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(220, 38, 38, 0.3);
+            border-radius: 20px;
+            padding: 3rem;
+            margin: 3rem 0;
+            box-shadow: 
+                0 10px 40px rgba(0, 0, 0, 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .seccion::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, #dc2626, #2563eb, #dc2626);
+            background-size: 200% 100%;
+            animation: gradientSlide 3s linear infinite;
+        }
+
+        @keyframes gradientSlide {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 200% 0%; }
+        }
+
+        .seccion-titulo {
+            font-family: 'Exo 2', sans-serif;
+            font-size: clamp(1.8rem, 4vw, 3rem);
+            font-weight: 900;
+            background: linear-gradient(135deg, #dc2626, #2563eb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 2rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            position: relative;
+            padding-bottom: 1rem;
+        }
+
+        .seccion-titulo::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100px;
+            height: 4px;
+            background: linear-gradient(90deg, #dc2626, #2563eb);
+            border-radius: 2px;
+        }
+
+        .seccion-texto {
+            font-size: 1.15rem;
+            line-height: 1.9;
+            color: #cbd5e1;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Paso a paso */
+        .paso-container {
+            margin: 2rem 0;
+        }
+
+        .paso-item {
+            display: grid;
+            grid-template-columns: 80px 1fr;
+            gap: 2rem;
+            margin: 3rem 0;
+            align-items: start;
+        }
+
+        .paso-numero {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #dc2626, #991b1b);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Exo 2', sans-serif;
+            font-size: 2rem;
+            font-weight: 900;
+            color: #fff;
+            box-shadow: 
+                0 8px 20px rgba(220, 38, 38, 0.4),
+                inset 0 2px 0 rgba(255, 255, 255, 0.2);
+            border: 3px solid #f87171;
+            position: relative;
+        }
+
+        .paso-numero::before {
+            content: '';
+            position: absolute;
+            top: -3px;
+            left: -3px;
+            right: -3px;
+            bottom: -3px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #dc2626, #2563eb);
+            z-index: -1;
+            filter: blur(10px);
+            opacity: 0.5;
+        }
+
+        .paso-contenido {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(37, 99, 235, 0.3);
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .paso-titulo {
+            font-family: 'Exo 2', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #60a5fa;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 10px rgba(96, 165, 250, 0.3);
+        }
+
+        .paso-descripcion {
+            font-size: 1.05rem;
+            line-height: 1.8;
+            color: #cbd5e1;
+            margin-bottom: 1.5rem;
+        }
+
+        .paso-imagen {
+            width: 100%;
+            height: 350px;
+            overflow: hidden;
+            border-radius: 12px;
+            border: 2px solid rgba(220, 38, 38, 0.3);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+            margin-top: 1rem;
+        }
+
+        .paso-imagen img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+
+        .paso-item:hover .paso-imagen img {
+            transform: scale(1.05);
+        }
+
+        /* Video resultado */
+        .video-resultado {
+            background: linear-gradient(135deg, rgba(220, 38, 38, 0.1), rgba(37, 99, 235, 0.1));
+            border: 3px solid;
+            border-image: linear-gradient(135deg, #dc2626, #2563eb) 1;
+            border-radius: 20px;
+            padding: 2rem;
+            margin: 3rem 0;
+            box-shadow: 
+                0 15px 50px rgba(0, 0, 0, 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        .video-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 900px;
+            margin: 2rem auto 0;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+            border: 3px solid rgba(248, 113, 113, 0.5);
+        }
+
+        .video-badge {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: linear-gradient(135deg, #dc2626, #991b1b);
+            color: #fff;
+            padding: 0.8rem 1.5rem;
+            border-radius: 25px;
+            font-family: 'Roboto Mono', monospace;
+            font-weight: 700;
+            font-size: 0.9rem;
+            letter-spacing: 2px;
+            z-index: 2;
+            box-shadow: 
+                0 5px 15px rgba(220, 38, 38, 0.6),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            border: 2px solid #f87171;
+        }
+
+        video {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        /* Lista de materiales */
+        .materiales-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .material-item {
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.1), rgba(220, 38, 38, 0.1));
+            border: 2px solid rgba(96, 165, 250, 0.3);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .material-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(220, 38, 38, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .material-item:hover {
+            border-color: #dc2626;
+            box-shadow: 
+                0 10px 30px rgba(220, 38, 38, 0.3),
+                0 0 40px rgba(37, 99, 235, 0.2);
+            transform: translateY(-5px);
+        }
+
+        .material-item:hover::before {
+            left: 100%;
+        }
+
+        .material-icono {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .material-nombre {
+            font-family: 'Exo 2', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #f87171;
+            margin-bottom: 0.5rem;
+        }
+
+        .material-descripcion {
+            font-size: 0.95rem;
+            color: #94a3b8;
+            line-height: 1.6;
+        }
+
+        /* Explicación técnica */
+        .explicacion-box {
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(30, 41, 59, 0.8));
+            border-left: 5px solid #dc2626;
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .explicacion-titulo {
+            font-family: 'Exo 2', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #60a5fa;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .explicacion-lista {
+            list-style: none;
+            padding: 0;
+        }
+
+        .explicacion-lista li {
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(96, 165, 250, 0.1);
+            font-size: 1.05rem;
+            line-height: 1.8;
+            color: #cbd5e1;
+        }
+
+        .explicacion-lista li:last-child {
+            border-bottom: none;
+        }
+
+        .explicacion-lista li strong {
+            color: #f87171;
+            font-weight: 700;
+        }
+
+        /* Diagrama especial */
+        .diagrama-card {
+            background: rgba(0, 0, 0, 0.4);
+            border: 2px solid rgba(37, 99, 235, 0.5);
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 2rem 0;
+            box-shadow: 
+                0 10px 35px rgba(0, 0, 0, 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        }
+
+        .diagrama-titulo {
+            font-family: 'Exo 2', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #60a5fa;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            text-shadow: 0 0 15px rgba(96, 165, 250, 0.5);
+        }
+
+        .diagrama-imagen {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            display: block;
+            border-radius: 10px;
+            box-shadow: 0 8px 30px rgba(37, 99, 235, 0.3);
+        }
+
+        /* Botón */
+        .btn-volver {
+            display: inline-block;
+            background: linear-gradient(135deg, #dc2626, #991b1b);
+            color: #fff;
+            padding: 1.2rem 3rem;
+            border: 3px solid #f87171;
+            border-radius: 50px;
+            text-decoration: none;
+            font-family: 'Exo 2', sans-serif;
+            font-weight: 700;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            transition: all 0.3s ease;
+            margin: 2rem 0;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 
+                0 8px 25px rgba(220, 38, 38, 0.5),
+                inset 0 2px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-volver::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn-volver:hover {
+            transform: translateY(-3px);
+            border-color: #2563eb;
+            box-shadow: 
+                0 12px 35px rgba(220, 38, 38, 0.6),
+                0 0 50px rgba(37, 99, 235, 0.4),
+                inset 0 2px 0 rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-volver:hover::before {
+            left: 100%;
+        }
+
+        /* Footer */
+        .footer {
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            color: #94a3b8;
+            text-align: center;
+            padding: 2.5rem;
+            margin-top: 5rem;
+            border-top: 3px solid;
+            border-image: linear-gradient(90deg, #dc2626, #2563eb) 1;
+            position: relative;
+            z-index: 10;
+        }
+
+        .footer-text {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 1.1rem;
+            color: #f87171;
+            letter-spacing: 2px;
+            text-shadow: 0 0 15px rgba(248, 113, 113, 0.3);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .paso-item {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .paso-numero {
+                width: 60px;
+                height: 60px;
+                font-size: 1.5rem;
+                margin: 0 auto;
+            }
+
+            .materiales-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .seccion {
+                padding: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Gradientes de fondo -->
+    <div class="bg-gradient gradient-1"></div>
+    <div class="bg-gradient gradient-2"></div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-deco deco-tl"></div>
+        <div class="header-deco deco-tr"></div>
+        <h1 class="titulo-principal">🔧 SERVOMOTOR 🔧</h1>
+        <p class="subtitulo">[ PRÁCTICA DE CONTROL DE POSICIÓN ]</p>
+    </header>
+
+    <!-- Contenido principal -->
+    <main class="contenido">
+        <center>
+            <a href="index.html" class="btn-volver">◄ VOLVER AL INICIO</a>
+        </center>
+
+        <!-- Sección: Introducción -->
+        <section class="seccion">
+            <h2 class="seccion-titulo">¿Qué es un Servomotor?</h2>
+            <p class="seccion-texto">
+                Un <strong>servomotor</strong> es un actuador rotativo que permite un control preciso de 
+                posición angular, velocidad y aceleración. A diferencia de los motores DC convencionales, 
+                los servomotores incorporan un sistema de retroalimentación que les permite mantener su 
+                posición con gran exactitud.
+            </p>
+            <p class="seccion-texto">
+                Los servomotores se utilizan ampliamente en robótica, automatización, sistemas de control 
+                y proyectos de electrónica por su capacidad de moverse a posiciones específicas con precisión 
+                y mantenerlas mediante un circuito de control interno.
+            </p>
+        </section>
+
+        <!-- Sección: Materiales -->
+        <section class="seccion">
+            <h2 class="seccion-titulo">Materiales Utilizados</h2>
+            <p class="seccion-texto">
+                Para realizar esta práctica de control de servomotor con Arduino, se requieren los siguientes 
+                componentes electrónicos:
+            </p>
+
+            <div class="materiales-grid">
+                <div class="material-item">
+                    <div class="material-icono">🔵</div>
+                    <div class="material-nombre">Arduino UNO</div>
+                    <div class="material-descripcion">
+                        Microcontrolador que genera las señales PWM necesarias para controlar el servomotor. 
+                        Proporciona alimentación de 5V y gestiona la comunicación.
+                    </div>
+                </div>
+
+                <div class="material-item">
+                    <div class="material-icono">⚙️</div>
+                    <div class="material-nombre">Servomotor SG90</div>
+                    <div class="material-descripcion">
+                        Servomotor de 180° con torque de 1.8 kg/cm. Incluye tres cables: rojo (alimentación), 
+                        café/negro (tierra), naranja/amarillo (señal de control).
+                    </div>
+                </div>
+
+                <div class="material-item">
+                    <div class="material-icono">🔌</div>
+                    <div class="material-nombre">Cable USB</div>
+                    <div class="material-descripcion">
+                        Cable USB tipo A a tipo B para conectar el Arduino al computador. Permite la 
+                        programación y suministra alimentación de 5V.
+                    </div>
+                </div>
+
+                <div class="material-item">
+                    <div class="material-icono">🔗</div>
+                    <div class="material-nombre">Cables Jumper</div>
+                    <div class="material-descripcion">
+                        Cables de conexión macho-hembra para conectar el servomotor directamente a los 
+                        pines del Arduino. Tres cables de colores según función.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sección: Diagrama -->
+        <section class="seccion">
+            <h2 class="seccion-titulo">Diagrama de Conexión</h2>
+            <div class="diagrama-card">
+                <div class="diagrama-titulo">Esquema Eléctrico Arduino + Servomotor</div>
+                <img src="/mnt/user-data/uploads/Servomotor_TINK.png" alt="Diagrama servomotor" class="diagrama-imagen">
+                <p class="seccion-texto" style="margin-top: 2rem; text-align: center;">
+                    <strong>Conexiones:</strong> Cable naranja → Pin digital PWM (~), 
+                    Cable rojo → 5V, Cable café → GND
+                </p>
+            </div>
+        </section>
+
+        <!-- Sección: Proceso Paso a Paso -->
+        <section class="seccion">
+            <h2 class="seccion-titulo">Proceso de Conexión Paso a Paso</h2>
+            <p class="seccion-texto">
+                A continuación se muestra el proceso detallado de conexión del servomotor al Arduino, 
+                identificando cada cable por su función específica.
+            </p>
+
+            <div class="paso-container">
+                <!-- Paso 1 -->
+                <div class="paso-item">
+                    <div class="paso-numero">1</div>
+                    <div class="paso-contenido">
+                        <h3 class="paso-titulo">Cable Café - Conexión a Tierra (GND)</h3>
+                        <p class="paso-descripcion">
+                            El cable <strong>café</strong> (o negro en algunos modelos) es la conexión a tierra (GND) 
+                            del servomotor. Este cable debe conectarse a cualquier pin GND del Arduino para cerrar 
+                            el circuito eléctrico. La tierra es el punto de referencia común para todas las señales 
+                            eléctricas del sistema.
+                        </p>
+                        <div class="paso-imagen">
+                            <img src="/mnt/user-data/uploads/Cable_Cafe_Serv.jpg" alt="Cable café GND">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Paso 2 -->
+                <div class="paso-item">
+                    <div class="paso-numero">2</div>
+                    <div class="paso-contenido">
+                        <h3 class="paso-titulo">Cable Rojo - Alimentación +5V</h3>
+                        <p class="paso-descripcion">
+                            El cable <strong>rojo</strong> corresponde a la alimentación positiva del servomotor. 
+                            Debe conectarse al pin de 5V del Arduino. Este voltaje alimenta tanto el circuito de 
+                            control interno del servo como el motor DC que genera el movimiento. La corriente 
+                            máxima del SG90 es de aproximadamente 500mA en movimiento.
+                        </p>
+                        <div class="paso-imagen">
+                            <img src="/mnt/user-data/uploads/Cable_Rojo_Serv.jpg" alt="Cable rojo 5V">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Paso 3 -->
+                <div class="paso-item">
+                    <div class="paso-numero">3</div>
+                    <div class="paso-contenido">
+                        <h3 class="paso-titulo">Cable Naranja - Señal PWM de Control</h3>
+                        <p class="paso-descripcion">
+                            El cable <strong>naranja</strong> (o amarillo/blanco) es la línea de señal de control. 
+                            Debe conectarse a un pin digital PWM del Arduino (identificados con el símbolo ~). 
+                            Por este cable, el Arduino envía pulsos de ancho modulado (PWM) que indican al servomotor 
+                            la posición angular deseada. La señal típicamente tiene una frecuencia de 50Hz con pulsos 
+                            de 1-2ms de duración.
+                        </p>
+                        <div class="paso-imagen">
+                            <img src="/mnt/user-data/uploads/Cable_Naranja_Serv.jpg" alt="Cable naranja PWM">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sección: Resultado Final -->
+        <section class="seccion">
+            <h2 class="seccion-titulo">Resultado Final - Funcionamiento</h2>
+            <p class="seccion-texto">
+                Una vez completadas todas las conexiones y cargado el código correspondiente en el Arduino, 
+                el servomotor estará listo para funcionar. El siguiente video muestra el servomotor en operación, 
+                realizando movimientos controlados mediante señales PWM generadas por el Arduino.
+            </p>
+
+            <div class="video-resultado">
+                <div class="video-wrapper">
+                    <div class="video-badge">▶ FUNCIONAMIENTO</div>
+                    <video controls>
+                        <source src="/mnt/user-data/uploads/Funcionamiento_Serv.mp4" type="video/mp4">
+                        Tu navegador no soporta videos HTML5.
+                    </video>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sección: Por qué funciona -->
+        <section class="seccion">
+            <h2 class="seccion-titulo">¿Por Qué Funciona el Servomotor?</h2>
+            <p class="seccion-texto">
+                El funcionamiento del servomotor se basa en la combinación de varios principios de control, 
+                electrónica y mecánica. A continuación se explican los conceptos fundamentales:
+            </p>
+
+            <div class="explicacion-box">
+                <h3 class="explicacion-titulo">
+                    <span style="color: #dc2626;">⚡</span> Principios de Funcionamiento
+                </h3>
+                <ul class="explicacion-lista">
+                    <li>
+                        <strong>Control por Modulación de Ancho de Pulso (PWM):</strong> El Arduino genera 
+                        pulsos eléctricos de duración variable (típicamente entre 1ms y 2ms) a una frecuencia 
+                        de 50Hz (20ms de período). La duración del pulso determina la posición angular del servo: 
+                        1ms = 0°, 1.5ms = 90°, 2ms = 180°.
+                    </li>
+                    <li>
+                        <strong>Circuito de Control Interno:</strong> El servomotor contiene un circuito 
+                        electrónico que decodifica la señal PWM recibida y la compara con la posición actual 
+                        detectada por el potenciómetro interno. Este circuito genera las señales necesarias 
+                        para controlar el motor DC.
+                    </li>
+                    <li>
+                        <strong>Motor DC y Sistema de Engranajes:</strong> Dentro del servomotor hay un pequeño 
+                        motor de corriente continua acoplado a una caja reductora de engranajes. Los engranajes 
+                        reducen la velocidad y aumentan el torque, permitiendo movimientos precisos y con fuerza 
+                        suficiente para aplicaciones prácticas.
+                    </li>
+                    <li>
+                        <strong>Retroalimentación por Potenciómetro:</strong> Un potenciómetro acoplado al eje 
+                        de salida convierte la posición mecánica en una señal eléctrica proporcional. El circuito 
+                        de control compara esta señal con la posición deseada (indicada por el PWM) y ajusta el 
+                        motor hasta alcanzar la posición objetivo.
+                    </li>
+                    <li>
+                        <strong>Sistema de Control en Lazo Cerrado:</strong> La combinación de sensor 
+                        (potenciómetro), controlador (circuito interno) y actuador (motor DC) forma un sistema 
+                        de control en lazo cerrado. Este sistema corrige automáticamente cualquier error de 
+                        posición causado por cargas externas o perturbaciones.
+                    </li>
+                    <li>
+                        <strong>Fuente de Alimentación:</strong> El pin de 5V del Arduino suministra la energía 
+                        necesaria tanto para el circuito de control como para el motor. La corriente puede variar 
+                        entre 100mA (en reposo) hasta 500-800mA (bajo carga máxima). Para aplicaciones con múltiples 
+                        servos o cargas pesadas, se recomienda usar una fuente de alimentación externa.
+                    </li>
+                </ul>
+            </div>
+
+            <div class="explicacion-box" style="margin-top: 2rem;">
+                <h3 class="explicacion-titulo">
+                    <span style="color: #2563eb;">🔬</span> Especificaciones Técnicas SG90
+                </h3>
+                <ul class="explicacion-lista">
+                    <li><strong>Voltaje de operación:</strong> 4.8V - 6V (típicamente 5V)</li>
+                    <li><strong>Corriente sin carga:</strong> 100mA @ 5V</li>
+                    <li><strong>Corriente con carga:</strong> 500-800mA @ 5V</li>
+                    <li><strong>Torque máximo:</strong> 1.8 kg/cm @ 5V</li>
+                    <li><strong>Velocidad:</strong> 0.1s/60° @ 5V</li>
+                    <li><strong>Rango de movimiento:</strong> 0° - 180° (aproximadamente)</li>
+                    <li><strong>Frecuencia de señal:</strong> 50Hz (período de 20ms)</li>
+                    <li><strong>Ancho de pulso:</strong> 1ms (0°) a 2ms (180°)</li>
+                    <li><strong>Peso:</strong> 9 gramos</li>
+                    <li><strong>Dimensiones:</strong> 22 x 11.5 x 27 mm</li>
+                </ul>
+            </div>
+        </section>
+
+        <center>
+            <a href="index.html" class="btn-volver">◄ VOLVER AL INICIO</a>
+        </center>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p class="footer-text">[ CONTROL DE SERVOMOTOR CON ARDUINO ]</p>
+        <p style="margin-top: 0.5rem; color: #64748b;">Principios de Electrónica - Práctica de Actuadores</p>
+    </footer>
+
+    <script>
+        // Animación de entrada para elementos
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.seccion, .paso-item').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(30px)';
+            el.style.transition = 'all 0.6s ease';
+            observer.observe(el);
+        });
+
+        // Efecto parallax suave para gradientes
+        document.addEventListener('mousemove', (e) => {
+            const moveX = (e.clientX / window.innerWidth - 0.5) * 50;
+            const moveY = (e.clientY / window.innerHeight - 0.5) * 50;
+            
+            document.querySelector('.gradient-1').style.transform = `translate(${moveX}px, ${moveY}px)`;
+            document.querySelector('.gradient-2').style.transform = `translate(${-moveX}px, ${-moveY}px)`;
+        });
+    </script>
+</body>
+</html>
