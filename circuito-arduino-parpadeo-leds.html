@@ -701,24 +701,29 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Paso 1 -->
                 <div class="paso-item">
                     <div class="paso-numero">1</div>
                     <div class="paso-contenido">
-                        <h3 class="paso-titulo">Configuración de Conexiones a Pines Digitales</h3>
+                        <h3 class="paso-titulo">Montaje de LEDs y Resistencias en Protoboard</h3>
                         <p class="paso-descripcion">
-                            Conectar los <strong>cables de señal</strong> desde los pines digitales PWM del Arduino 
-                            (identificados con el símbolo ~) hacia el protoboard. En esta imagen se observan tres cables 
-                            de colores (amarillo, azul y rosa) conectados desde los pines digitales del Arduino.
+                            Ensamblar los componentes en el protoboard siguiendo la configuración en paralelo. 
+                            Cada <strong>LED verde</strong> debe conectarse con su respectiva <strong>resistencia 
+                            de 220Ω</strong> en serie para limitar la corriente.
                         </p>
                         <p class="paso-descripcion">
-                            Cada cable lleva la señal de control digital (HIGH = 5V, LOW = 0V) que determinará el 
-                            encendido y apagado de cada LED. Los pines PWM permiten también controlar la intensidad 
-                            mediante modulación de ancho de pulso si fuera necesario.
+                            <strong>Configuración por LED:</strong>
+                            <br>• Ánodo (terminal larga del LED) → Resistencia 220Ω → Cable de señal del Arduino
+                            <br>• Cátodo (terminal corta del LED) → Línea de tierra común (GND)
+                        </p>
+                        <p class="paso-descripcion">
+                            La imagen muestra los tres LEDs verdes alineados horizontalmente con sus resistencias 
+                            azules conectadas. Cada LED funciona independientemente pero recibe la misma señal de 
+                            control, creando un efecto de parpadeo sincronizado.
                         </p>
                         <div class="paso-imagen">
-                            <img src="PIN LEDS PARA.jpg" alt="Conexión pines digitales">
+                            <img src="LEDS PARA.jpg" alt="LEDs y resistencias montados">
                         </div>
                     </div>
                 </div>
@@ -748,24 +753,19 @@
                 <div class="paso-item">
                     <div class="paso-numero">3</div>
                     <div class="paso-contenido">
-                        <h3 class="paso-titulo">Montaje de LEDs y Resistencias en Protoboard</h3>
+                        <h3 class="paso-titulo">Configuración de Conexiones a Pines Digitales</h3>
                         <p class="paso-descripcion">
-                            Ensamblar los componentes en el protoboard siguiendo la configuración en paralelo. 
-                            Cada <strong>LED verde</strong> debe conectarse con su respectiva <strong>resistencia 
-                            de 220Ω</strong> en serie para limitar la corriente.
+                            Conectar los <strong>cables de señal</strong> desde los pines digitales PWM del Arduino 
+                            (identificados con el símbolo ~) hacia el protoboard. En esta imagen se observan tres cables 
+                            de colores (amarillo, azul y rosa) conectados desde los pines digitales del Arduino.
                         </p>
                         <p class="paso-descripcion">
-                            <strong>Configuración por LED:</strong>
-                            <br>• Ánodo (terminal larga del LED) → Resistencia 220Ω → Cable de señal del Arduino
-                            <br>• Cátodo (terminal corta del LED) → Línea de tierra común (GND)
-                        </p>
-                        <p class="paso-descripcion">
-                            La imagen muestra los tres LEDs verdes alineados horizontalmente con sus resistencias 
-                            azules conectadas. Cada LED funciona independientemente pero recibe la misma señal de 
-                            control, creando un efecto de parpadeo sincronizado.
+                            Cada cable lleva la señal de control digital (HIGH = 5V, LOW = 0V) que determinará el 
+                            encendido y apagado de cada LED. Los pines PWM permiten también controlar la intensidad 
+                            mediante modulación de ancho de pulso si fuera necesario.
                         </p>
                         <div class="paso-imagen">
-                            <img src="LEDS PARA.jpg" alt="LEDs y resistencias montados">
+                            <img src="PIN LEDS PARA.jpg" alt="Conexión pines digitales">
                         </div>
                     </div>
                 </div>
@@ -793,12 +793,11 @@
                         </h4>
                         <p class="seccion-texto" style="font-size: 1rem; margin-bottom: 1.5rem;">
                             Este video demuestra que el circuito funciona <strong>sin necesidad de los 3 LEDs físicos</strong>. 
-                            Muestra el Arduino ejecutando el código de parpadeo, evidenciando que la programación y las 
-                            señales digitales se generan correctamente incluso sin carga conectada. Esto valida el 
-                            funcionamiento del software y la capacidad del microcontrolador de alternar estados HIGH/LOW.
+                            Ya que cada LED tiene su propio PIN (PIN 13, PIN 12, PIN 11) en el arduino, estos tambien sirven como
+                            fuente de alimentación independiente para cada LED.
                         </p>
                         <div class="video-wrapper">
-                            <div class="video-badge">⚙ SIN LEDs FÍSICOS</div>
+                            <div class="video-badge">⚙ SIN TODOS LOS LEDS</div>
                             <video controls>
                                 <source src="LEDS PARA IN.mp4" type="video/mp4">
                             </video>
@@ -915,18 +914,28 @@
                 </p>
                 <ul class="tech-lista">
                     <li>
-                        <strong>void setup():</strong> Configuración inicial que se ejecuta una sola vez. Aquí se 
-                        declaran los pines como salidas usando pinMode(pin, OUTPUT) para los tres LEDs.
-                    </li>
-                    <li>
-                        <strong>void loop():</strong> Bucle principal que se repite infinitamente. Contiene la 
-                        secuencia: digitalWrite(pin, HIGH) para encender → delay(tiempo) para esperar → 
-                        digitalWrite(pin, LOW) para apagar → delay(tiempo) para esperar antes de repetir.
-                    </li>
-                    <li>
-                        <strong>Control Sincronizado:</strong> Al usar el mismo delay() para todos los LEDs, se 
-                        logra que parpadeen al unísono. Para patrones más complejos, se pueden usar diferentes 
-                        tiempos o técnicas como millis() para control no bloqueante.
+                        <strong>void setup():</strong>
+                        {
+                          pinMode(13, OUTPUT);
+                          pinMode(12, OUTPUT);
+                          pinMode(11, OUTPUT);
+                        }
+                        
+                        void loop()
+                        {
+                          // Encender todos al mismo tiempo
+                          digitalWrite(13, HIGH);
+                          digitalWrite(12, HIGH);
+                          digitalWrite(11, HIGH);
+                          delay(1000);
+                            
+                          // Apagar todos al mismo tiempo
+                          digitalWrite(13, LOW);
+                          digitalWrite(12, LOW);
+                          digitalWrite(11, LOW);
+                          delay(1000);
+                        }
+
                     </li>
                 </ul>
             </div>
