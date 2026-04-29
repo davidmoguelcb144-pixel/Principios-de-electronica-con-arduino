@@ -7,17 +7,19 @@
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600&display=swap" rel="stylesheet"/>
   <style>
     :root {
-      --bg-deep: #020812;
-      --bg-mid: #040f1e;
-      --bg-card: #06142a;
-      --blue-bright: #00aaff;
-      --blue-glow: #0077cc;
-      --blue-dim: #003d6e;
-      --blue-ice: #a8d8ff;
+      --bg-deep: #1a0f0a;
+      --bg-mid: #2d1810;
+      --bg-card: #3d2415;
+      --gold-bright: #d4af37;
+      --gold-glow: #b8860b;
+      --gold-dim: #6b5d1f;
+      --gold-ice: #f5deb3;
       --white: #f0f8ff;
-      --white-dim: #b0c8e0;
-      --accent: #00e5ff;
-      --accent2: #005fff;
+      --white-dim: #d4cfc4;
+      --accent: #ffd700;
+      --accent2: #8b4513;
+      --wine: #722f37;
+      --wine-dark: #4a1f24;
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -39,8 +41,8 @@
       position: fixed;
       inset: 0;
       background-image:
-        linear-gradient(rgba(0,170,255,0.04) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0,170,255,0.04) 1px, transparent 1px);
+        linear-gradient(rgba(212,175,55,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(212,175,55,0.04) 1px, transparent 1px);
       background-size: 40px 40px;
       pointer-events: none;
       z-index: 0;
@@ -55,9 +57,9 @@
       z-index: 0;
       animation: orbPulse 8s ease-in-out infinite alternate;
     }
-    .orb-1 { width: 500px; height: 500px; background: rgba(0,120,255,0.12); top: -100px; left: -150px; animation-delay: 0s; }
-    .orb-2 { width: 400px; height: 400px; background: rgba(0,200,255,0.08); bottom: 100px; right: -100px; animation-delay: 3s; }
-    .orb-3 { width: 300px; height: 300px; background: rgba(0,80,200,0.1); top: 50%; left: 50%; transform: translate(-50%,-50%); animation-delay: 1.5s; }
+    .orb-1 { width: 500px; height: 500px; background: rgba(139,69,19,0.12); top: -100px; left: -150px; animation-delay: 0s; }
+    .orb-2 { width: 400px; height: 400px; background: rgba(212,175,55,0.08); bottom: 100px; right: -100px; animation-delay: 3s; }
+    .orb-3 { width: 300px; height: 300px; background: rgba(114,47,55,0.1); top: 50%; left: 50%; transform: translate(-50%,-50%); animation-delay: 1.5s; }
 
     @keyframes orbPulse {
       0%   { opacity: 0.6; transform: scale(1); }
@@ -70,7 +72,7 @@
       z-index: 1;
       text-align: center;
       padding: 80px 20px 60px;
-      border-bottom: 1px solid rgba(0,170,255,0.15);
+      border-bottom: 1px solid rgba(212,175,55,0.15);
     }
 
     .badge {
@@ -79,7 +81,7 @@
       font-size: 0.65rem;
       letter-spacing: 4px;
       color: var(--accent);
-      border: 1px solid rgba(0,229,255,0.4);
+      border: 1px solid rgba(212,175,55,0.4);
       padding: 5px 16px;
       border-radius: 2px;
       margin-bottom: 24px;
@@ -93,7 +95,7 @@
       font-weight: 900;
       line-height: 1.1;
       letter-spacing: 2px;
-      background: linear-gradient(135deg, var(--white) 30%, var(--blue-bright) 70%, var(--accent) 100%);
+      background: linear-gradient(135deg, var(--white) 30%, var(--gold-bright) 70%, var(--accent) 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
@@ -120,8 +122,8 @@
     .led {
       width: 8px; height: 8px;
       border-radius: 50%;
-      background: var(--blue-bright);
-      box-shadow: 0 0 8px 3px var(--blue-bright);
+      background: var(--gold-bright);
+      box-shadow: 0 0 8px 3px var(--gold-bright);
       animation: ledBlink 2s ease-in-out infinite;
     }
     .led:nth-child(2) { animation-delay: 0.2s; background: var(--accent); box-shadow: 0 0 8px 3px var(--accent); }
@@ -145,7 +147,7 @@
       justify-content: center;
       gap: 10px;
       padding: 30px 20px;
-      border-bottom: 1px solid rgba(0,170,255,0.1);
+      border-bottom: 1px solid rgba(212,175,55,0.1);
     }
     nav a {
       font-family: 'Orbitron', sans-serif;
@@ -154,7 +156,7 @@
       text-transform: uppercase;
       text-decoration: none;
       color: var(--white-dim);
-      border: 1px solid rgba(0,170,255,0.25);
+      border: 1px solid rgba(212,175,55,0.25);
       padding: 7px 16px;
       border-radius: 2px;
       transition: all 0.25s ease;
@@ -162,8 +164,8 @@
     nav a:hover {
       color: var(--accent);
       border-color: var(--accent);
-      box-shadow: 0 0 12px rgba(0,229,255,0.3);
-      background: rgba(0,229,255,0.05);
+      box-shadow: 0 0 12px rgba(212,175,55,0.3);
+      background: rgba(212,175,55,0.05);
     }
 
     /* ── MAIN CONTENT ── */
@@ -199,7 +201,7 @@
       content: '';
       flex: 1;
       height: 1px;
-      background: linear-gradient(90deg, rgba(0,229,255,0.4), transparent);
+      background: linear-gradient(90deg, rgba(212,175,55,0.4), transparent);
     }
 
     /* ── CARD GRID ── */
@@ -212,7 +214,7 @@
 
     .card {
       background: var(--bg-card);
-      border: 1px solid rgba(0,170,255,0.15);
+      border: 1px solid rgba(212,175,55,0.15);
       border-radius: 4px;
       padding: 28px;
       position: relative;
@@ -225,7 +227,7 @@
       position: absolute;
       top: 0; left: 0; right: 0;
       height: 2px;
-      background: linear-gradient(90deg, transparent, var(--blue-bright), transparent);
+      background: linear-gradient(90deg, transparent, var(--gold-bright), transparent);
       opacity: 0;
       transition: opacity 0.3s;
     }
@@ -233,13 +235,13 @@
       content: '';
       position: absolute;
       inset: 0;
-      background: radial-gradient(ellipse at top left, rgba(0,170,255,0.06), transparent 60%);
+      background: radial-gradient(ellipse at top left, rgba(212,175,55,0.06), transparent 60%);
       pointer-events: none;
     }
     .card:hover {
       transform: translateY(-4px);
-      border-color: rgba(0,170,255,0.4);
-      box-shadow: 0 8px 40px rgba(0,120,255,0.15);
+      border-color: rgba(212,175,55,0.4);
+      box-shadow: 0 8px 40px rgba(139,69,19,0.15);
     }
     .card:hover::before { opacity: 1; }
 
@@ -247,7 +249,7 @@
       font-size: 2rem;
       margin-bottom: 14px;
       display: block;
-      filter: drop-shadow(0 0 8px rgba(0,170,255,0.6));
+      filter: drop-shadow(0 0 8px rgba(212,175,55,0.6));
     }
 
     .card h3 {
@@ -255,7 +257,7 @@
       font-size: 0.85rem;
       letter-spacing: 2px;
       font-weight: 700;
-      color: var(--blue-bright);
+      color: var(--gold-bright);
       margin-bottom: 10px;
       text-transform: uppercase;
     }
@@ -270,7 +272,7 @@
     /* ── FULL-WIDTH SECTION ── */
     .full-card {
       background: var(--bg-card);
-      border: 1px solid rgba(0,170,255,0.15);
+      border: 1px solid rgba(212,175,55,0.15);
       border-radius: 4px;
       padding: 40px;
       margin-bottom: 70px;
@@ -281,7 +283,7 @@
       content: '';
       position: absolute;
       inset: 0;
-      background: radial-gradient(ellipse at bottom right, rgba(0,100,255,0.05), transparent 60%);
+      background: radial-gradient(ellipse at bottom right, rgba(139,69,19,0.05), transparent 60%);
       pointer-events: none;
     }
 
@@ -289,7 +291,7 @@
       font-family: 'Orbitron', sans-serif;
       font-size: 0.9rem;
       letter-spacing: 2px;
-      color: var(--blue-bright);
+      color: var(--gold-bright);
       margin-bottom: 16px;
       text-transform: uppercase;
     }
@@ -316,23 +318,23 @@
       color: var(--accent);
       padding: 12px 16px;
       text-align: left;
-      border-bottom: 1px solid rgba(0,229,255,0.3);
+      border-bottom: 1px solid rgba(212,175,55,0.3);
     }
     .pin-table td {
       padding: 12px 16px;
       color: var(--white-dim);
-      border-bottom: 1px solid rgba(0,170,255,0.08);
+      border-bottom: 1px solid rgba(212,175,55,0.08);
       vertical-align: top;
     }
     .pin-table tr:hover td {
-      background: rgba(0,170,255,0.05);
+      background: rgba(212,175,55,0.05);
       color: var(--white);
     }
     .tag {
       display: inline-block;
-      background: rgba(0,170,255,0.12);
-      color: var(--blue-bright);
-      border: 1px solid rgba(0,170,255,0.3);
+      background: rgba(212,175,55,0.12);
+      color: var(--gold-bright);
+      border: 1px solid rgba(212,175,55,0.3);
       font-family: 'Orbitron', sans-serif;
       font-size: 0.6rem;
       letter-spacing: 1px;
@@ -344,8 +346,8 @@
 
     /* ── CODE BLOCK ── */
     .code-wrap {
-      background: #010a18;
-      border: 1px solid rgba(0,170,255,0.2);
+      background: #0f0805;
+      border: 1px solid rgba(212,175,55,0.2);
       border-radius: 4px;
       padding: 28px;
       margin-top: 20px;
@@ -358,19 +360,19 @@
       font-family: 'Orbitron', sans-serif;
       font-size: 0.55rem;
       letter-spacing: 2px;
-      color: rgba(0,229,255,0.4);
+      color: rgba(212,175,55,0.4);
     }
     pre {
       font-family: 'Courier New', monospace;
       font-size: 0.88rem;
       line-height: 1.8;
-      color: var(--blue-ice);
+      color: var(--gold-ice);
     }
-    .kw  { color: #00e5ff; font-weight: bold; }
-    .fn  { color: #60b8ff; }
-    .cm  { color: #3d6080; font-style: italic; }
-    .num { color: #a0d8ff; }
-    .str { color: #80c8ff; }
+    .kw  { color: #ffd700; font-weight: bold; }
+    .fn  { color: #daa520; }
+    .cm  { color: #8b6914; font-style: italic; }
+    .num { color: #f5deb3; }
+    .str { color: #eee8aa; }
 
     /* ── COMPARISON ── */
     .compare-grid {
@@ -383,7 +385,7 @@
 
     .compare-card {
       background: var(--bg-card);
-      border: 1px solid rgba(0,170,255,0.15);
+      border: 1px solid rgba(212,175,55,0.15);
       border-radius: 4px;
       padding: 28px;
     }
@@ -391,7 +393,7 @@
       font-family: 'Orbitron', sans-serif;
       font-size: 0.75rem;
       letter-spacing: 2px;
-      color: var(--blue-bright);
+      color: var(--gold-bright);
       margin-bottom: 14px;
       text-transform: uppercase;
     }
@@ -403,7 +405,7 @@
       color: var(--white-dim);
       font-size: 0.92rem;
       padding: 6px 0;
-      border-bottom: 1px solid rgba(0,170,255,0.07);
+      border-bottom: 1px solid rgba(212,175,55,0.07);
       display: flex;
       align-items: flex-start;
       gap: 10px;
@@ -417,61 +419,61 @@
     }
 
     /* Botón */
-        .btn-volver {
-            display: inline-block;
-            background: linear-gradient(135deg, #16a34a, #15803d);
-            color: #fff;
-            padding: 1.3rem 3.5rem;
-            border: 3px solid #22c55e;
-            border-radius: 50px;
-            text-decoration: none;
-            font-family: 'Orbitron', monospace;
-            font-weight: 700;
-            font-size: 1.15rem;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            transition: all 0.35s ease;
-            margin: 2rem 0;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 
-                0 8px 30px rgba(34, 197, 94, 0.5),
-                inset 0 2px 0 rgba(255, 255, 255, 0.2);
-        }
+    .btn-volver {
+      display: inline-block;
+      background: linear-gradient(135deg, #722f37, #4a1f24);
+      color: #fff;
+      padding: 1.3rem 3.5rem;
+      border: 3px solid #d4af37;
+      border-radius: 50px;
+      text-decoration: none;
+      font-family: 'Orbitron', monospace;
+      font-weight: 700;
+      font-size: 1.15rem;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      transition: all 0.35s ease;
+      margin: 2rem 0;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 
+          0 8px 30px rgba(212,175,55,0.5),
+          inset 0 2px 0 rgba(255, 255, 255, 0.2);
+    }
 
-        .btn-volver::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
-            transition: left 0.5s ease;
-        }
+    .btn-volver::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+      transition: left 0.5s ease;
+    }
 
-        .btn-volver:hover {
-            transform: translateY(-4px);
-            border-color: #86efac;
-            box-shadow: 
-                0 15px 45px rgba(34, 197, 94, 0.7),
-                0 0 60px rgba(34, 197, 94, 0.4),
-                inset 0 2px 0 rgba(255, 255, 255, 0.3);
-        }
+    .btn-volver:hover {
+      transform: translateY(-4px);
+      border-color: #ffd700;
+      box-shadow: 
+          0 15px 45px rgba(212,175,55,0.7),
+          0 0 60px rgba(212,175,55,0.4),
+          inset 0 2px 0 rgba(255, 255, 255, 0.3);
+    }
 
-        .btn-volver:hover::before {
-            left: 100%;
-        }
-    
+    .btn-volver:hover::before {
+      left: 100%;
+    }
+
     /* ── FOOTER ── */
     footer {
       position: relative;
       z-index: 1;
       text-align: center;
       padding: 40px 20px;
-      border-top: 1px solid rgba(0,170,255,0.12);
+      border-top: 1px solid rgba(212,175,55,0.12);
       font-size: 0.8rem;
-      color: rgba(160,200,220,0.4);
+      color: rgba(212,175,55,0.4);
       font-family: 'Orbitron', sans-serif;
       letter-spacing: 2px;
     }
@@ -496,7 +498,7 @@
     /* scrollbar */
     ::-webkit-scrollbar { width: 6px; }
     ::-webkit-scrollbar-track { background: var(--bg-deep); }
-    ::-webkit-scrollbar-thumb { background: var(--blue-glow); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb { background: var(--gold-glow); border-radius: 3px; }
   </style>
 </head>
 <body>
@@ -551,8 +553,8 @@
         necesidad de conocimientos avanzados en electrónica.
       </p>
       <p>
-        La plataforma combina una <strong style="color:var(--blue-bright)">placa microcontroladora</strong>
-        (el hardware físico) con el entorno de desarrollo <strong style="color:var(--blue-bright)">Arduino IDE</strong>
+        La plataforma combina una <strong style="color:var(--gold-bright)">placa microcontroladora</strong>
+        (el hardware físico) con el entorno de desarrollo <strong style="color:var(--gold-bright)">Arduino IDE</strong>
         (el software) en el que se escribe el código. Los programas escritos para Arduino se llaman
         <em style="color:var(--accent)">sketches</em>.
       </p>
