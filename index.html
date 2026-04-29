@@ -1,331 +1,231 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Principios de Electrónica con Arduino</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
- 
-    body {
-      font-family: 'Inter', sans-serif;
-      background: #fff;
-      color: #1a0a0a;
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Electrónica con Arduino</title>
+
+<style>
+/* ===== VARIABLES ===== */
+:root{
+    --bg: #0a0a0a;
+    --primary: #7c3aed;
+    --secondary: #3b82f6;
+    --accent: #ec4899;
+    --text: #ffffff;
+    --glass: rgba(255,255,255,0.08);
+}
+
+/* ===== RESET ===== */
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family: 'Poppins', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+}
+
+/* ===== PORTADA ===== */
+.portada{
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    text-align:center;
+
+    background: linear-gradient(-45deg,
+        #667eea,
+        #764ba2,
+        #f093fb,
+        #4facfe
+    );
+    background-size:400% 400%;
+    animation: fondo 10s ease infinite;
+}
+
+@keyframes fondo{
+    0%{background-position:0% 50%;}
+    50%{background-position:100% 50%;}
+    100%{background-position:0% 50%;}
+}
+
+/* ===== TITULO ===== */
+.titulo{
+    font-size: clamp(2.5rem, 7vw, 4.5rem);
+    font-weight: 800;
+    text-transform: uppercase;
+    margin-bottom: 2rem;
+
+    text-shadow:0 0 15px rgba(255,255,255,.7);
+}
+
+/* ===== EQUIPO ===== */
+.equipo{
+    max-width:600px;
+}
+
+.equipo h2{
+    margin-bottom:1rem;
+    color:#fff;
+}
+
+.miembro{
+    background: var(--glass);
+    margin:.5rem 0;
+    padding:1rem;
+    border-radius:12px;
+    transition:.3s;
+}
+
+.miembro:hover{
+    transform: translateY(-3px);
+    background: rgba(255,255,255,0.15);
+}
+
+/* ===== CATALOGO ===== */
+.catalogo{
+    padding:4rem 2rem;
+}
+
+.catalogo h2{
+    text-align:center;
+    font-size:2.5rem;
+    margin-bottom:3rem;
+}
+
+/* GRID */
+.grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+    gap:2rem;
+}
+
+/* ===== CARD ===== */
+.card{
+    background:#111;
+    border-radius:18px;
+    overflow:hidden;
+    transition:.4s;
+    position:relative;
+}
+
+.card:hover{
+    transform: translateY(-8px) scale(1.02);
+    box-shadow:0 15px 40px rgba(124,58,237,.5);
+}
+
+.card img{
+    width:100%;
+    height:200px;
+    object-fit:cover;
+}
+
+.card-content{
+    padding:1.2rem;
+}
+
+.card-title{
+    font-size:1.3rem;
+    margin-bottom:.5rem;
+}
+
+/* BOTÓN */
+.btn{
+    display:inline-block;
+    margin-top:.5rem;
+    padding:.5rem 1rem;
+    border-radius:8px;
+    background: linear-gradient(135deg,var(--primary),var(--secondary));
+    color:white;
+    text-decoration:none;
+    font-size:.9rem;
+    transition:.3s;
+}
+
+.btn:hover{
+    opacity:.8;
+}
+
+/* NUMERO */
+.numero{
+    position:absolute;
+    top:10px;
+    right:10px;
+    background:var(--primary);
+    width:40px;
+    height:40px;
+    border-radius:50%;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-weight:bold;
+}
+
+/* RESPONSIVE */
+@media(max-width:600px){
+    .titulo{
+        font-size:2rem;
     }
- 
-    /* ── PORTADA ── */
-    .portada {
-      background: #5a0a1e;
-      padding: 3.5rem 2rem 3rem;
-      text-align: center;
-      border-bottom: 4px solid #C9A84C;
-    }
- 
-    .portada-accent {
-      display: inline-block;
-      background: #C9A84C;
-      height: 3px;
-      width: 60px;
-      margin-bottom: 1.5rem;
-      border-radius: 2px;
-    }
- 
-    .portada h1 {
-      font-size: clamp(1.8rem, 5vw, 2.8rem);
-      font-weight: 700;
-      color: #fff;
-      letter-spacing: 0.5px;
-      line-height: 1.3;
-      margin-bottom: 0.5rem;
-    }
- 
-    .portada h1 span {
-      color: #C9A84C;
-    }
- 
-    .portada-sub {
-      font-size: 0.75rem;
-      color: rgba(255,255,255,0.45);
-      letter-spacing: 2.5px;
-      text-transform: uppercase;
-      margin-bottom: 2.5rem;
-    }
- 
-    .equipo-label {
-      font-size: 0.7rem;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: #C9A84C;
-      margin-bottom: 1rem;
-      font-weight: 600;
-    }
- 
-    .miembros {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-      gap: 0.6rem;
-      max-width: 720px;
-      margin: 0 auto;
-    }
- 
-    .miembro {
-      background: rgba(255,255,255,0.07);
-      border: 1px solid rgba(201,168,76,0.3);
-      border-radius: 8px;
-      padding: 0.7rem 1rem;
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-    }
- 
-    .miembro-num {
-      background: #C9A84C;
-      color: #5a0a1e;
-      font-size: 0.72rem;
-      font-weight: 700;
-      width: 24px;
-      height: 24px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
- 
-    .miembro span {
-      font-size: 0.88rem;
-      color: #fff;
-      font-weight: 400;
-    }
- 
-    /* ── CATÁLOGO ── */
-    .catalogo {
-      padding: 3rem 1.5rem 4rem;
-      background: #fafafa;
-    }
- 
-    .catalogo-header {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      max-width: 900px;
-      margin: 0 auto 2rem;
-    }
- 
-    .catalogo-header-line {
-      flex: 1;
-      height: 1px;
-      background: #C9A84C;
-      opacity: 0.4;
-    }
- 
-    .catalogo-header h2 {
-      font-size: 0.72rem;
-      letter-spacing: 2.5px;
-      text-transform: uppercase;
-      color: #5a0a1e;
-      font-weight: 600;
-      white-space: nowrap;
-    }
- 
-    .cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 1rem;
-      max-width: 900px;
-      margin: 0 auto;
-    }
- 
-    .card {
-      background: #fff;
-      border: 1px solid #e5d9d9;
-      border-radius: 10px;
-      padding: 1.1rem 1.2rem;
-      display: flex;
-      align-items: flex-start;
-      gap: 1rem;
-      transition: border-color 0.2s, box-shadow 0.2s;
-      text-decoration: none;
-      color: inherit;
-    }
- 
-    .card:hover {
-      border-color: #C9A84C;
-      box-shadow: 0 4px 16px rgba(90,10,30,0.09);
-    }
- 
-    .card-badge {
-      background: #5a0a1e;
-      color: #C9A84C;
-      font-size: 0.8rem;
-      font-weight: 700;
-      width: 32px;
-      height: 32px;
-      border-radius: 6px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      margin-top: 1px;
-    }
- 
-    .card-body h3 {
-      font-size: 0.9rem;
-      font-weight: 600;
-      color: #1a0a0a;
-      line-height: 1.45;
-      margin-bottom: 0.4rem;
-    }
- 
-    .card-link {
-      font-size: 0.75rem;
-      color: #C9A84C;
-      font-weight: 600;
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      gap: 3px;
-    }
- 
-    .card-link::after {
-      content: '→';
-      font-size: 0.72rem;
-    }
- 
-    /* ── FOOTER ── */
-    .footer-bar {
-      background: #5a0a1e;
-      height: 4px;
-    }
- 
-    /* ── RESPONSIVE ── */
-    @media (max-width: 600px) {
-      .portada { padding: 2.5rem 1rem 2rem; }
-      .catalogo { padding: 2rem 1rem 3rem; }
-      .miembros { grid-template-columns: 1fr; }
-      .cards { grid-template-columns: 1fr; }
-    }
-  </style>
+}
+</style>
 </head>
+
 <body>
- 
-  <!-- PORTADA -->
-  <section class="portada">
-    <div class="portada-accent"></div>
-    <h1>Principios de Electrónica con Arduino UNO R3</h1>
-   
-    <p class="equipo-label">Equipo de trabajo</p>
-    <div class="miembros">
-      <div class="miembro">
-        <div class="miembro-num">1</div>
-        <span>David Yael Gutiérrez Moguel</span>
-      </div>
-      
-      <div class="miembro">
-        <div class="miembro-num">2</div>
-        <span>Alde Elishua Ruiz Pérez</span>
-      </div>
-      
-      <div class="miembro">
-        <div class="miembro-num">3</div>
-        <span>Valeria Michell Velasco Maza</span>
-      </div>
-      
-      <div class="miembro">
-        <div class="miembro-num">4</div>
-        <span>Ervin Alexander Gonzales Meneces</span>
-      </div>
+
+<!-- ===== PORTADA ===== -->
+<section class="portada">
+    <h1 class="titulo">Electrónica con Arduino</h1>
+
+    <div class="equipo">
+        <h2>Equipo:</h2>
+        <div class="miembro">1. David Yael Gutiérrez Moguel</div>
+        <div class="miembro">2. Alde Elishua Ruiz Pérez</div>
+        <div class="miembro">3. Valeria Michell Velasco Maza</div>
+        <div class="miembro">4. Ervin Alexander Gonzales Meneces</div>
     </div>
-  </section>
- 
-  <!-- CATÁLOGO -->
-  <section class="catalogo">
-    <div class="catalogo-header">
-      <div class="catalogo-header-line"></div>
-      <h2>Catálogo de Temas</h2>
-      <div class="catalogo-header-line"></div>
+</section>
+
+<!-- ===== CATALOGO ===== -->
+<section class="catalogo">
+    <h2>Catálogo de Temas</h2>
+
+    <div class="grid">
+
+        <div class="card">
+            <div class="numero">1</div>
+            <img src="https://images.unsplash.com/photo-1553406830-ef2513450d76">
+            <div class="card-content">
+                <h3 class="card-title">Conceptos Básicos</h3>
+                <a href="conceptos-basicos.html" class="btn">Ver tema</a>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="numero">2</div>
+            <img src="https://images.unsplash.com/photo-1581092160562-40aa08e78837">
+            <div class="card-content">
+                <h3 class="card-title">Materiales</h3>
+                <a href="materiales-arduino.html" class="btn">Ver tema</a>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="numero">3</div>
+            <img src="https://images.unsplash.com/photo-1581092160562-40aa08e78837">
+            <div class="card-content">
+                <h3 class="card-title">Circuitos Serie y Paralelo</h3>
+                <a href="circuitos-serie-paralelo.html" class="btn">Ver tema</a>
+            </div>
+        </div>
+
     </div>
- 
-    <div class="cards">
- 
-      <a class="card" href="conceptos-basicos.html">
-        <div class="card-badge">1</div>
-        <div class="card-body">
-          <h3>Conceptos Básicos de Arduino</h3>
-          <span class="card-link">Ver tema</span>
-        </div>
-      </a>
- 
-      <a class="card" href="materiales-arduino.html">
-        <div class="card-badge">2</div>
-        <div class="card-body">
-          <h3>Materiales de Arduino</h3>
-          <span class="card-link">Ver tema</span>
-        </div>
-      </a>
- 
-      <a class="card" href="circuitos-serie-paralelo.html">
-        <div class="card-badge">3</div>
-        <div class="card-body">
-          <h3>Circuito en Serie y Paralelo</h3>
-          <span class="card-link">Ver tema</span>
-        </div>
-      </a>
- 
-      <a class="card" href="circuito-leds-push-button.html">
-        <div class="card-badge">4</div>
-        <div class="card-body">
-          <h3>Circuito en Serie y Paralelo Controlado con Push Button</h3>
-          <span class="card-link">Ver tema</span>
-        </div>
-      </a>
- 
-      <a class="card" href="circuito-leds-potenciometro.html">
-        <div class="card-badge">5</div>
-        <div class="card-body">
-          <h3>Circuito en Serie y Paralelo Controlado con Potenciómetro</h3>
-          <span class="card-link">Ver tema</span>
-        </div>
-      </a>
- 
-      <a class="card" href="circuito-arduino-parpadeo-leds.html">
-        <div class="card-badge">6</div>
-        <div class="card-body">
-          <h3>Circuito en Paralelo Arduino (Parpadea)</h3>
-          <span class="card-link">Ver tema</span>
-        </div>
-      </a>
- 
-      <a class="card" href="maqueta-pvz-proyecto-final.html">
-        <div class="card-badge">7</div>
-        <div class="card-body">
-          <h3>PvZ Maqueta</h3>
-          <span class="card-link">Ver tema</span>
-        </div>
-      </a>
- 
-      <a class="card" href="practica_led_rgb.html">
-        <div class="card-badge">8</div>
-        <div class="card-body">
-          <h3>Práctica LED RGB</h3>
-          <span class="card-link">Ver tema</span>
-        </div>
-      </a>
- 
-      <a class="card" href="servomotor-practica.html">
-        <div class="card-badge">9</div>
-        <div class="card-body">
-          <h3>Práctica Servomotor</h3>
-          <span class="card-link">Ver tema</span>
-        </div>
-      </a>
- 
-    </div>
-  </section>
- 
-  <div class="footer-bar"></div>
- 
+</section>
+
 </body>
 </html>
- 
