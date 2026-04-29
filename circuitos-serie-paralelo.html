@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Circuitos en Serie y Paralelo</title>
+    <title>Encender un Led con Protoboard</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap');
 
         * {
             margin: 0;
@@ -14,14 +14,14 @@
         }
 
         body {
-            font-family: 'Noto Sans JP', sans-serif;
-            background: #000;
-            color: #fff;
+            font-family: 'Rajdhani', sans-serif;
+            background: linear-gradient(135deg, #0a0e27 0%, #16213e 50%, #0f3460 100%);
+            color: #e0e7ff;
             overflow-x: hidden;
             position: relative;
         }
 
-        /* Fondo del dominio infinito */
+        /* Fondo de circuito */
         body::before {
             content: '';
             position: fixed;
@@ -29,640 +29,961 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: 
-                radial-gradient(ellipse at center, transparent 0%, #000 70%),
-                radial-gradient(circle at 20% 50%, rgba(0, 150, 255, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 80% 50%, rgba(138, 43, 226, 0.1) 0%, transparent 50%);
-            z-index: 0;
-            animation: domainPulse 4s ease-in-out infinite;
-        }
-
-        @keyframes domainPulse {
-            0%, 100% { opacity: 0.8; }
-            50% { opacity: 1; }
-        }
-
-        /* Líneas infinitas del dominio */
-        .infinite-lines {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            perspective: 1000px;
-            overflow: hidden;
+            background-image: 
+                linear-gradient(90deg, rgba(34, 197, 94, 0.03) 1px, transparent 1px),
+                linear-gradient(0deg, rgba(34, 197, 94, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
             z-index: 0;
             pointer-events: none;
         }
 
-        .line {
-            position: absolute;
-            width: 2px;
-            height: 200%;
-            background: linear-gradient(180deg, 
-                transparent 0%, 
-                rgba(0, 150, 255, 0.3) 20%,
-                rgba(138, 43, 226, 0.5) 50%,
-                rgba(0, 150, 255, 0.3) 80%,
-                transparent 100%);
-            animation: lineFlow 3s linear infinite;
-            transform-style: preserve-3d;
-        }
-
-        @keyframes lineFlow {
-            0% { transform: translateY(-50%) translateZ(0); }
-            100% { transform: translateY(0%) translateZ(1000px); }
-        }
-
-        /* Partículas flotantes */
-        .particle {
+        /* Gradientes de fondo */
+        .bg-gradient {
             position: fixed;
-            width: 3px;
-            height: 3px;
-            background: #00d4ff;
+            width: 600px;
+            height: 600px;
             border-radius: 50%;
-            box-shadow: 
-                0 0 10px #00d4ff,
-                0 0 20px #00d4ff,
-                0 0 30px rgba(0, 212, 255, 0.5);
-            animation: particleFloat 8s ease-in-out infinite;
+            filter: blur(120px);
+            opacity: 0.12;
             pointer-events: none;
-            z-index: 1;
+            z-index: 0;
         }
 
-        @keyframes particleFloat {
-            0%, 100% { 
-                transform: translate(0, 0) scale(1);
-                opacity: 0.3;
-            }
-            50% { 
-                transform: translate(100px, -50px) scale(1.5);
-                opacity: 1;
-            }
+        .gradient-green {
+            top: -250px;
+            right: -250px;
+            background: radial-gradient(circle, #22c55e, transparent);
+            animation: pulse 8s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.12; }
+            50% { opacity: 0.18; }
         }
 
         /* Header */
         .header {
-            background: linear-gradient(135deg, 
-                rgba(0, 150, 255, 0.2) 0%, 
-                rgba(138, 43, 226, 0.3) 50%,
-                rgba(0, 150, 255, 0.2) 100%);
-            backdrop-filter: blur(20px);
-            border: 2px solid rgba(0, 212, 255, 0.3);
-            border-radius: 0 0 30px 30px;
-            padding: 3rem 2rem;
+            background: linear-gradient(135deg, #166534 0%, #15803d 50%, #16a34a 100%);
+            padding: 3.5rem 2rem;
             text-align: center;
-            box-shadow: 
-                0 0 50px rgba(0, 212, 255, 0.4),
-                inset 0 0 50px rgba(138, 43, 226, 0.2);
             position: relative;
             z-index: 10;
-            margin-bottom: 3rem;
+            border-bottom: 4px solid #22c55e;
+            box-shadow: 
+                0 10px 40px rgba(34, 197, 94, 0.4),
+                inset 0 -1px 0 rgba(255, 255, 255, 0.1);
             overflow: hidden;
         }
 
         .header::before {
             content: '';
             position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(0, 212, 255, 0.1) 0%, transparent 70%);
-            animation: headerRotate 10s linear infinite;
+            top: 0;
+            left: -100%;
+            width: 300%;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                rgba(255, 255, 255, 0.08) 50%, 
+                transparent 100%);
+            animation: headerShine 4s ease-in-out infinite;
         }
 
-        @keyframes headerRotate {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        @keyframes headerShine {
+            0% { left: -100%; }
+            100% { left: 100%; }
         }
 
-        .six-eyes {
+        /* Decoración LED */
+        .led-indicator {
             position: absolute;
-            width: 80px;
-            height: 80px;
-            border: 3px solid #00d4ff;
+            width: 12px;
+            height: 12px;
+            background: #22c55e;
             border-radius: 50%;
-            box-shadow: 
-                0 0 20px #00d4ff,
-                inset 0 0 20px rgba(0, 212, 255, 0.3);
-            animation: eyesGlow 2s ease-in-out infinite;
+            box-shadow: 0 0 20px #22c55e;
+            animation: blink 1.5s ease-in-out infinite;
         }
 
-        .six-eyes::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 30px;
-            height: 30px;
-            background: radial-gradient(circle, #00d4ff 0%, transparent 70%);
-            border-radius: 50%;
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.2; }
         }
 
-        .eyes-left {
-            left: 5%;
-            top: 50%;
-            transform: translateY(-50%);
-        }
-
-        .eyes-right {
-            right: 5%;
-            top: 50%;
-            transform: translateY(-50%);
-        }
-
-        @keyframes eyesGlow {
-            0%, 100% { 
-                box-shadow: 
-                    0 0 20px #00d4ff,
-                    inset 0 0 20px rgba(0, 212, 255, 0.3);
-            }
-            50% { 
-                box-shadow: 
-                    0 0 40px #00d4ff,
-                    0 0 60px rgba(0, 212, 255, 0.5),
-                    inset 0 0 30px rgba(0, 212, 255, 0.5);
-            }
-        }
+        .led-tl { top: 30px; left: 30px; }
+        .led-tr { top: 30px; right: 30px; }
+        .led-bl { bottom: 30px; left: 30px; animation-delay: 0.5s; }
+        .led-br { bottom: 30px; right: 30px; animation-delay: 0.5s; }
 
         .titulo-principal {
+            font-family: 'Orbitron', monospace;
             font-size: clamp(2rem, 6vw, 4.5rem);
             font-weight: 900;
             color: #fff;
             text-transform: uppercase;
-            letter-spacing: 4px;
+            letter-spacing: 5px;
             text-shadow: 
-                0 0 10px #00d4ff,
-                0 0 20px #00d4ff,
-                0 0 40px rgba(0, 212, 255, 0.8),
-                0 0 80px rgba(138, 43, 226, 0.6);
+                0 0 30px rgba(34, 197, 94, 0.8),
+                0 4px 6px rgba(0, 0, 0, 0.5),
+                0 8px 20px rgba(0, 0, 0, 0.3);
             margin: 0;
             position: relative;
             z-index: 2;
-            animation: titleGlow 3s ease-in-out infinite;
-        }
-
-        @keyframes titleGlow {
-            0%, 100% { 
-                text-shadow: 
-                    0 0 10px #00d4ff,
-                    0 0 20px #00d4ff,
-                    0 0 40px rgba(0, 212, 255, 0.8);
-            }
-            50% { 
-                text-shadow: 
-                    0 0 20px #00d4ff,
-                    0 0 40px #00d4ff,
-                    0 0 80px rgba(0, 212, 255, 1),
-                    0 0 120px rgba(138, 43, 226, 0.8);
-            }
+            line-height: 1.3;
         }
 
         .subtitulo {
-            font-size: clamp(1rem, 3vw, 1.5rem);
-            color: #00d4ff;
+            font-family: 'Orbitron', monospace;
+            font-size: clamp(0.9rem, 2vw, 1.2rem);
+            color: #86efac;
             margin-top: 1rem;
-            text-shadow: 0 0 10px rgba(0, 212, 255, 0.8);
-            position: relative;
-            z-index: 2;
+            letter-spacing: 4px;
+            text-shadow: 0 0 10px rgba(134, 239, 172, 0.5);
         }
 
-        /* Contenedor principal */
+        /* Contenedor */
         .contenido {
             max-width: 1400px;
             margin: 0 auto;
-            padding: 0 2rem 4rem;
+            padding: 4rem 2rem;
             position: relative;
             z-index: 10;
         }
 
-        /* Sección de título */
-        .seccion-titulo {
-            background: linear-gradient(90deg, 
-                transparent 0%, 
-                rgba(0, 212, 255, 0.3) 50%, 
-                transparent 100%);
-            border-top: 2px solid #00d4ff;
-            border-bottom: 2px solid #00d4ff;
-            color: #fff;
-            padding: 1.5rem 2rem;
-            margin: 4rem 0 2rem;
-            font-size: 2rem;
-            font-weight: 900;
-            text-transform: uppercase;
-            text-shadow: 
-                0 0 10px #00d4ff,
-                0 0 20px rgba(0, 212, 255, 0.6);
-            letter-spacing: 3px;
+        /* Sección */
+        .seccion {
+            background: linear-gradient(135deg, 
+                rgba(30, 41, 59, 0.85) 0%, 
+                rgba(15, 23, 42, 0.95) 100%);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(34, 197, 94, 0.3);
+            border-radius: 20px;
+            padding: 3rem;
+            margin: 3rem 0;
+            box-shadow: 
+                0 10px 40px rgba(0, 0, 0, 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
             position: relative;
-            text-align: center;
+            overflow: hidden;
         }
 
-        .seccion-titulo::before {
-            content: '∞';
+        .seccion::before {
+            content: '';
             position: absolute;
-            left: 2rem;
-            color: #00d4ff;
-            font-size: 2.5rem;
-            text-shadow: 0 0 20px #00d4ff;
-            animation: spin 4s linear infinite;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, #22c55e, #10b981, #22c55e);
+            background-size: 200% 100%;
+            animation: borderFlow 3s linear infinite;
+        }
+
+        @keyframes borderFlow {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 200% 0%; }
+        }
+
+        .seccion-titulo {
+            font-family: 'Orbitron', monospace;
+            font-size: clamp(1.8rem, 4vw, 2.8rem);
+            font-weight: 900;
+            color: #22c55e;
+            margin-bottom: 2rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            text-shadow: 0 0 20px rgba(34, 197, 94, 0.5);
+            position: relative;
+            padding-bottom: 1rem;
         }
 
         .seccion-titulo::after {
-            content: '∞';
+            content: '';
             position: absolute;
-            right: 2rem;
-            color: #00d4ff;
-            font-size: 2.5rem;
-            text-shadow: 0 0 20px #00d4ff;
-            animation: spin 4s linear infinite reverse;
+            bottom: 0;
+            left: 0;
+            width: 120px;
+            height: 4px;
+            background: linear-gradient(90deg, #22c55e, transparent);
+            border-radius: 2px;
         }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        .seccion-texto {
+            font-size: 1.15rem;
+            line-height: 1.9;
+            color: #cbd5e1;
+            margin-bottom: 1.5rem;
         }
 
-        /* Container de imágenes */
-        .imagenes-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-            gap: 3rem;
+        /* Paso a paso */
+        .paso-container {
             margin: 3rem 0;
         }
 
-        /* Card de imagen */
-        .imagen-card {
-            background: linear-gradient(135deg, 
-                rgba(0, 20, 40, 0.8) 0%, 
-                rgba(20, 0, 40, 0.8) 100%);
-            backdrop-filter: blur(10px);
-            border: 2px solid rgba(0, 212, 255, 0.3);
-            border-radius: 20px;
-            padding: 2rem;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.4s ease;
-            box-shadow: 
-                0 8px 32px rgba(0, 0, 0, 0.6),
-                inset 0 0 20px rgba(0, 212, 255, 0.1);
+        .paso-item {
+            display: grid;
+            grid-template-columns: 90px 1fr;
+            gap: 2.5rem;
+            margin: 3.5rem 0;
+            align-items: start;
         }
 
-        .imagen-card::before {
+        .paso-numero {
+            width: 90px;
+            height: 90px;
+            background: linear-gradient(135deg, #16a34a, #15803d);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Orbitron', monospace;
+            font-size: 2.2rem;
+            font-weight: 900;
+            color: #fff;
+            box-shadow: 
+                0 8px 25px rgba(34, 197, 94, 0.5),
+                inset 0 2px 0 rgba(255, 255, 255, 0.2);
+            border: 4px solid #22c55e;
+            position: relative;
+        }
+
+        .paso-numero::before {
             content: '';
             position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(0, 212, 255, 0.1) 0%, transparent 70%);
-            opacity: 0;
-            transition: opacity 0.4s ease;
+            top: -4px;
+            left: -4px;
+            right: -4px;
+            bottom: -4px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #22c55e, #10b981);
+            z-index: -1;
+            filter: blur(12px);
+            opacity: 0.6;
         }
 
-        .imagen-card:hover {
-            transform: translateY(-10px) scale(1.02);
-            border-color: #00d4ff;
-            box-shadow: 
-                0 12px 48px rgba(0, 212, 255, 0.4),
-                0 0 60px rgba(138, 43, 226, 0.3),
-                inset 0 0 30px rgba(0, 212, 255, 0.2);
-        }
-
-        .imagen-card:hover::before {
-            opacity: 1;
-            animation: cardGlow 2s ease-in-out infinite;
-        }
-
-        @keyframes cardGlow {
-            0%, 100% { transform: rotate(0deg); }
-            50% { transform: rotate(180deg); }
-        }
-
-        .imagen-titulo {
-            font-size: 1.8rem;
-            font-weight: 900;
-            color: #00d4ff;
-            margin-bottom: 1.5rem;
-            text-transform: uppercase;
-            text-shadow: 0 0 10px rgba(0, 212, 255, 0.8);
-            letter-spacing: 1px;
-            text-align: center;
-        }
-
-        .imagen-wrapper {
-            width: 100%;
+        .paso-contenido {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid rgba(34, 197, 94, 0.3);
             border-radius: 15px;
-            overflow: hidden;
-            border: 2px solid rgba(0, 212, 255, 0.3);
-            transition: all 0.4s ease;
-            box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
+            padding: 2.5rem;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
         }
 
-        .imagen-card:hover .imagen-wrapper {
-            border-color: #00d4ff;
-            box-shadow: 0 0 40px rgba(0, 212, 255, 0.5);
+        .paso-titulo {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.7rem;
+            font-weight: 700;
+            color: #86efac;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 10px rgba(134, 239, 172, 0.3);
         }
 
-        .imagen-content {
+        .paso-descripcion {
+            font-size: 1.08rem;
+            line-height: 1.85;
+            color: #cbd5e1;
+            margin-bottom: 1.5rem;
+        }
+
+        .paso-imagen {
             width: 100%;
-            height: auto;
-            display: block;
+            height: 380px;
+            overflow: hidden;
+            border-radius: 12px;
+            border: 3px solid rgba(34, 197, 94, 0.4);
+            box-shadow: 
+                0 8px 30px rgba(0, 0, 0, 0.5),
+                0 0 40px rgba(34, 197, 94, 0.2);
+            margin-top: 1.5rem;
+            background: #000;
+        }
+
+        .paso-imagen img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
             transition: transform 0.4s ease;
         }
 
-        .imagen-card:hover .imagen-content {
-            transform: scale(1.05);
+        .paso-item:hover .paso-imagen img {
+            transform: scale(1.08);
         }
 
-        .imagen-descripcion {
-            margin-top: 1.5rem;
-            font-size: 1.1rem;
+        /* Video */
+        .video-section {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.08), rgba(16, 185, 129, 0.08));
+            border: 3px solid;
+            border-image: linear-gradient(135deg, #22c55e, #10b981) 1;
+            border-radius: 20px;
+            padding: 2.5rem;
+            margin: 3rem 0;
+            box-shadow: 
+                0 15px 50px rgba(0, 0, 0, 0.6),
+                inset 0 1px 0 rgba(255, 255, 255, 0.08);
+        }
+
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 2.5rem;
+            margin-top: 2rem;
+        }
+
+        .video-wrapper {
+            position: relative;
+            width: 100%;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 
+                0 10px 40px rgba(0, 0, 0, 0.6),
+                0 0 60px rgba(34, 197, 94, 0.2);
+            border: 3px solid rgba(134, 239, 172, 0.5);
+        }
+
+        .video-badge {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: linear-gradient(135deg, #16a34a, #15803d);
+            color: #fff;
+            padding: 0.8rem 1.5rem;
+            border-radius: 25px;
+            font-family: 'Orbitron', monospace;
+            font-weight: 700;
+            font-size: 0.9rem;
+            letter-spacing: 2px;
+            z-index: 2;
+            box-shadow: 
+                0 5px 15px rgba(34, 197, 94, 0.6),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            border: 2px solid #86efac;
+        }
+
+        video {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        /* Materiales */
+        .materiales-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin: 2.5rem 0;
+        }
+
+        .material-card {
+            background: linear-gradient(135deg, rgba(22, 163, 74, 0.1), rgba(21, 128, 61, 0.1));
+            border: 2px solid rgba(34, 197, 94, 0.3);
+            border-radius: 15px;
+            padding: 2rem;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .material-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(34, 197, 94, 0.15), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .material-card:hover {
+            border-color: #22c55e;
+            box-shadow: 
+                0 12px 35px rgba(34, 197, 94, 0.4),
+                0 0 50px rgba(34, 197, 94, 0.2);
+            transform: translateY(-8px);
+        }
+
+        .material-card:hover::before {
+            left: 100%;
+        }
+
+        .material-icon {
+            font-size: 3rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .material-nombre {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #86efac;
+            margin-bottom: 0.8rem;
+        }
+
+        .material-descripcion {
+            font-size: 1rem;
+            color: #94a3b8;
             line-height: 1.7;
-            color: #ccc;
-            text-align: center;
+        }
+
+        /* Explicación técnica */
+        .tech-box {
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.85), rgba(30, 41, 59, 0.85));
+            border-left: 6px solid #22c55e;
+            border-radius: 15px;
+            padding: 2.5rem;
+            margin: 2.5rem 0;
+            box-shadow: 
+                0 10px 35px rgba(0, 0, 0, 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        }
+
+        .tech-titulo {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #86efac;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .tech-lista {
+            list-style: none;
+            padding: 0;
+        }
+
+        .tech-lista li {
+            padding: 1.2rem 0;
+            border-bottom: 1px solid rgba(34, 197, 94, 0.15);
+            font-size: 1.08rem;
+            line-height: 1.85;
+            color: #cbd5e1;
+        }
+
+        .tech-lista li:last-child {
+            border-bottom: none;
+        }
+
+        .tech-lista li strong {
+            color: #86efac;
+            font-weight: 700;
         }
 
         /* Botón */
         .btn-volver {
             display: inline-block;
-            background: linear-gradient(135deg, 
-                rgba(0, 150, 255, 0.3) 0%, 
-                rgba(138, 43, 226, 0.3) 100%);
-            backdrop-filter: blur(10px);
-            color: white;
-            padding: 1.2rem 3rem;
-            border: 2px solid #00d4ff;
+            background: linear-gradient(135deg, #16a34a, #15803d);
+            color: #fff;
+            padding: 1.3rem 3.5rem;
+            border: 3px solid #22c55e;
             border-radius: 50px;
             text-decoration: none;
-            font-weight: 900;
-            font-size: 1.1rem;
+            font-family: 'Orbitron', monospace;
+            font-weight: 700;
+            font-size: 1.15rem;
             text-transform: uppercase;
-            box-shadow: 
-                0 0 20px rgba(0, 212, 255, 0.4),
-                inset 0 0 20px rgba(0, 212, 255, 0.1);
-            transition: all 0.3s ease;
+            letter-spacing: 3px;
+            transition: all 0.35s ease;
             margin: 2rem 0;
-            letter-spacing: 2px;
-            text-shadow: 0 0 10px rgba(0, 212, 255, 0.8);
             position: relative;
             overflow: hidden;
+            box-shadow: 
+                0 8px 30px rgba(34, 197, 94, 0.5),
+                inset 0 2px 0 rgba(255, 255, 255, 0.2);
         }
 
         .btn-volver::before {
             content: '';
             position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(0, 212, 255, 0.3) 0%, transparent 70%);
-            opacity: 0;
-            transition: opacity 0.3s ease;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+            transition: left 0.5s ease;
         }
 
         .btn-volver:hover {
-            transform: translateY(-5px);
-            border-color: #fff;
+            transform: translateY(-4px);
+            border-color: #86efac;
             box-shadow: 
-                0 0 40px rgba(0, 212, 255, 0.8),
-                0 0 60px rgba(138, 43, 226, 0.6),
-                inset 0 0 30px rgba(0, 212, 255, 0.3);
+                0 15px 45px rgba(34, 197, 94, 0.7),
+                0 0 60px rgba(34, 197, 94, 0.4),
+                inset 0 2px 0 rgba(255, 255, 255, 0.3);
         }
 
         .btn-volver:hover::before {
-            opacity: 1;
-            animation: buttonPulse 1s ease-in-out infinite;
-        }
-
-        @keyframes buttonPulse {
-            0%, 100% { transform: scale(1) rotate(0deg); }
-            50% { transform: scale(1.5) rotate(180deg); }
+            left: 100%;
         }
 
         /* Footer */
         .footer {
-            background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.8) 100%);
-            color: #666;
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            color: #94a3b8;
             text-align: center;
-            padding: 3rem 2rem;
-            margin-top: 4rem;
-            border-top: 2px solid rgba(0, 212, 255, 0.2);
+            padding: 2.5rem;
+            margin-top: 5rem;
+            border-top: 3px solid;
+            border-image: linear-gradient(90deg, #22c55e, #10b981) 1;
             position: relative;
             z-index: 10;
         }
 
         .footer-text {
-            color: #00d4ff;
-            text-shadow: 0 0 10px rgba(0, 212, 255, 0.6);
-            font-weight: bold;
-            font-size: 1.1rem;
-            margin-bottom: 0.5rem;
+            font-family: 'Orbitron', monospace;
+            font-size: 1.15rem;
+            color: #86efac;
+            letter-spacing: 2px;
+            text-shadow: 0 0 15px rgba(134, 239, 172, 0.3);
         }
 
         /* Responsive */
         @media (max-width: 768px) {
-            .six-eyes {
-                width: 50px;
-                height: 50px;
-            }
-
-            .imagenes-container {
+            .paso-item {
                 grid-template-columns: 1fr;
-                gap: 2rem;
+                gap: 1.5rem;
             }
 
-            .seccion-titulo {
-                font-size: 1.5rem;
-                padding: 1rem;
+            .paso-numero {
+                width: 70px;
+                height: 70px;
+                font-size: 1.8rem;
+                margin: 0 auto;
             }
 
-            .seccion-titulo::before,
-            .seccion-titulo::after {
-                font-size: 1.5rem;
+            .video-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .materiales-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .seccion {
+                padding: 2rem;
             }
         }
 
-        /* Efecto de carga */
-        @keyframes domainExpand {
-            0% {
-                transform: scale(0);
+        /* Animación entrada */
+        @keyframes fadeInUp {
+            from {
                 opacity: 0;
+                transform: translateY(40px);
             }
-            50% {
+            to {
                 opacity: 1;
+                transform: translateY(0);
             }
-            100% {
-                transform: scale(1);
-                opacity: 1;
-            }
-        }
-
-        .contenido {
-            animation: domainExpand 0.8s ease-out;
         }
     </style>
 </head>
 <body>
-    <!-- Líneas infinitas del dominio -->
-    <div class="infinite-lines" id="lines"></div>
-
-    <!-- Partículas flotantes -->
-    <div id="particles"></div>
+    <!-- Gradiente de fondo -->
+    <div class="bg-gradient gradient-green"></div>
 
     <!-- Header -->
     <header class="header">
-        <div class="six-eyes eyes-left"></div>
-        <h1 class="titulo-principal">Circuito en Serie y Paralelo</h1>
-        <p class="subtitulo">Tinkercad y Fisico</p>
-        <div class="six-eyes eyes-right"></div>
+        <div class="led-indicator led-tl"></div>
+        <div class="led-indicator led-tr"></div>
+        <div class="led-indicator led-bl"></div>
+        <div class="led-indicator led-br"></div>
+        <h1 class="titulo-principal">💡 Encender un Led con Protoboard 💡</h1>
+        <p class="subtitulo">[CIRCUITOS DE LEDS EN PARALELO Y SERIE]</p>
+        <p class="subtitulo">[CIRCUITOS DE LEDS EN PARALELO Y SERIE CON PUSH BUTTON]</p>
+        <p class="subtitulo">[ CIRCUITOS DE LEDS EN PARALELO Y SERIE CON POTENCIÓMETRO]</p>
+
+
     </header>
 
-    <!-- Contenido principal -->
+    <!-- Contenido -->
     <main class="contenido">
         <center>
-            <a href="index.html" class="btn-volver">← Volver a la pagina principal</a>
+            <a href="index.html" class="btn-volver">◄ VOLVER AL INICIO</a>
         </center>
 
-        <!-- Sección: Diagramas -->
-        <h2 class="seccion-titulo">Diagramas de Circuitos</h2>
-        <div class="imagenes-container">
-            <div class="imagen-card">
-                <h3 class="imagen-titulo">Circuito en Serie y Paralelo - Diagrama 1</h3>
-                <div class="imagen-wrapper">
-                    <img src="Circuitos.png" alt="Circuito en Serie Diagrama 1" class="imagen-content">
+        <!-- Introducción -->
+        <section class="seccion">
+            <h2 class="seccion-titulo">Introducción al Circuito</h2>
+            <p class="seccion-texto">
+              
+                Un proyecto de <strong> encende un LED</strong> en una protoboard demuestra los fundamentos básicos de la electrónica.
+                En este tipo de circuito se observa cómo fluye la corriente eléctrica desde una fuente de energía, pasando por conductores, hasta 
+                llegar a un componente como el LED y regresar al punto de origen. 
+                También permite comprender la importancia de la polaridad, ya que el LED solo 
+                funciona correctamente si se conecta en la dirección adecuada (ánodo y cátodo). 
+                Además, se demuestra el uso de una resistencia para limitar la corriente y evitar que 
+                el LED se dañe.
+                El uso de un push button o botón en el circuito demuestra el control manual del flujo de corriente. Al presionar el botón, el circuito se cierra y permite el paso de la electricidad, encendiendo los LEDs; al soltarlo, el circuito se abre y se interrumpe el flujo, apagándolos. Esto permite comprender el funcionamiento de interruptores y el concepto de circuitos abiertos y cerrados.
+
+Finalmente, el uso de un potenciómetro en el circuito permite regular la intensidad de la luz del LED. Este componente actúa como una resistencia variable, lo que significa que al girarlo se puede aumentar o disminuir la cantidad de corriente que pasa por el circuito. Como resultado, el LED puede brillar más o menos, demostrando la relación directa entre resistencia, corriente e intensidad luminosa.
+
+                
+
+                
+            </p>
+            <p class="seccion-texto">
+                El circuito utiliza salidas digitales PWM del Arduino para generar un patrón de parpadeo sincronizado 
+                en tres LEDs verdes. Esta práctica ilustra conceptos fundamentales de electrónica digital, control 
+                de actuadores y programación de microcontroladores.
+            </p>
+        </section>
+
+        <!-- Materiales -->
+        <section class="seccion">
+            <h2 class="seccion-titulo">Materiales Utilizados</h2>
+            <p class="seccion-texto">
+                Componentes necesarios para construir el circuito de parpadeo de LEDs en paralelo:
+            </p>
+
+            <div class="materiales-grid">
+                <div class="material-card">
+                    <div class="material-icon">🔵</div>
+                    <div class="material-nombre">Arduino UNO</div>
+                    <div class="material-descripcion">
+                        Placa de desarrollo con microcontrolador ATmega328P. Genera las señales digitales de control 
+                        (HIGH/LOW) para encender y apagar los LEDs mediante programación.
+                    </div>
                 </div>
-                <p class="imagen-descripcion">
-                    En un circuito en serie, los componentes están conectados uno tras otro. La corriente es la misma en todos los componentes, pero el voltaje se divide entre ellos. 
-                    En un circuito paralelo, los componentes comparten los mismos puntos de conexión. El voltaje es el mismo en todos los componentes, pero la corriente se divide.
+
+                <div class="material-card">
+                    <div class="material-icon">💚</div>
+                    <div class="material-nombre">3x LEDs Verdes</div>
+                    <div class="material-descripcion">
+                        Diodos emisores de luz de 5mm con longitud de onda de ~525nm (verde). Voltaje de operación 
+                        típico: 2.0-2.2V. Corriente máxima: 20mA.
+                    </div>
+                </div>
+
+                <div class="material-card">
+                    <div class="material-icon">⚡</div>
+                    <div class="material-nombre">3x Resistencias 220Ω</div>
+                    <div class="material-descripcion">
+                        Resistencias limitadoras de corriente (código de colores: rojo-rojo-café). Protegen los LEDs 
+                        del exceso de corriente calculadas mediante la Ley de Ohm.
+                    </div>
+                </div>
+
+                <div class="material-card">
+                    <div class="material-icon">🔲</div>
+                    <div class="material-nombre">Protoboard</div>
+                    <div class="material-descripcion">
+                        Tablero de conexiones sin soldadura con filas interconectadas. Permite el montaje temporal 
+                        del circuito facilitando pruebas y modificaciones.
+                    </div>
+                </div>
+
+                <div class="material-card">
+                    <div class="material-icon">🔗</div>
+                    <div class="material-nombre">Cables Jumper</div>
+                    <div class="material-descripcion">
+                        Cables de conexión macho-macho para establecer las conexiones entre Arduino y protoboard. 
+                        Colores: amarillo (señal), azul (señal), rosa (señal), negro (GND).
+                    </div>
+                </div>
+
+                <div class="material-card">
+                    <div class="material-icon">🔌</div>
+                    <div class="material-nombre">Cable USB</div>
+                    <div class="material-descripcion">
+                        Cable USB tipo A a tipo B para programación del Arduino y suministro de alimentación de 5V 
+                        desde el computador.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Proceso Paso a Paso -->
+        <section class="seccion">
+            <h2 class="seccion-titulo">Proceso de Construcción Paso a Paso</h2>
+            <p class="seccion-texto">
+                Guía detallada para ensamblar el circuito de parpadeo de LEDs en paralelo con Arduino:
+            </p>
+
+            <div class="paso-container">
+                <!-- Tinkercad -->
+                <div class="paso-item">
+                    <div class="paso-numero">0</div>
+                    <div class="paso-contenido">
+                        <h3 class="paso-titulo">Diagrama de Tinkercad</h3>
+                        <p class="paso-descripcion">
+                            En este diagrama<strong>se puede ver</strong> el uso de arduino, 3 LEDS verdes, cables y resistencias
+                        </p>
+                        <p class="paso-descripcion">
+                            Este es el diagrama hecho en tinkercad de este circuito
+                        </p>
+                        <div class="paso-imagen">
+                            <img src="ArdPA.png" alt="Diagrama">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Paso 1 -->
+                <div class="paso-item">
+                    <div class="paso-numero">1</div>
+                    <div class="paso-contenido">
+                        <h3 class="paso-titulo">Montaje de LEDs y Resistencias en Protoboard</h3>
+                        <p class="paso-descripcion">
+                            Ensamblar los componentes en el protoboard siguiendo la configuración en paralelo. 
+                            Cada <strong>LED verde</strong> debe conectarse con su respectiva <strong>resistencia 
+                            de 220Ω</strong> en serie para limitar la corriente.
+                        </p>
+                        <p class="paso-descripcion">
+                            <strong>Configuración por LED:</strong>
+                            <br>• Ánodo (terminal larga del LED) → Resistencia 220Ω → Cable de señal del Arduino
+                            <br>• Cátodo (terminal corta del LED) → Línea de tierra común (GND)
+                        </p>
+                        <p class="paso-descripcion">
+                            La imagen muestra los tres LEDs verdes alineados horizontalmente con sus resistencias 
+                            azules conectadas. Cada LED funciona independientemente pero recibe la misma señal de 
+                            control, creando un efecto de parpadeo sincronizado.
+                        </p>
+                        <div class="paso-imagen">
+                            <img src="LEDS PARA.jpg" alt="LEDs y resistencias montados">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Paso 2 -->
+                <div class="paso-item">
+                    <div class="paso-numero">2</div>
+                    <div class="paso-contenido">
+                        <h3 class="paso-titulo">Conexión a Tierra (GND)</h3>
+                        <p class="paso-descripcion">
+                            Establecer la conexión de <strong>tierra común (GND)</strong> desde el Arduino hacia 
+                            el protoboard. Este cable (generalmente negro o café) completa el circuito eléctrico 
+                            y sirve como referencia de voltaje (0V) para todo el sistema.
+                        </p>
+                        <p class="paso-descripcion">
+                            En la imagen se aprecia el cable conectado desde el pin GND del Arduino. La tierra común 
+                            es esencial en la configuración paralela, ya que todos los LEDs comparten este punto de 
+                            retorno de corriente. Sin esta conexión, el circuito no funcionaría correctamente.
+                        </p>
+                        <div class="paso-imagen">
+                            <img src="GND LEDS PARA.jpg" alt="Conexión GND">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Paso 3 -->
+                <div class="paso-item">
+                    <div class="paso-numero">3</div>
+                    <div class="paso-contenido">
+                        <h3 class="paso-titulo">Configuración de Conexiones a Pines Digitales</h3>
+                        <p class="paso-descripcion">
+                            Conectar los <strong>cables de señal</strong> desde los pines digitales PWM del Arduino 
+                            (identificados con el símbolo ~) hacia el protoboard. En esta imagen se observan tres cables 
+                            de colores (amarillo, azul y rosa) conectados desde los pines digitales del Arduino.
+                        </p>
+                        <p class="paso-descripcion">
+                            Cada cable lleva la señal de control digital (HIGH = 5V, LOW = 0V) que determinará el 
+                            encendido y apagado de cada LED. Los pines PWM permiten también controlar la intensidad 
+                            mediante modulación de ancho de pulso si fuera necesario.
+                        </p>
+                        <div class="paso-imagen">
+                            <img src="PIN LEDS PARA.jpg" alt="Conexión pines digitales">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Videos de Funcionamiento -->
+        <section class="seccion">
+            <h2 class="seccion-titulo">Demostración de Funcionamiento</h2>
+            
+            <div class="video-section">
+                <h3 style="font-family: 'Orbitron', monospace; color: #86efac; font-size: 1.5rem; margin-bottom: 1rem;">
+                    Resultados del Circuito
+                </h3>
+                <p class="seccion-texto">
+                    A continuación se presentan dos demostraciones del circuito en funcionamiento, mostrando diferentes 
+                    configuraciones y validando el correcto funcionamiento del sistema.
                 </p>
+
+                <div class="video-grid">
+                    <!-- Video 1: Funcionamiento Independiente -->
+                    <div style="animation: fadeInUp 0.6s ease-out;">
+                        <h4 style="font-family: 'Orbitron', monospace; color: #22c55e; font-size: 1.3rem; margin-bottom: 1rem;">
+                            Funcionamiento Independiente del Arduino
+                        </h4>
+                        <p class="seccion-texto" style="font-size: 1rem; margin-bottom: 1.5rem;">
+                            Este video demuestra que el circuito funciona <strong>sin necesidad de los 3 LEDs físicos</strong>. 
+                            Ya que cada LED tiene su propio PIN (PIN 13, PIN 12, PIN 11) en el arduino, estos tambien sirven como
+                            fuente de alimentación independiente para cada LED.
+                        </p>
+                        <div class="video-wrapper">
+                            <div class="video-badge">⚙ SIN TODOS LOS LEDS</div>
+                            <video controls>
+                                <source src="LEDS PARA IN.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                    </div>
+
+                    <!-- Video 2: Resultado Final -->
+                    <div style="animation: fadeInUp 0.6s ease-out 0.2s; opacity: 0; animation-fill-mode: forwards;">
+                        <h4 style="font-family: 'Orbitron', monospace; color: #22c55e; font-size: 1.3rem; margin-bottom: 1rem;">
+                            Resultado Final Completo
+                        </h4>
+                        <p class="seccion-texto" style="font-size: 1rem; margin-bottom: 1.5rem;">
+                            Demostración del <strong>circuito completo en operación</strong> con los tres LEDs verdes 
+                            conectados en paralelo. Se observa el patrón de parpadeo sincronizado controlado por el 
+                            Arduino, mostrando la aplicación práctica del control digital de actuadores luminosos 
+                            mediante programación.
+                        </p>
+                        <div class="video-wrapper">
+                            <div class="video-badge">✓ RESULTADO FINAL</div>
+                            <video controls>
+                                <source src="LEDS PARA ON.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Explicación de Funcionamiento -->
+        <section class="seccion">
+            <h2 class="seccion-titulo">¿Por Qué Funciona el Circuito?</h2>
+            <p class="seccion-texto">
+                El funcionamiento de este circuito se basa en varios principios fundamentales de electrónica digital 
+                y control de microcontroladores. A continuación se explican los conceptos clave:
+            </p>
+
+            <div class="tech-box">
+                <h3 class="tech-titulo">
+                    <span style="color: #22c55e;">⚡</span> Principios de Funcionamiento
+                </h3>
+                <ul class="tech-lista">
+                    <li>
+                        <strong>Configuración en Paralelo:</strong> Los tres LEDs están conectados en paralelo, 
+                        lo que significa que cada uno tiene su propia rama independiente desde la fuente de voltaje 
+                        hasta tierra. Esto permite que todos reciban el mismo voltaje (5V cuando el pin está en HIGH) 
+                        y que la falla de un LED no afecte a los demás. Cada rama es independiente y tiene su propia 
+                        resistencia limitadora.
+                    </li>
+                    <li>
+                        <strong>Control Digital del Arduino:</strong> El microcontrolador ATmega328P del Arduino 
+                        genera señales digitales en sus pines de salida mediante el código programado. Cuando se 
+                        ejecuta digitalWrite(pin, HIGH), el pin produce 5V; con digitalWrite(pin, LOW), produce 0V. 
+                        Esta alternancia controlada crea el efecto de parpadeo.
+                    </li>
+                    <li>
+                        <strong>Resistencias Limitadoras de Corriente:</strong> Cada LED tiene una resistencia de 
+                        220Ω en serie calculada mediante la Ley de Ohm: R = (Vfuente - VLED) / ILED = (5V - 2.0V) / 0.02A 
+                        ≈ 150Ω (se usa 220Ω como valor comercial estándar). Estas resistencias protegen los LEDs 
+                        limitando la corriente a aproximadamente 13.6mA, por debajo del máximo de 20mA.
+                    </li>
+                    <li>
+                        <strong>Polarización del LED:</strong> Los LEDs son diodos que solo conducen en una dirección. 
+                        El ánodo (terminal larga, positiva) se conecta hacia la fuente de voltaje (pin del Arduino), 
+                        y el cátodo (terminal corta, negativa) hacia tierra. Esta polarización correcta permite el 
+                        flujo de corriente y la emisión de luz cuando el pin está en estado HIGH.
+                    </li>
+                    <li>
+                        <strong>Función delay() en Arduino:</strong> La biblioteca de Arduino proporciona la función 
+                        delay(ms) que pausa la ejecución del programa durante un tiempo especificado en milisegundos. 
+                        Combinando digitalWrite() con delay(), se crea un patrón de encendido-espera-apagado-espera 
+                        que produce el efecto de parpadeo visible.
+                    </li>
+                    <li>
+                        <strong>Capacidad de Corriente de los Pines:</strong> Cada pin digital del Arduino puede 
+                        proporcionar hasta 40mA de corriente máxima (20mA recomendado). Como cada LED consume ~13.6mA, 
+                        es posible controlar múltiples LEDs desde diferentes pines sin exceder la capacidad total 
+                        del microcontrolador (200mA máximo para todos los pines combinados).
+                    </li>
+                </ul>
             </div>
 
-            <div class="imagen-card">
-                <h3 class="imagen-titulo">Ambos circuitos en un mismo protoboard - Diagrama 2</h3>
-                <div class="imagen-wrapper">
-                    <img src="Un solo circuito.png" alt="Circuito en Paralelo Diagrama 2" class="imagen-content">
-                </div>
-                <p class="imagen-descripcion">
-                    En esta imagen se muestran ambos circuitos en un mismo protoboard realizado en Tinkercad
-                </p>
+            <div class="tech-box" style="margin-top: 2.5rem;">
+                <h3 class="tech-titulo">
+                    <span style="color: #22c55e;">🔬</span> Cálculos Técnicos del Circuito
+                </h3>
+                <ul class="tech-lista">
+                    <li>
+                        <strong>Voltaje de Operación del LED:</strong> VLED = 2.0V - 2.2V (típico para LEDs verdes)
+                    </li>
+                    <li>
+                        <strong>Corriente por LED:</strong> ILED = (VPIN - VLED) / R = (5V - 2.0V) / 220Ω ≈ 13.6mA
+                    </li>
+                    <li>
+                        <strong>Potencia Disipada por Resistencia:</strong> P = I² × R = (0.0136A)² × 220Ω ≈ 40.7mW
+                    </li>
+                    <li>
+                        <strong>Potencia Consumida por LED:</strong> PLED = VLED × ILED = 2.0V × 0.0136A ≈ 27.2mW
+                    </li>
+                    <li>
+                        <strong>Corriente Total del Circuito:</strong> ITOTAL = 3 × ILED = 3 × 13.6mA ≈ 40.8mA
+                    </li>
+                    <li>
+                        <strong>Consumo Total de Potencia:</strong> PTOTAL ≈ 3 × (40.7mW + 27.2mW) ≈ 203.7mW
+                    </li>
+                </ul>
             </div>
-        </div>
 
-        <!-- Sección: Implementaciones Reales -->
-        <h2 class="seccion-titulo">Implementaciones Prácticas</h2>
-        <div class="imagenes-container">
-            <div class="imagen-card">
-                <h3 class="imagen-titulo">Protoboard Fisico Apagado - Implementación 1</h3>
-                <div class="imagen-wrapper">
-                    <img src="Fisico Off.jpg" alt="Circuito en Protoboard 1" class="imagen-content">
-                </div>
-                <p class="imagen-descripcion">
-                    Implementación física del circuito en protoboard con LEDs, resistencias y cables jumper. Se observan las conexiones básicas y la distribución de componentes.
+            <div class="tech-box" style="margin-top: 2.5rem;">
+                <h3 class="tech-titulo">
+                    <span style="color: #22c55e;">💻</span> Estructura del Código Arduino
+                </h3>
+                <p class="seccion-texto" style="color: #cbd5e1;">
+                    El código típico para este circuito sigue esta estructura básica:
                 </p>
-            </div>
+                <ul class="tech-lista">
+                    <li>
+                        <strong>void setup():</strong>
+                        {
+                          pinMode(13, OUTPUT);
+                          pinMode(12, OUTPUT);
+                          pinMode(11, OUTPUT);
+                        }
+                        
+                        void loop()
+                        {
+                          // Encender todos al mismo tiempo
+                          digitalWrite(13, HIGH);
+                          digitalWrite(12, HIGH);
+                          digitalWrite(11, HIGH);
+                          delay(1000);
+                            
+                          // Apagar todos al mismo tiempo
+                          digitalWrite(13, LOW);
+                          digitalWrite(12, LOW);
+                          digitalWrite(11, LOW);
+                          delay(1000);
+                        }
 
-            <div class="imagen-card">
-                <h3 class="imagen-titulo">Protoboard Fisico Encendido - Implementación 2</h3>
-                <div class="imagen-wrapper">
-                    <img src="Fisico On.jpg" alt="Circuito en Protoboard 2" class="imagen-content">
-                </div>
-                <p class="imagen-descripcion">
-                    Vista del circuito funcionando con LEDs encendidos. Se muestra la batería de 9V conectada y la iluminación de los componentes en el circuito activo.
-                </p>
+                    </li>
+                </ul>
             </div>
-        </div>
+        </section>
 
         <center>
-            <a href="index.html" class="btn-volver">← Retornar al Mundo Real</a>
+            <a href="index.html" class="btn-volver">◄ VOLVER AL INICIO</a>
         </center>
     </main>
 
     <!-- Footer -->
     <footer class="footer">
-        <p class="footer-text">Circuitos</p>
-        <p>Principios de Electrónica con Arduino</p>
+        <p class="footer-text">[ CIRCUITO DE PARPADEO DE LEDS EN PARALELO - ARDUINO ]</p>
+        <p style="margin-top: 0.5rem; color: #64748b;">Principios de Electrónica - Control Digital de Actuadores</p>
     </footer>
 
     <script>
-        // Crear líneas infinitas del dominio
-        function createDomainLines() {
-            const linesContainer = document.getElementById('lines');
-            const numberOfLines = 30;
-
-            for (let i = 0; i < numberOfLines; i++) {
-                const line = document.createElement('div');
-                line.className = 'line';
-                line.style.left = (i * (100 / numberOfLines)) + '%';
-                line.style.animationDelay = (i * 0.1) + 's';
-                line.style.animationDuration = (2 + Math.random() * 2) + 's';
-                linesContainer.appendChild(line);
-            }
-        }
-
-        // Crear partículas flotantes
-        function createParticles() {
-            const particlesContainer = document.getElementById('particles');
-            const numberOfParticles = 50;
-
-            for (let i = 0; i < numberOfParticles; i++) {
-                const particle = document.createElement('div');
-                particle.className = 'particle';
-                particle.style.left = Math.random() * 100 + '%';
-                particle.style.top = Math.random() * 100 + '%';
-                particle.style.animationDelay = Math.random() * 8 + 's';
-                particle.style.animationDuration = (5 + Math.random() * 5) + 's';
-                
-                const colors = ['#00d4ff', '#8a2be2', '#00bfff', '#9370db'];
-                particle.style.background = colors[Math.floor(Math.random() * colors.length)];
-                particle.style.boxShadow = `0 0 10px ${particle.style.background}, 0 0 20px ${particle.style.background}`;
-                
-                particlesContainer.appendChild(particle);
-            }
-        }
-
-        // Efecto de parallax en las cards
-        document.addEventListener('mousemove', (e) => {
-            const cards = document.querySelectorAll('.imagen-card');
-            const mouseX = e.clientX / window.innerWidth - 0.5;
-            const mouseY = e.clientY / window.innerHeight - 0.5;
-
-            cards.forEach((card, index) => {
-                const speed = (index % 2 + 1) * 5;
-                const x = mouseX * speed;
-                const y = mouseY * speed;
-                
-                card.style.transform = `perspective(1000px) rotateY(${x}deg) rotateX(${-y}deg)`;
-            });
-        });
-
-        // Resetear transformación al salir
-        document.addEventListener('mouseleave', () => {
-            const cards = document.querySelectorAll('.imagen-card');
-            cards.forEach(card => {
-                card.style.transform = 'perspective(1000px) rotateY(0deg) rotateX(0deg)';
-            });
-        });
-
-        // Ejecutar al cargar la página
-        window.addEventListener('load', () => {
-            createDomainLines();
-            createParticles();
-        });
-
-        // Efecto de expansión del dominio al hacer scroll
+        // Animación de entrada
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
-                    entry.target.style.animation = 'domainExpand 0.6s ease-out';
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
                 }
             });
         }, { threshold: 0.1 });
 
-        document.querySelectorAll('.imagen-card').forEach(card => {
-            observer.observe(card);
+        document.querySelectorAll('.seccion, .paso-item').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(40px)';
+            el.style.transition = 'all 0.7s ease';
+            observer.observe(el);
         });
     </script>
 </body>
