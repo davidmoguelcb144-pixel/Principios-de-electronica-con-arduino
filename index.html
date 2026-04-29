@@ -3,233 +3,187 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Arduino Dinámico</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap" rel="stylesheet">
+<title>Electrónica con Arduino</title>
 
 <style>
-:root{
-    --bg:#0b0b0f;
-    --primary:#7c3aed;
-    --secondary:#3b82f6;
-    --text:#fff;
+:root {
+    --vino: #2b0d14;
+    --vino-claro: #4a1c24;
+    --dorado: #d4af37;
+    --blanco: #ffffff;
 }
 
-*{margin:0;padding:0;box-sizing:border-box;}
-
-body{
-    font-family:'Inter',sans-serif;
-    background:var(--bg);
-    color:var(--text);
-    overflow-x:hidden;
-    cursor:none; /* ocultamos cursor */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-/* ===== CURSOR PRO ===== */
-.cursor{
-    width:20px;
-    height:20px;
-    border:2px solid white;
-    border-radius:50%;
-    position:fixed;
-    pointer-events:none;
-    transform:translate(-50%,-50%);
-    z-index:999;
-    transition:transform .1s;
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background: var(--vino);
+    color: var(--blanco);
 }
 
-/* ===== PARTÍCULAS ===== */
-canvas{
-    position:fixed;
-    top:0;
-    left:0;
-    z-index:-1;
+/* PORTADA */
+.portada {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: radial-gradient(circle at center, #3a121b, #1a0509);
+    text-align: center;
 }
 
-/* ===== PORTADA ===== */
-.portada{
-    min-height:100vh;
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
-    align-items:center;
-    text-align:center;
+.titulo-principal {
+    font-size: clamp(2.5rem, 6vw, 4rem);
+    font-weight: 900;
+    letter-spacing: 2px;
+    color: var(--blanco);
+    text-shadow: 0 0 20px rgba(212,175,55,0.5);
+    animation: glow 3s infinite alternate;
 }
 
-.titulo{
-    font-size:clamp(2.5rem,6vw,4rem);
-    font-weight:900;
+@keyframes glow {
+    from { text-shadow: 0 0 10px rgba(212,175,55,0.3); }
+    to { text-shadow: 0 0 30px rgba(212,175,55,0.8); }
 }
 
-/* ===== CARDS ===== */
-.grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
-    gap:2rem;
-    padding:4rem;
+.equipo {
+    margin-top: 2rem;
 }
 
-.card{
-    background:#111;
-    border-radius:15px;
-    overflow:hidden;
-    transition:.2s;
-    transform-style:preserve-3d;
-    position:relative;
+.miembro {
+    margin: 10px 0;
+    padding: 10px 20px;
+    border-left: 3px solid var(--dorado);
+    background: rgba(255,255,255,0.05);
+    transition: 0.3s;
 }
 
-.card::before{
-    content:"";
-    position:absolute;
-    inset:0;
-    background: radial-gradient(circle at var(--x) var(--y),
-        rgba(124,58,237,.4),
-        transparent 60%);
-    opacity:0;
-    transition:.2s;
+.miembro:hover {
+    transform: translateX(10px);
+    background: rgba(212,175,55,0.1);
 }
 
-.card:hover::before{
-    opacity:1;
+/* CATÁLOGO */
+.catalogo {
+    padding: 4rem 2rem;
 }
 
-.card img{
-    width:100%;
-    height:180px;
-    object-fit:cover;
+.catalogo-titulo {
+    text-align: center;
+    font-size: 2.5rem;
+    margin-bottom: 3rem;
+    color: var(--dorado);
 }
 
-.card-content{
-    padding:1rem;
+/* CARDS */
+.cards-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
 }
 
-.btn{
-    display:inline-block;
-    margin-top:.5rem;
-    padding:.5rem 1rem;
-    background:linear-gradient(135deg,var(--primary),var(--secondary));
-    border-radius:8px;
-    color:white;
-    text-decoration:none;
+.card {
+    background: #1a0509;
+    border: 1px solid rgba(212,175,55,0.2);
+    border-radius: 15px;
+    overflow: hidden;
+    transition: 0.4s;
+    position: relative;
 }
 
-/* ===== SCROLL ===== */
-.hidden{
-    opacity:0;
-    transform:translateY(40px);
-    transition:all .7s;
+.card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 0 25px rgba(212,175,55,0.3);
 }
 
-.show{
-    opacity:1;
-    transform:translateY(0);
+/* IMAGEN COMPLETA */
+.card-image {
+    width: 100%;
+    height: 200px;
+    object-fit: contain;
+    background: black;
 }
+
+/* CONTENIDO */
+.card-content {
+    padding: 1rem;
+}
+
+.card-title {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+    color: var(--blanco);
+}
+
+/* BOTÓN */
+.card a {
+    display: inline-block;
+    padding: 8px 15px;
+    border: 1px solid var(--dorado);
+    color: var(--dorado);
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+.card a:hover {
+    background: var(--dorado);
+    color: black;
+}
+
+/* NUMERO */
+.card-number {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    color: var(--dorado);
+    font-weight: bold;
+}
+
 </style>
 </head>
 
 <body>
 
-<div class="cursor"></div>
-<canvas id="particles"></canvas>
+<section class="portada">
+    <h1 class="titulo-principal">Electrónica con Arduino</h1>
 
-<section class="portada hidden">
-    <h1 class="titulo">Electrónica con Arduino</h1>
+    <div class="equipo">
+        <div class="miembro">David Yael Gutiérrez</div>
+        <div class="miembro">Alde Elishua Ruiz</div>
+        <div class="miembro">Valeria Michell Velasco</div>
+        <div class="miembro">Ervin Alexander Gonzales</div>
+    </div>
 </section>
 
-<section class="grid">
+<section class="catalogo">
+    <h2 class="catalogo-titulo">Catálogo</h2>
 
-<div class="card hidden">
-<img src="https://images.unsplash.com/photo-1553406830-ef2513450d76">
-<div class="card-content">
-<h3>Conceptos Básicos</h3>
-<a href="#" class="btn">Entrar</a>
-</div>
-</div>
+    <div class="cards-container">
 
-<div class="card hidden">
-<img src="https://images.unsplash.com/photo-1581092160562-40aa08e78837">
-<div class="card-content">
-<h3>Materiales</h3>
-<a href="#" class="btn">Entrar</a>
-</div>
-</div>
+        <div class="card">
+            <img src="https://images.unsplash.com/photo-1553406830-ef2513450d76" class="card-image">
+            <div class="card-content">
+                <div class="card-number">1</div>
+                <h3 class="card-title">Conceptos Básicos</h3>
+                <a href="#">Ver</a>
+            </div>
+        </div>
 
+        <div class="card">
+            <img src="https://images.unsplash.com/photo-1581092160562-40aa08e78837" class="card-image">
+            <div class="card-content">
+                <div class="card-number">2</div>
+                <h3 class="card-title">Materiales</h3>
+                <a href="#">Ver</a>
+            </div>
+        </div>
+
+    </div>
 </section>
-
-<script>
-/* ===== CURSOR ===== */
-const cursor = document.querySelector(".cursor");
-document.addEventListener("mousemove", e=>{
-    cursor.style.top = e.clientY+"px";
-    cursor.style.left = e.clientX+"px";
-});
-
-/* ===== PARTICULAS ===== */
-const canvas = document.getElementById("particles");
-const ctx = canvas.getContext("2d");
-
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
-
-let particles = [];
-
-for(let i=0;i<80;i++){
-    particles.push({
-        x:Math.random()*canvas.width,
-        y:Math.random()*canvas.height,
-        vx:Math.random()*1-0.5,
-        vy:Math.random()*1-0.5
-    });
-}
-
-function animate(){
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    particles.forEach(p=>{
-        p.x+=p.vx;
-        p.y+=p.vy;
-
-        ctx.fillStyle="#7c3aed";
-        ctx.fillRect(p.x,p.y,2,2);
-
-        if(p.x<0||p.x>canvas.width) p.vx*=-1;
-        if(p.y<0||p.y>canvas.height) p.vy*=-1;
-    });
-    requestAnimationFrame(animate);
-}
-animate();
-
-/* ===== SCROLL ===== */
-const observer = new IntersectionObserver(entries=>{
-    entries.forEach(entry=>{
-        if(entry.isIntersecting){
-            entry.target.classList.add("show");
-        }
-    });
-});
-document.querySelectorAll(".hidden").forEach(el=>observer.observe(el));
-
-/* ===== CARD INTERACTIVA ===== */
-document.querySelectorAll(".card").forEach(card=>{
-    card.addEventListener("mousemove",e=>{
-        const rect = card.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-
-        card.style.setProperty("--x", x+"px");
-        card.style.setProperty("--y", y+"px");
-
-        const rotateX = (y - rect.height/2)/15;
-        const rotateY = (rect.width/2 - x)/15;
-
-        card.style.transform =
-            `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.03)`;
-    });
-
-    card.addEventListener("mouseleave",()=>{
-        card.style.transform="rotateX(0) rotateY(0)";
-    });
-});
-</script>
 
 </body>
 </html>
