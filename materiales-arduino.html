@@ -228,6 +228,167 @@
             border-radius: 10px;
         }
 
+            .paso-contenido {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            border-radius: 15px;
+            padding: 2.5rem;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .paso-titulo {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.7rem;
+            font-weight: 700;
+            color: #86efac;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 10px rgba(134, 239, 172, 0.3);
+        }
+
+        .paso-descripcion {
+            font-size: 1.08rem;
+            line-height: 1.85;
+            color: #cbd5e1;
+            margin-bottom: 1.5rem;
+        }
+
+        .paso-imagen {
+            width: 100%;
+            height: 380px;
+            overflow: hidden;
+            border-radius: 12px;
+            border: 3px solid rgba(34, 197, 94, 0.4);
+            box-shadow: 
+                0 8px 30px rgba(0, 0, 0, 0.5),
+                0 0 40px rgba(34, 197, 94, 0.2);
+            margin-top: 1.5rem;
+            background: #000;
+        }
+
+        .paso-imagen img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+
+        .paso-item:hover .paso-imagen img {
+            transform: scale(1.08);
+        }
+ /* Explicación técnica */
+        .tech-box {
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.85), rgba(30, 41, 59, 0.85));
+            border-left: 6px solid #22c55e;
+            border-radius: 15px;
+            padding: 2.5rem;
+            margin: 2.5rem 0;
+            box-shadow: 
+                0 10px 35px rgba(0, 0, 0, 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        }
+
+        .tech-titulo {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #86efac;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .tech-lista {
+            list-style: none;
+            padding: 0;
+        }
+
+        .tech-lista li {
+            padding: 1.2rem 0;
+            border-bottom: 1px solid rgba(34, 197, 94, 0.15);
+            font-size: 1.08rem;
+            line-height: 1.85;
+            color: #cbd5e1;
+        }
+
+        .tech-lista li:last-child {
+            border-bottom: none;
+        }
+
+        .tech-lista li strong {
+            color: #86efac;
+            font-weight: 700;
+        }
+
+        /* Botón */
+        .btn-volver {
+            display: inline-block;
+            background: linear-gradient(135deg, #16a34a, #15803d);
+            color: #fff;
+            padding: 1.3rem 3.5rem;
+            border: 3px solid #22c55e;
+            border-radius: 50px;
+            text-decoration: none;
+            font-family: 'Orbitron', monospace;
+            font-weight: 700;
+            font-size: 1.15rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            transition: all 0.35s ease;
+            margin: 2rem 0;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 
+                0 8px 30px rgba(34, 197, 94, 0.5),
+                inset 0 2px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-volver::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn-volver:hover {
+            transform: translateY(-4px);
+            border-color: #86efac;
+            box-shadow: 
+                0 15px 45px rgba(34, 197, 94, 0.7),
+                0 0 60px rgba(34, 197, 94, 0.4),
+                inset 0 2px 0 rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-volver:hover::before {
+            left: 100%;
+        }
+
+        /* Footer */
+        .footer {
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            color: #94a3b8;
+            text-align: center;
+            padding: 2.5rem;
+            margin-top: 5rem;
+            border-top: 3px solid;
+            border-image: linear-gradient(90deg, #22c55e, #10b981) 1;
+            position: relative;
+            z-index: 10;
+        }
+
+        .footer-text {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.15rem;
+            color: #86efac;
+            letter-spacing: 2px;
+            text-shadow: 0 0 15px rgba(134, 239, 172, 0.3);
+        }
+
+        
         /* Tarjetas de temas */
         .theme-section {
             margin-bottom: 40px;
@@ -858,6 +1019,12 @@
         </div>
     </div>
 
+
+        <!-- Contenido principal -->
+    <main class="contenido">
+        <center>
+            <a href="index.html" class="btn-volver">⬅ Volver al Inicio</a>
+        </center>
     <!-- Footer -->
     <footer>
         <p>Aprendizaje de Arduino y Electrónica</p>
