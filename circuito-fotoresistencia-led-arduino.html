@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Circuito de Arduino, Fotoresistencia y Led</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background: linear-gradient(135deg, #0d0721 0%, #150a3a 50%, #0a1a4a 100%);
+            color: #e0e7ff;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Fondo de circuito */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                linear-gradient(90deg, rgba(99, 102, 241, 0.04) 1px, transparent 1px),
+                linear-gradient(0deg, rgba(99, 102, 241, 0.04) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Gradientes de fondo */
+        .bg-gradient {
+            position: fixed;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.13;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .gradient-violet {
+            top: -250px;
+            right: -250px;
+            background: radial-gradient(circle, #7c3aed, transparent);
+            animation: pulse 8s ease-in-out infinite;
+        }
+
+        .gradient-cyan {
+            bottom: -250px;
+            left: -250px;
+            background: radial-gradient(circle, #06b6d4, transparent);
+            animation: pulse 10s ease-in-out infinite reverse;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.13; }
+            50% { opacity: 0.22; }
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #3b0764 0%, #4c1d95 50%, #5b21b6 100%);
+            padding: 3.5rem 2rem;
+            text-align: center;
+            position: relative;
+            z-index: 10;
+            border-bottom: 4px solid #a78bfa;
+            box-shadow: 
+                0 10px 40px rgba(139, 92, 246, 0.5),
+                inset 0 -1px 0 rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 300%;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                rgba(255, 255, 255, 0.08) 50%, 
+                transparent 100%);
+            animation: headerShine 4s ease-in-out infinite;
+        }
+
+        @keyframes headerShine {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        /* Decoración LED */
+        .led-indicator {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: #06b6d4;
+            border-radius: 50%;
+            box-shadow: 0 0 20px #06b6d4;
+            animation: blink 1.5s ease-in-out infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.2; }
+        }
+
+        .led-tl { top: 30px; left: 30px; }
+        .led-tr { top: 30px; right: 30px; background: #a78bfa; box-shadow: 0 0 20px #a78bfa; }
+        .led-bl { bottom: 30px; left: 30px; animation-delay: 0.5s; background: #a78bfa; box-shadow: 0 0 20px #a78bfa; }
+        .led-br { bottom: 30px; right: 30px; animation-delay: 0.5s; }
+
+        .titulo-principal {
+            font-family: 'Orbitron', monospace;
+            font-size: clamp(1.8rem, 5vw, 4rem);
+            font-weight: 900;
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            text-shadow: 
+                0 0 30px rgba(167, 139, 250, 0.9),
+                0 4px 6px rgba(0, 0, 0, 0.5),
+                0 8px 20px rgba(0, 0, 0, 0.3);
+            margin: 0;
+            position: relative;
+            z-index: 2;
+            line-height: 1.3;
+        }
+
+        .subtitulo {
+            font-family: 'Orbitron', monospace;
+            font-size: clamp(0.85rem, 2vw, 1.1rem);
+            color: #67e8f9;
+            margin-top: 1rem;
+            letter-spacing: 4px;
+            text-shadow: 0 0 10px rgba(103, 232, 249, 0.5);
+        }
+
+        /* Contenedor */
+        .contenido {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Sección */
+        .seccion {
+            background: linear-gradient(135deg, 
+                rgba(30, 27, 75, 0.85) 0%, 
+                rgba(15, 10, 50, 0.95) 100%);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(139, 92, 246, 0.3);
+            border-radius: 20px;
+            padding: 3rem;
+            margin: 3rem 0;
+            box-shadow: 
+                0 10px 40px rgba(0, 0, 0, 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .seccion::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, #7c3aed, #06b6d4, #7c3aed);
+            background-size: 200% 100%;
+            animation: borderFlow 3s linear infinite;
+        }
+
+        @keyframes borderFlow {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 200% 0%; }
+        }
+
+        .seccion-titulo {
+            font-family: 'Orbitron', monospace;
+            font-size: clamp(1.8rem, 4vw, 2.8rem);
+            font-weight: 900;
+            color: #a78bfa;
+            margin-bottom: 2rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            text-shadow: 0 0 20px rgba(167, 139, 250, 0.5);
+            position: relative;
+            padding-bottom: 1rem;
+        }
+
+        .seccion-titulo::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 120px;
+            height: 4px;
+            background: linear-gradient(90deg, #a78bfa, transparent);
+            border-radius: 2px;
+        }
+
+        .seccion-texto {
+            font-size: 1.15rem;
+            line-height: 1.9;
+            color: #cbd5e1;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Paso a paso */
+        .paso-container {
+            margin: 3rem 0;
+        }
+
+        .paso-item {
+            display: grid;
+            grid-template-columns: 90px 1fr;
+            gap: 2.5rem;
+            margin: 3.5rem 0;
+            align-items: start;
+        }
+
+        .paso-numero {
+            width: 90px;
+            height: 90px;
+            background: linear-gradient(135deg, #5b21b6, #4c1d95);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Orbitron', monospace;
+            font-size: 2.2rem;
+            font-weight: 900;
+            color: #fff;
+            box-shadow: 
+                0 8px 25px rgba(139, 92, 246, 0.5),
+                inset 0 2px 0 rgba(255, 255, 255, 0.2);
+            border: 4px solid #a78bfa;
+            position: relative;
+        }
+
+        .paso-numero::before {
+            content: '';
+            position: absolute;
+            top: -4px;
+            left: -4px;
+            right: -4px;
+            bottom: -4px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #7c3aed, #06b6d4);
+            z-index: -1;
+            filter: blur(12px);
+            opacity: 0.6;
+        }
+
+        .paso-contenido {
+            background: rgba(30, 20, 70, 0.6);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 15px;
+            padding: 2.5rem;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .paso-titulo {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.7rem;
+            font-weight: 700;
+            color: #67e8f9;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 10px rgba(103, 232, 249, 0.3);
+        }
+
+        .paso-descripcion {
+            font-size: 1.08rem;
+            line-height: 1.85;
+            color: #cbd5e1;
+            margin-bottom: 1.5rem;
+        }
+
+        .paso-imagen {
+            width: 100%;
+            height: 380px;
+            overflow: hidden;
+            border-radius: 12px;
+            border: 3px solid rgba(139, 92, 246, 0.4);
+            box-shadow: 
+                0 8px 30px rgba(0, 0, 0, 0.5),
+                0 0 40px rgba(139, 92, 246, 0.2);
+            margin-top: 1.5rem;
+            background: #000;
+        }
+
+        .paso-imagen img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+
+        .paso-item:hover .paso-imagen img {
+            transform: scale(1.08);
+        }
+
+        /* Foto única */
+        .foto-unica-wrapper {
+            width: 100%;
+            max-width: 800px;
+            margin: 2.5rem auto;
+            border-radius: 20px;
+            overflow: hidden;
+            border: 3px solid rgba(139, 92, 246, 0.5);
+            box-shadow:
+                0 12px 45px rgba(0, 0, 0, 0.6),
+                0 0 60px rgba(139, 92, 246, 0.25);
+            background: #080420;
+            position: relative;
+        }
+
+        .foto-unica-badge {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: linear-gradient(135deg, #5b21b6, #0e7490);
+            color: #fff;
+            padding: 0.7rem 1.4rem;
+            border-radius: 25px;
+            font-family: 'Orbitron', monospace;
+            font-weight: 700;
+            font-size: 0.85rem;
+            letter-spacing: 2px;
+            z-index: 2;
+            box-shadow: 0 5px 15px rgba(139, 92, 246, 0.6);
+            border: 2px solid #a78bfa;
+        }
+
+        .foto-unica-placeholder {
+            width: 100%;
+            height: 450px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, rgba(91, 33, 182, 0.2), rgba(6, 182, 212, 0.1));
+            color: #64748b;
+            gap: 1rem;
+        }
+
+        .foto-unica-placeholder span {
+            font-size: 4rem;
+        }
+
+        .foto-unica-placeholder p {
+            font-family: 'Orbitron', monospace;
+            font-size: 1rem;
+            letter-spacing: 2px;
+            color: #7c3aed;
+        }
+
+        .foto-unica-placeholder img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        /* Materiales */
+        .materiales-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin: 2.5rem 0;
+        }
+
+        .material-card {
+            background: linear-gradient(135deg, rgba(91, 33, 182, 0.1), rgba(6, 182, 212, 0.08));
+            border: 2px solid rgba(139, 92, 246, 0.3);
+            border-radius: 15px;
+            padding: 2rem;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .material-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.15), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .material-card:hover {
+            border-color: #a78bfa;
+            box-shadow: 
+                0 12px 35px rgba(139, 92, 246, 0.4),
+                0 0 50px rgba(139, 92, 246, 0.2);
+            transform: translateY(-8px);
+        }
+
+        .material-card:hover::before {
+            left: 100%;
+        }
+
+        .material-icon {
+            font-size: 3rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .material-nombre {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #67e8f9;
+            margin-bottom: 0.8rem;
+        }
+
+        .material-descripcion {
+            font-size: 1rem;
+            color: #94a3b8;
+            line-height: 1.7;
+        }
+
+        /* Explicación técnica */
+        .tech-box {
+            background: linear-gradient(135deg, rgba(10, 5, 40, 0.85), rgba(30, 15, 70, 0.85));
+            border-left: 6px solid #7c3aed;
+            border-radius: 15px;
+            padding: 2.5rem;
+            margin: 2.5rem 0;
+            box-shadow: 
+                0 10px 35px rgba(0, 0, 0, 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        }
+
+        .tech-titulo {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #67e8f9;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .tech-lista {
+            list-style: none;
+            padding: 0;
+        }
+
+        .tech-lista li {
+            padding: 1.2rem 0;
+            border-bottom: 1px solid rgba(139, 92, 246, 0.15);
+            font-size: 1.08rem;
+            line-height: 1.85;
+            color: #cbd5e1;
+        }
+
+        .tech-lista li:last-child {
+            border-bottom: none;
+        }
+
+        .tech-lista li strong {
+            color: #a78bfa;
+            font-weight: 700;
+        }
+
+        /* Botón */
+        .btn-volver {
+            display: inline-block;
+            background: linear-gradient(135deg, #5b21b6, #4c1d95);
+            color: #fff;
+            padding: 1.3rem 3.5rem;
+            border: 3px solid #a78bfa;
+            border-radius: 50px;
+            text-decoration: none;
+            font-family: 'Orbitron', monospace;
+            font-weight: 700;
+            font-size: 1.15rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            transition: all 0.35s ease;
+            margin: 2rem 0;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 
+                0 8px 30px rgba(139, 92, 246, 0.5),
+                inset 0 2px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-volver::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn-volver:hover {
+            transform: translateY(-4px);
+            border-color: #67e8f9;
+            box-shadow: 
+                0 15px 45px rgba(139, 92, 246, 0.7),
+                0 0 60px rgba(6, 182, 212, 0.4),
+                inset 0 2px 0 rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-volver:hover::before {
+            left: 100%;
+        }
+
+        /* Footer */
+        .footer {
+            background: linear-gradient(135deg, #05030f, #0d0721);
+            color: #94a3b8;
+            text-align: center;
+            padding: 2.5rem;
+            margin-top: 5rem;
+            border-top: 3px solid;
+            border-image: linear-gradient(90deg, #7c3aed, #06b6d4) 1;
+            position: relative;
+            z-index: 10;
+        }
+
+        .footer-text {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.15rem;
+            color: #a78bfa;
+            letter-spacing: 2px;
+            text-shadow: 0 0 15px rgba(167, 139, 250, 0.3);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .paso-item {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .paso-numero {
+                width: 70px;
+                height: 70px;
+                font-size: 1.8rem;
+                margin: 0 auto;
+            }
+
+            .materiales-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .seccion {
+                padding: 2rem;
+            }
+
+            .foto-unica-placeholder {
+                height: 280px;
+            }
+        }
+
+        /* Animación entrada */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Gradientes de fondo -->
+    <div class="bg-gradient gradient-violet"></div>
+    <div class="bg-gradient gradient-cyan"></div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="led-indicator led-tl"></div>
+        <div class="led-indicator led-tr"></div>
+        <div class="led-indicator led-bl"></div>
+        <div class="led-indicator led-br"></div>
+        <h1 class="titulo-principal">☀️ CIRCUITO DE ARDUINO<br>FOTORESISTENCIA Y LED ☀️</h1>
+        <p class="subtitulo">[ CONTROL DE LUZ CON SENSOR LDR ]</p>
+    </header>
+
+    <!-- Contenido -->
+    <main class="contenido">
+        <center>
+            <a href="index.html" class="btn-volver">◄ VOLVER AL INICIO</a>
+        </center>
+
+        <!-- Introducción -->
+        <section class="seccion">
+            <h2 class="seccion-titulo">Introducción al Circuito</h2>
+            <p class="seccion-texto">
+                Este proyecto demuestra el uso de una <strong>fotoresistencia (LDR - Light Dependent Resistor)</strong> 
+                como sensor de luz para controlar el encendido de un LED mediante un Arduino. La LDR varía su resistencia 
+                eléctrica en función de la intensidad luminosa que recibe, permitiendo al microcontrolador detectar 
+                condiciones de luz o penumbra en el entorno.
+            </p>
+            <p class="seccion-texto">
+                El Arduino lee el valor analógico de la fotoresistencia a través de una de sus entradas analógicas (A0-A5) 
+                y, según un umbral programado, activa o desactiva el LED de salida. Esta práctica ilustra conceptos 
+                fundamentales de conversión analógico-digital, lectura de sensores pasivos y control condicional 
+                de actuadores con microcontroladores.
+            </p>
+        </section>
+
+        <!-- Materiales -->
+        <section class="seccion">
+            <h2 class="seccion-titulo">Materiales Utilizados</h2>
+            <p class="seccion-texto">
+                Componentes necesarios para construir el circuito de control de LED con fotoresistencia:
+            </p>
+
+            <div class="materiales-grid">
+                <div class="material-card">
+                    <div class="material-icon">🔵</div>
+                    <div class="material-nombre">Arduino UNO</div>
+                    <div class="material-descripcion">
+                        Placa de desarrollo con microcontrolador ATmega328P. Lee el valor analógico del LDR 
+                        mediante su convertidor ADC de 10 bits y controla el LED según el nivel de luz detectado.
+                    </div>
+                </div>
+
+                <div class="material-card">
+                    <div class="material-icon">☀️</div>
+                    <div class="material-nombre">Fotoresistencia (LDR)</div>
+                    <div class="material-descripcion">
+                        Sensor de luz de sulfuro de cadmio (CdS). Su resistencia varía entre ~1kΩ (luz intensa) 
+                        y ~1MΩ (oscuridad total), permitiendo detectar cambios en la iluminación ambiental.
+                    </div>
+                </div>
+
+                <div class="material-card">
+                    <div class="material-icon">💡</div>
+                    <div class="material-nombre">1x LED</div>
+                    <div class="material-descripcion">
+                        Diodo emisor de luz de 5mm. Actúa como actuador de salida: se enciende cuando el nivel 
+                        de luz detectado es inferior al umbral programado en el Arduino.
+                    </div>
+                </div>
+
+                <div class="material-card">
+                    <div class="material-icon">⚡</div>
+                    <div class="material-nombre">Resistencias</div>
+                    <div class="material-descripcion">
+                        Resistencia de 10kΩ para el divisor de voltaje del LDR y resistencia de 220Ω 
+                        limitadora de corriente para el LED. Ambas calculadas mediante la Ley de Ohm.
+                    </div>
+                </div>
+
+                <div class="material-card">
+                    <div class="material-icon">🔲</div>
+                    <div class="material-nombre">Protoboard</div>
+                    <div class="material-descripcion">
+                        Tablero de conexiones sin soldadura. Permite el montaje temporal del circuito divisor 
+                        de voltaje del LDR y la rama de control del LED de forma ordenada.
+                    </div>
+                </div>
+
+                <div class="material-card">
+                    <div class="material-icon">🔌</div>
+                    <div class="material-nombre">Cables Jumper y USB</div>
+                    <div class="material-descripcion">
+                        Cables macho-macho para conectar el Arduino con el protoboard. Cable USB tipo A-B 
+                        para la programación y alimentación de 5V desde la computadora.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Proceso Paso a Paso -->
+        <section class="seccion">
+            <h2 class="seccion-titulo">Proceso de Construcción Paso a Paso</h2>
+            <p class="seccion-texto">
+                Guía detallada para ensamblar el circuito de control de LED con fotoresistencia en Arduino:
+            </p>
+
+            <div class="paso-container">
+                <!-- Paso 1 -->
+                <div class="paso-item">
+                    <div class="paso-numero">1</div>
+                    <div class="paso-contenido">
+                        <h3 class="paso-titulo">Armar el Divisor de Voltaje con la LDR</h3>
+                        <p class="paso-descripcion">
+                            Colocar la <strong>fotoresistencia (LDR)</strong> en el protoboard y conectar en serie 
+                            una <strong>resistencia de 10kΩ</strong> para formar un divisor de voltaje. Un extremo 
+                            del divisor va a 5V (pin de alimentación del Arduino) y el otro extremo a GND.
+                        </p>
+                        <p class="paso-descripcion">
+                            El punto medio entre la LDR y la resistencia de 10kΩ se conecta a la entrada 
+                            analógica <strong>A0</strong> del Arduino. Este voltaje intermedio varía con la luz: 
+                            aumenta cuando hay más luz y disminuye en la oscuridad, permitiendo al ADC leer 
+                            valores entre 0 y 1023.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Paso 2 -->
+                <div class="paso-item">
+                    <div class="paso-numero">2</div>
+                    <div class="paso-contenido">
+                        <h3 class="paso-titulo">Conectar el LED con su Resistencia Limitadora</h3>
+                        <p class="paso-descripcion">
+                            Insertar el <strong>LED</strong> en el protoboard con el ánodo (terminal larga) conectado 
+                            a través de una <strong>resistencia de 220Ω</strong> al pin digital 13 del Arduino 
+                            (o cualquier pin digital configurado como salida).
+                        </p>
+                        <p class="paso-descripcion">
+                            El cátodo (terminal corta del LED) va directamente a <strong>GND</strong>. 
+                            La resistencia de 220Ω limita la corriente a aproximadamente 13.6mA, protegiendo 
+                            el LED y el pin de salida del Arduino de una sobrecorriente. Esta es la rama de 
+                            actuación del circuito: el LED responderá a las instrucciones del programa.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Paso 3 -->
+                <div class="paso-item">
+                    <div class="paso-numero">3</div>
+                    <div class="paso-contenido">
+                        <h3 class="paso-titulo">Programar el Arduino con Lógica Condicional</h3>
+                        <p class="paso-descripcion">
+                            Cargar el sketch en el Arduino usando el IDE. En <strong>void setup()</strong> 
+                            se configura el pin del LED como salida con <code>pinMode(LED_PIN, OUTPUT)</code>. 
+                            En <strong>void loop()</strong> se lee continuamente el valor del LDR con 
+                            <code>analogRead(A0)</code>, que retorna un número entre 0 y 1023.
+                        </p>
+                        <p class="paso-descripcion">
+                            Se compara el valor leído con un <strong>umbral definido</strong> (por ejemplo, 500). 
+                            Si el valor es menor que el umbral (poca luz), se ejecuta <code>digitalWrite(LED_PIN, HIGH)</code> 
+                            para encender el LED. Si el valor supera el umbral (mucha luz), se ejecuta 
+                            <code>digitalWrite(LED_PIN, LOW)</code> para apagarlo, completando el ciclo de detección y respuesta.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Paso 4 -->
+                <div class="paso-item">
+                    <div class="paso-numero">4</div>
+                    <div class="paso-contenido">
+                        <h3 class="paso-titulo">Prueba y Calibración del Circuito</h3>
+                        <p class="paso-descripcion">
+                            Con el circuito completo y el programa cargado, cubrir la LDR con la mano para 
+                            simular oscuridad: el LED deberá encenderse. Al exponer la LDR a la luz ambiental 
+                            o de una linterna, el LED deberá apagarse.
+                        </p>
+                        <p class="paso-descripcion">
+                            Para ajustar la sensibilidad, abrir el <strong>Monitor Serial</strong> del IDE 
+                            de Arduino y agregar <code>Serial.println(analogRead(A0))</code> al loop para 
+                            observar los valores en tiempo real. Con estos datos, modificar el valor del umbral 
+                            en el código hasta obtener el comportamiento deseado según las condiciones de 
+                            iluminación del entorno real.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Foto del Circuito -->
+        <section class="seccion">
+            <h2 class="seccion-titulo">Fotografía del Circuito</h2>
+            <p class="seccion-texto">
+                A continuación se muestra el resultado final del circuito montado, con la fotoresistencia 
+                conectada al divisor de voltaje y el LED respondiendo a los cambios de iluminación ambiental.
+            </p>
+
+            <div class="foto-unica-wrapper">
+                <div class="foto-unica-badge">📷 CIRCUITO MONTADO</div>
+                <!-- 
+                    INSTRUCCIÓN: Reemplaza el contenido del div .foto-unica-placeholder
+                    con una etiqueta <img> apuntando a tu foto:
+                    <img src="ruta/a/tu/foto.jpg" alt="Circuito fotoresistencia y LED">
+                -->
+                <div class="foto-unica-placeholder">
+                    <span>📷</span>
+                    <p>[ INSERTAR FOTO DEL CIRCUITO AQUÍ ]</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Explicación de Funcionamiento -->
+        <section class="seccion">
+            <h2 class="seccion-titulo">¿Por Qué Funciona el Circuito?</h2>
+            <p class="seccion-texto">
+                El funcionamiento de este circuito combina principios de electrónica analógica (divisor de voltaje 
+                y sensor resistivo) con control digital (conversión ADC y lógica condicional). A continuación se 
+                explican los conceptos clave:
+            </p>
+
+            <div class="tech-box">
+                <h3 class="tech-titulo">
+                    <span style="color: #06b6d4;">⚡</span> Principios de Funcionamiento
+                </h3>
+                <ul class="tech-lista">
+                    <li>
+                        <strong>Divisor de Voltaje con LDR:</strong> La fotoresistencia y la resistencia de 10kΩ 
+                        forman un divisor de voltaje. El voltaje en el punto medio es: Vmedio = 5V × R10k / (RLDR + R10k). 
+                        Cuando hay luz, RLDR disminuye y Vmedio sube. En oscuridad, RLDR aumenta y Vmedio baja, 
+                        creando una señal analógica proporcional a la iluminación.
+                    </li>
+                    <li>
+                        <strong>Convertidor Analógico-Digital (ADC):</strong> El Arduino UNO integra un ADC de 10 bits 
+                        en sus pines A0-A5. La función analogRead() convierte el voltaje analógico (0-5V) en un 
+                        valor entero entre 0 y 1023. Esto permite al microcontrolador procesar digitalmente 
+                        una señal de naturaleza analógica como la resistencia de la LDR.
+                    </li>
+                    <li>
+                        <strong>Lógica Condicional de Control:</strong> El programa compara el valor leído con un 
+                        umbral definido por el programador. Esta estructura if-else permite que el Arduino tome 
+                        decisiones basadas en el estado del entorno, implementando un sistema de control reactivo 
+                        simple pero muy efectivo para automatizar la respuesta luminosa.
+                    </li>
+                    <li>
+                        <strong>Resistencia Limitadora del LED:</strong> Con la resistencia de 220Ω se controla 
+                        la corriente que fluye por el LED: I = (5V - 2.0V) / 220Ω ≈ 13.6mA. Este valor está 
+                        dentro del rango seguro del LED (máx. 20mA) y de los pines del Arduino (máx. 40mA), 
+                        garantizando operación confiable y larga vida del componente.
+                    </li>
+                    <li>
+                        <strong>Ciclo de Lectura Continua:</strong> La función void loop() del Arduino se ejecuta 
+                        repetidamente sin parar, lo que permite que el circuito monitoree la luz en tiempo real. 
+                        Cada iteración del loop lee el sensor, evalúa la condición y actualiza el estado del LED, 
+                        logrando una respuesta prácticamente instantánea a los cambios de iluminación.
+                    </li>
+                </ul>
+            </div>
+
+            <div class="tech-box" style="margin-top: 2.5rem;">
+                <h3 class="tech-titulo">
+                    <span style="color: #06b6d4;">🔬</span> Cálculos Técnicos del Circuito
+                </h3>
+                <ul class="tech-lista">
+                    <li>
+                        <strong>Resolución del ADC:</strong> Resolución = 5V / 1024 pasos ≈ 4.88 mV por paso
+                    </li>
+                    <li>
+                        <strong>Voltaje del Divisor con Luz Intensa (RLDR ≈ 1kΩ):</strong> Vmedio = 5V × 10kΩ / (1kΩ + 10kΩ) ≈ 4.55V → ADC ≈ 931
+                    </li>
+                    <li>
+                        <strong>Voltaje del Divisor en Penumbra (RLDR ≈ 10kΩ):</strong> Vmedio = 5V × 10kΩ / (10kΩ + 10kΩ) = 2.5V → ADC ≈ 512
+                    </li>
+                    <li>
+                        <strong>Corriente por el LED:</strong> ILED = (5V - 2.0V) / 220Ω ≈ 13.6mA
+                    </li>
+                    <li>
+                        <strong>Potencia Disipada en la Resistencia del LED:</strong> P = I² × R = (0.0136A)² × 220Ω ≈ 40.7mW
+                    </li>
+                    <li>
+                        <strong>Consumo Total del Circuito (LED encendido):</strong> PTOTAL ≈ 40.7mW + 27.2mW = 67.9mW
+                    </li>
+                </ul>
+            </div>
+
+            <div class="tech-box" style="margin-top: 2.5rem;">
+                <h3 class="tech-titulo">
+                    <span style="color: #06b6d4;">💻</span> Estructura del Código Arduino
+                </h3>
+                <p class="seccion-texto" style="color: #cbd5e1;">
+                    El código para este circuito sigue la siguiente lógica básica:
+                </p>
+                <ul class="tech-lista">
+                    <li>
+                        <strong>Definición de pines y umbral:</strong> Se declaran constantes para el pin del LED 
+                        (por ej. pin 13), el pin analógico del LDR (A0) y el valor umbral de activación (por ej. 500) 
+                        que separa la condición de "luz" de la de "oscuridad".
+                    </li>
+                    <li>
+                        <strong>void setup():</strong> Se configura el pin del LED como salida con 
+                        <code>pinMode(LED_PIN, OUTPUT)</code> e, opcionalmente, se inicia la comunicación serial 
+                        con <code>Serial.begin(9600)</code> para depuración y calibración del umbral.
+                    </li>
+                    <li>
+                        <strong>void loop():</strong> Se lee el valor del sensor con <code>int valorLDR = analogRead(A0)</code>. 
+                        Una sentencia condicional evalúa si valorLDR es menor que el umbral: si es así, enciende el LED 
+                        con <code>digitalWrite(LED_PIN, HIGH)</code>; de lo contrario, lo apaga con 
+                        <code>digitalWrite(LED_PIN, LOW)</code>.
+                    </li>
+                    <li>
+                        <strong>Ajuste de Sensibilidad:</strong> Modificando el valor del umbral en el código y 
+                        recargando el sketch, es posible calibrar el circuito para diferentes condiciones de 
+                        iluminación, haciéndolo más o menos sensible a los cambios de luz ambiental.
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <center>
+            <a href="index.html" class="btn-volver">◄ VOLVER AL INICIO</a>
+        </center>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p class="footer-text">[ CIRCUITO DE ARDUINO, FOTORESISTENCIA Y LED ]</p>
+        <p style="margin-top: 0.5rem; color: #64748b;">Principios de Electrónica - Sensores Analógicos y Control Digital</p>
+    </footer>
+
+    <script>
+        // Animación de entrada
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.seccion, .paso-item').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(40px)';
+            el.style.transition = 'all 0.7s ease';
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>
