@@ -616,11 +616,6 @@
 
             <ul class="caracteristicas-lista">
                 <li>
-                    <strong>Potenciómetro como Resistencia Variable:</strong> El potenciómetro actúa como una resistencia 
-                    ajustable manualmente (típicamente de 1kΩ a 100kΩ). Al girar su eje, cambia el valor de resistencia, 
-                    modificando la corriente total del circuito según la Ley de Ohm: I = V / R.
-                </li>
-                <li>
                     <strong>Control de Corriente:</strong> Al aumentar la resistencia del potenciómetro, disminuye la 
                     corriente que fluye por el circuito, reduciendo el brillo de los LEDs. Al disminuir la resistencia, 
                     aumenta la corriente y el brillo se incrementa.
@@ -630,11 +625,7 @@
                     de la fuente. El potenciómetro controla la corriente total disponible, que se distribuye entre todos 
                     los LEDs. Ventaja: si un LED falla, los demás siguen funcionando.
                 </li>
-                <li>
-                    <strong>Circuito en Serie:</strong> En configuración serie, la corriente es igual en todos los 
-                    componentes, pero el voltaje se divide. El potenciómetro controla la corriente única que atraviesa 
-                    todos los LEDs. Desventaja: si un LED falla, todo el circuito se interrumpe.
-                </li>
+                
                 <li>
                     <strong>Resistencias Limitadoras:</strong> Las resistencias fijas (220Ω típicamente) protegen los LEDs 
                     del exceso de corriente cuando el potenciómetro está en su valor mínimo, evitando daños por 
@@ -646,24 +637,7 @@
                     aplicaciones simples de ajuste manual.
                 </li>
             </ul>
-
-            <div class="destacado-box" style="margin-top: 3rem;">
-                <div class="destacado-titulo">📊 Cálculos Básicos del Circuito</div>
-                <div class="destacado-texto">
-                    <strong>Ejemplo con configuración paralela:</strong>
-                    <br><br>
-                    • Voltaje de fuente: 5V
-                    <br>• Voltaje LED verde: 2.0V
-                    <br>• Resistencia limitadora: 220Ω
-                    <br>• Potenciómetro: 0-10kΩ
-                    <br><br>
-                    <strong>Corriente por LED (sin potenciómetro):</strong> I = (5V - 2V) / 220Ω ≈ 13.6mA
-                    <br><br>
-                    <strong>Con potenciómetro a máximo (10kΩ):</strong> I ≈ (5V - 2V) / (220Ω + 10000Ω) ≈ 0.3mA (brillo muy bajo)
-                    <br><br>
-                    Este control permite ajustar el brillo desde muy tenue hasta máximo, ofreciendo un rango amplio de 
-                    intensidades luminosas.
-                </div>
+            
             </div>
         </section>
 
