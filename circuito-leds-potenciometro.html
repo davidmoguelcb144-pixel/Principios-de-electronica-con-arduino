@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Circuito de Melodía con Arduino, Leds y Potenciómetro</title>
+    <title>Circuito LEDs con Potenciómetro</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&family=JetBrains+Mono:wght@400;700&display=swap');
 
@@ -523,7 +523,7 @@
     <!-- Header -->
     <header class="header">
         <div class="icon-potenciometro">🎚️</div>
-        <h1 class="titulo-principal">Melodía con Arduino, Leds, y Buzzer<br>controlado con Potenciometro</h1>
+        <h1 class="titulo-principal">CIRCUITO LEDS EN PARALELO Y DE SERIE<br>CONTROLADO CON POTENCIÓMETRO</h1>
         <p class="subtitulo">Control Analógico de Intensidad Luminosa</p>
     </header>
 
@@ -560,9 +560,9 @@
 
         <!-- Configuraciones -->
         <section class="seccion">
-            <h2 class="seccion-titulo">Configuraciones del Circuito</h2>
+            <h2 class="seccion-titulo">VISTA DEL CIRCUITO</h2>
             <p class="intro-text">
-                A continuación se muestran las dos configuraciones principales del circuito con potenciómetro:
+                A continuación se muestra el diagrama y un vídeo explicando el tema.
             </p>
 
             <div class="imagenes-grid">
@@ -573,38 +573,28 @@
                         <img src="TINKER POTENCIO BUZZ.png" alt="LEDs en paralelo con potenciómetro" class="imagen-content">
                     </div>
                     <div class="imagen-info">
-                        <h3 class="imagen-titulo">Diagrama de Tinkercad</h3>
+                        <h3 class="imagen-titulo">DIAGRAMA DE TINKERCAD</h3>
                         <p class="imagen-descripcion">
-                            Circuito con tres LEDs conectados en paralelo, controlados mediante un potenciómetro rotatorio. 
-                            En este circuito se usa un buzzer para hacer una melodía coordinada con los LEDs controlados con
-                            potenciometro.
+                            Aquí puedes presenciar el diagrama del circuito completo hecho en tinkercad
                         </p>
-                        <a href="https://www.tinkercad.com/things/fFqPlJgkyno-melodia-con-arduino-leds-potenciometro-y-buzzer?sharecode=-D5T8WyDQNaW6ny5AnnzUM3M2kyZKPV1oOk3EDb35Eg">Tinkercad Link</a>
                     </div>
                 </div>
 
-               
-
-        <!-- Video de demostración -->
-        <section class="seccion">
-            <div class="video-section">
-                <h2 class="video-titulo">🎬 Demostración del Funcionamiento</h2>
-                <p class="intro-text" style="text-align: center; margin-bottom: 2rem;">
-                    Video demostrativo del circuito en operación, mostrando cómo el ajuste del potenciómetro 
-                    modifica la intensidad luminosa de los LEDs en tiempo real.
-                </p>
-                <div class="video-wrapper">
-                    <div class="video-badge">▶ FUNCIONAMIENTO</div>
-                    <video controls>
-                        <source src="/mnt/user-data/uploads/video-potenciometro.mp4" type="video/mp4">
-                    </video>
+                <!-- Imagen 2: Configuración Serie -->
+                <div class="imagen-card">
+                    <div class="imagen-numero">2</div>
+                    <div class="imagen-wrapper">
+                        <img src="/mnt/user-data/uploads/Potenciometro_S.jpg" alt="LEDs en serie con potenciómetro" class="imagen-content">
+                    </div>
+                    <div class="imagen-info">
+                        <h3 class="imagen-titulo">VÍDEO TUTORIAL</h3>
+                        <p class="imagen-descripcion">
+                            A Continuacion se les presenta un vídeo tutorial de como realizar el circuito
+                            para una mejor explicación.
+                        </p>
+                        <a href="https://youtu.be/1woYFu2zuk8">Youtube Link</a>
+                    </div>
                 </div>
-                 </p>
-                        <a href="https://youtu.be/1woYFu2zuk8?si=30t2hwAqWEoC2kP7">YouTube Link</a>
-                <p class="intro-text" style="text-align: center; margin-top: 2rem; font-size: 0.95rem; color: #64748b;">
-                </p>
-            </div>
-        </section>
 
         <!-- Explicación técnica -->
         <section class="seccion">
@@ -616,6 +606,11 @@
 
             <ul class="caracteristicas-lista">
                 <li>
+                    <strong>Potenciómetro como Resistencia Variable:</strong> El potenciómetro actúa como una resistencia 
+                    ajustable manualmente (típicamente de 1kΩ a 100kΩ). Al girar su eje, cambia el valor de resistencia, 
+                    modificando la corriente total del circuito según la Ley de Ohm: I = V / R.
+                </li>
+                <li>
                     <strong>Control de Corriente:</strong> Al aumentar la resistencia del potenciómetro, disminuye la 
                     corriente que fluye por el circuito, reduciendo el brillo de los LEDs. Al disminuir la resistencia, 
                     aumenta la corriente y el brillo se incrementa.
@@ -625,15 +620,40 @@
                     de la fuente. El potenciómetro controla la corriente total disponible, que se distribuye entre todos 
                     los LEDs. Ventaja: si un LED falla, los demás siguen funcionando.
                 </li>
-                
+                <li>
+                    <strong>Circuito en Serie:</strong> En configuración serie, la corriente es igual en todos los 
+                    componentes, pero el voltaje se divide. El potenciómetro controla la corriente única que atraviesa 
+                    todos los LEDs. Desventaja: si un LED falla, todo el circuito se interrumpe.
+                </li>
                 <li>
                     <strong>Resistencias Limitadoras:</strong> Las resistencias fijas (220Ω típicamente) protegen los LEDs 
                     del exceso de corriente cuando el potenciómetro está en su valor mínimo, evitando daños por 
                     sobrecarga.
                 </li>
-                
+                <li>
+                    <strong>Control Analógico vs Digital:</strong> A diferencia del control con Arduino (digital, mediante 
+                    PWM), el potenciómetro ofrece control analógico continuo sin necesidad de programación, ideal para 
+                    aplicaciones simples de ajuste manual.
+                </li>
             </ul>
-            
+
+            <div class="destacado-box" style="margin-top: 3rem;">
+                <div class="destacado-titulo">📊 Cálculos Básicos del Circuito</div>
+                <div class="destacado-texto">
+                    <strong>Ejemplo con configuración paralela:</strong>
+                    <br><br>
+                    • Voltaje de fuente: 5V
+                    <br>• Voltaje LED verde: 2.0V
+                    <br>• Resistencia limitadora: 220Ω
+                    <br>• Potenciómetro: 0-10kΩ
+                    <br><br>
+                    <strong>Corriente por LED (sin potenciómetro):</strong> I = (5V - 2V) / 220Ω ≈ 13.6mA
+                    <br><br>
+                    <strong>Con potenciómetro a máximo (10kΩ):</strong> I ≈ (5V - 2V) / (220Ω + 10000Ω) ≈ 0.3mA (brillo muy bajo)
+                    <br><br>
+                    Este control permite ajustar el brillo desde muy tenue hasta máximo, ofreciendo un rango amplio de 
+                    intensidades luminosas.
+                </div>
             </div>
         </section>
 
@@ -671,7 +691,7 @@
 
     <!-- Footer -->
     <footer class="footer">
-        <p class="footer-text">🎚️ Circuito con Arduino, LEDs, Potenciómetro y Buzzer🎚️</p>
+        <p class="footer-text">🎚️ Control de LEDs con Potenciómetro - Circuitos en Serie y Paralelo 🎚️</p>
         <p style="margin-top: 0.5rem; opacity: 0.8;">Principios de Electrónica Analógica</p>
     </footer>
 
