@@ -634,141 +634,63 @@
             <div class="paso-container">
                 <!-- Tinkercad -->
                 <div class="paso-item">
-                    <div class="paso-numero">0</div>
+                    <div class="paso-numero">1</div>
                     <div class="paso-contenido">
-                        <h3 class="paso-titulo">Diagrama de Tinkercad Encender un Led con Protoboard</h3>
+                        <h3 class="paso-titulo">Diagrama de Tinkercad Encender un Led con Protoboard (Circuito en serie)</h3>
                          
                         <div class="paso-imagen">
-                            <img src="ArdPA.png" alt="Diagrama">
+                            <img src="CIRCUITO SERIE.png" alt="Diagrama">
                         </div>
 
+                    </div>
+                </div>
+
+                <!-- Tinkercad -->
+                <div class="paso-item">
+                    <div class="paso-numero">2</div>
+                    <div class="paso-contenido">
+                        <h3 class="paso-titulo">Diagrama de Tinkercad Encender un Led con Protoboard (Circuito en paralelo)</h3>
+                         
+                        <div class="paso-imagen">
+                            <img src="CIRCUITO PARAL.png" alt="Diagrama">
+                        </div>
+
+                    </div>
+                </div>
+                
+                <!-- Paso 1 -->
+                <div class="paso-item">
+                    <div class="paso-numero">3</div>
+                    <div class="paso-contenido">
+                        <h3 class="paso-titulo">VÍDEO TUTORIAL (EN SERIE)</h3>
+                        <p class="paso-descripcion">
+                            A Continuación se presenta un vídeo tutorial para
+                            realizar el circuito en serie.
+                        </p>
+                        <a href="https://youtu.be/jeFqPKuh2O0">YOUTUBE LINK</a>
+                        <div class="paso-imagen">
+                            <img src="FOTOR MINI.png" alt="LEDs y resistencias montados">
+                        </div>
                     </div>
                 </div>
 
                 <!-- Paso 1 -->
                 <div class="paso-item">
-                    <div class="paso-numero">1</div>
+                    <div class="paso-numero">4</div>
                     <div class="paso-contenido">
-                        <h3 class="paso-titulo">Montaje de LEDs y Resistencias en Protoboard</h3>
+                        <h3 class="paso-titulo">VÍDEO TUTORIAL (EN PARALELO)</h3>
                         <p class="paso-descripcion">
-                            Ensamblar los componentes en el protoboard siguiendo la configuración en paralelo. 
-                            Cada <strong>LED verde</strong> debe conectarse con su respectiva <strong>resistencia 
-                            de 220Ω</strong> en serie para limitar la corriente.
+                            A Continuación se presenta un vídeo tutorial para
+                            realizar el circuito en paralelo.
                         </p>
-                        <p class="paso-descripcion">
-                            <strong>Configuración por LED:</strong>
-                            <br>• Ánodo (terminal larga del LED) → Resistencia 220Ω → Cable de señal del Arduino
-                            <br>• Cátodo (terminal corta del LED) → Línea de tierra común (GND)
-                        </p>
-                        <p class="paso-descripcion">
-                            La imagen muestra los tres LEDs verdes alineados horizontalmente con sus resistencias 
-                            azules conectadas. Cada LED funciona independientemente pero recibe la misma señal de 
-                            control, creando un efecto de parpadeo sincronizado.
-                        </p>
+                        <a href="https://youtu.be/7IMnM3yeb-4">YOUTUBE LINK</a>
                         <div class="paso-imagen">
-                            <img src="LEDS PARA.jpg" alt="LEDs y resistencias montados">
+                            <img src="FOTOR MINI.png" alt="LEDs y resistencias montados">
                         </div>
                     </div>
                 </div>
 
-                <!-- Paso 2 -->
-                <div class="paso-item">
-                    <div class="paso-numero">2</div>
-                    <div class="paso-contenido">
-                        <h3 class="paso-titulo">Conexión a Tierra (GND)</h3>
-                        <p class="paso-descripcion">
-                            Establecer la conexión de <strong>tierra común (GND)</strong> desde el Arduino hacia 
-                            el protoboard. Este cable (generalmente negro o café) completa el circuito eléctrico 
-                            y sirve como referencia de voltaje (0V) para todo el sistema.
-                        </p>
-                        <p class="paso-descripcion">
-                            En la imagen se aprecia el cable conectado desde el pin GND del Arduino. La tierra común 
-                            es esencial en la configuración paralela, ya que todos los LEDs comparten este punto de 
-                            retorno de corriente. Sin esta conexión, el circuito no funcionaría correctamente.
-                        </p>
-                        <div class="paso-imagen">
-                            <img src="GND LEDS PARA.jpg" alt="Conexión GND">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Paso 3 -->
-                <div class="paso-item">
-                    <div class="paso-numero">3</div>
-                    <div class="paso-contenido">
-                        <h3 class="paso-titulo">Configuración de Conexiones a Pines Digitales</h3>
-                        <p class="paso-descripcion">
-                            Conectar los <strong>cables de señal</strong> desde los pines digitales PWM del Arduino 
-                            (identificados con el símbolo ~) hacia el protoboard. En esta imagen se observan tres cables 
-                            de colores (amarillo, azul y rosa) conectados desde los pines digitales del Arduino.
-                        </p>
-                        <p class="paso-descripcion">
-                            Cada cable lleva la señal de control digital (HIGH = 5V, LOW = 0V) que determinará el 
-                            encendido y apagado de cada LED. Los pines PWM permiten también controlar la intensidad 
-                            mediante modulación de ancho de pulso si fuera necesario.
-                        </p>
-                        <div class="paso-imagen">
-                            <img src="PIN LEDS PARA.jpg" alt="Conexión pines digitales">
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Videos de Funcionamiento -->
-        <section class="seccion">
-            <h2 class="seccion-titulo">Demostración de Funcionamiento</h2>
-            
-            <div class="video-section">
-                <h3 style="font-family: 'Orbitron', monospace; color: #86efac; font-size: 1.5rem; margin-bottom: 1rem;">
-                    Resultados del Circuito
-                </h3>
-                <p class="seccion-texto">
-                    A continuación se presentan dos demostraciones del circuito en funcionamiento, mostrando diferentes 
-                    configuraciones y validando el correcto funcionamiento del sistema.
-                </p>
-
-                <div class="video-grid">
-                    <!-- Video 1: Funcionamiento Independiente -->
-                    <div style="animation: fadeInUp 0.6s ease-out;">
-                        <h4 style="font-family: 'Orbitron', monospace; color: #22c55e; font-size: 1.3rem; margin-bottom: 1rem;">
-                            Funcionamiento Independiente del Arduino
-                        </h4>
-                        <p class="seccion-texto" style="font-size: 1rem; margin-bottom: 1.5rem;">
-                            Este video demuestra que el circuito funciona <strong>sin necesidad de los 3 LEDs físicos</strong>. 
-                            Ya que cada LED tiene su propio PIN (PIN 13, PIN 12, PIN 11) en el arduino, estos tambien sirven como
-                            fuente de alimentación independiente para cada LED.
-                        </p>
-                        <div class="video-wrapper">
-                            <div class="video-badge">⚙ SIN TODOS LOS LEDS</div>
-                            <video controls>
-                                <source src="LEDS PARA IN.mp4" type="video/mp4">
-                            </video>
-                        </div>
-                    </div>
-
-                    <!-- Video 2: Resultado Final -->
-                    <div style="animation: fadeInUp 0.6s ease-out 0.2s; opacity: 0; animation-fill-mode: forwards;">
-                        <h4 style="font-family: 'Orbitron', monospace; color: #22c55e; font-size: 1.3rem; margin-bottom: 1rem;">
-                            Resultado Final Completo
-                        </h4>
-                        <p class="seccion-texto" style="font-size: 1rem; margin-bottom: 1.5rem;">
-                            Demostración del <strong>circuito completo en operación</strong> con los tres LEDs verdes 
-                            conectados en paralelo. Se observa el patrón de parpadeo sincronizado controlado por el 
-                            Arduino, mostrando la aplicación práctica del control digital de actuadores luminosos 
-                            mediante programación.
-                        </p>
-                        <div class="video-wrapper">
-                            <div class="video-badge">✓ RESULTADO FINAL</div>
-                            <video controls>
-                                <source src="LEDS PARA ON.mp4" type="video/mp4">
-                            </video>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
+                
         <!-- Explicación de Funcionamiento -->
         <section class="seccion">
             <h2 class="seccion-titulo">¿Por Qué Funciona el Circuito?</h2>
