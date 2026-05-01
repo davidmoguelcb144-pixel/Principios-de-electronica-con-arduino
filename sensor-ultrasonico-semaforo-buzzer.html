@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sensor Ultrasónico con Semáforo de Leds y Buzzer</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&family=JetBrains+Mono:wght@400;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 50%, #5b21b6 100%);
+            color: #2d3748;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Patrón de fondo */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                radial-gradient(circle at 20% 50%, rgba(124, 58, 237, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(91, 33, 182, 0.15) 0%, transparent 50%);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Partículas flotantes */
+        .particle {
+            position: fixed;
+            width: 4px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 1;
+            animation: float 8s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { 
+                transform: translateY(0) translateX(0);
+                opacity: 0;
+            }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { 
+                transform: translateY(-100vh) translateX(50px);
+                opacity: 0;
+            }
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.95), rgba(109, 40, 217, 0.95));
+            backdrop-filter: blur(10px);
+            padding: 4rem 2rem;
+            text-align: center;
+            position: relative;
+            z-index: 10;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            border-bottom: 4px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            animation: headerShimmer 3s ease-in-out infinite;
+        }
+
+        @keyframes headerShimmer {
+            0%, 100% { transform: translateX(-100%); }
+            50% { transform: translateX(100%); }
+        }
+
+        .icon-sensor {
+            font-size: 5rem;
+            margin-bottom: 1rem;
+            filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.3));
+        }
+
+        .titulo-principal {
+            font-size: clamp(2rem, 6vw, 4.5rem);
+            font-weight: 900;
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            text-shadow: 
+                0 5px 15px rgba(0, 0, 0, 0.3),
+                0 10px 30px rgba(124, 58, 237, 0.5);
+            margin: 0;
+            position: relative;
+            z-index: 2;
+            line-height: 1.3;
+        }
+
+        .subtitulo {
+            font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+            color: rgba(255, 255, 255, 0.95);
+            margin-top: 1rem;
+            letter-spacing: 2px;
+            font-weight: 300;
+        }
+
+        /* Contenedor */
+        .contenido {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Sección */
+        .seccion {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 25px;
+            padding: 3rem;
+            margin: 3rem 0;
+            box-shadow: 
+                0 20px 60px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .seccion::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, #7c3aed, #6d28d9, #5b21b6);
+            background-size: 200% 100%;
+            animation: gradientMove 3s ease infinite;
+        }
+
+        @keyframes gradientMove {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .seccion-titulo {
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 900;
+            background: linear-gradient(135deg, #7c3aed, #6d28d9);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 2rem;
+            position: relative;
+            padding-bottom: 1rem;
+        }
+
+        .seccion-titulo::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 80px;
+            height: 5px;
+            background: linear-gradient(90deg, #7c3aed, #6d28d9);
+            border-radius: 3px;
+        }
+
+        .intro-text {
+            font-size: 1.2rem;
+            line-height: 1.9;
+            color: #4a5568;
+            margin-bottom: 2rem;
+        }
+
+        /* Imagen destacada */
+        .imagen-destacada {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.95));
+            border-radius: 20px;
+            padding: 0;
+            box-shadow: 
+                0 15px 40px rgba(0, 0, 0, 0.15),
+                0 1px 0 rgba(255, 255, 255, 1) inset;
+            position: relative;
+            overflow: hidden;
+            border: 3px solid transparent;
+            max-width: 900px;
+            margin: 3rem auto;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .imagen-destacada::before {
+            content: '';
+            position: absolute;
+            top: -3px;
+            left: -3px;
+            right: -3px;
+            bottom: -3px;
+            background: linear-gradient(135deg, #7c3aed, #6d28d9, #5b21b6);
+            border-radius: 20px;
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .imagen-destacada:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 
+                0 25px 60px rgba(124, 58, 237, 0.3),
+                0 1px 0 rgba(255, 255, 255, 1) inset;
+        }
+
+        .imagen-destacada:hover::before {
+            opacity: 1;
+        }
+
+        .imagen-badge {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: linear-gradient(135deg, #7c3aed, #6d28d9);
+            color: #fff;
+            padding: 0.8rem 1.5rem;
+            border-radius: 25px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            letter-spacing: 2px;
+            z-index: 2;
+            box-shadow: 
+                0 5px 15px rgba(124, 58, 237, 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+
+        .imagen-wrapper {
+            width: 100%;
+            height: 500px;
+            overflow: hidden;
+            border-radius: 20px 20px 0 0;
+            background: linear-gradient(135deg, #1e1b4b, #2e1065);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .imagen-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+
+        .imagen-destacada:hover .imagen-wrapper img {
+            transform: scale(1.05);
+        }
+
+        /* Placeholder cuando no hay imagen */
+        .imagen-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            color: rgba(255, 255, 255, 0.5);
+            gap: 1rem;
+        }
+
+        .imagen-placeholder .placeholder-icon {
+            font-size: 5rem;
+            opacity: 0.4;
+        }
+
+        .imagen-placeholder p {
+            font-size: 1rem;
+            font-style: italic;
+            letter-spacing: 1px;
+        }
+
+        .imagen-info {
+            padding: 2.5rem;
+        }
+
+        .imagen-titulo {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 1.5rem;
+        }
+
+        .imagen-descripcion {
+            font-size: 1.15rem;
+            line-height: 1.9;
+            color: #4a5568;
+        }
+
+        /* Lista de características */
+        .caracteristicas-lista {
+            list-style: none;
+            padding: 0;
+            margin: 2rem 0;
+        }
+
+        .caracteristicas-lista li {
+            padding: 1rem 0;
+            padding-left: 3rem;
+            position: relative;
+            font-size: 1.08rem;
+            line-height: 1.8;
+            color: #4a5568;
+            border-bottom: 1px solid rgba(124, 58, 237, 0.1);
+        }
+
+        .caracteristicas-lista li:last-child {
+            border-bottom: none;
+        }
+
+        .caracteristicas-lista li::before {
+            content: '📡';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 35px;
+            height: 35px;
+            background: linear-gradient(135deg, #7c3aed, #6d28d9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 10px rgba(124, 58, 237, 0.3);
+        }
+
+        .caracteristicas-lista li strong {
+            color: #6d28d9;
+            font-weight: 700;
+        }
+
+        /* Box destacado */
+        .destacado-box {
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.1), rgba(109, 40, 217, 0.1));
+            border-left: 5px solid #7c3aed;
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+            box-shadow: 0 5px 20px rgba(124, 58, 237, 0.1);
+        }
+
+        .destacado-titulo {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #6d28d9;
+            margin-bottom: 1rem;
+        }
+
+        .destacado-texto {
+            font-size: 1.05rem;
+            line-height: 1.8;
+            color: #4a5568;
+        }
+
+        /* Semáforo visual */
+        .semaforo-visual {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+
+        .semaforo-card {
+            background: #fff;
+            border-radius: 20px;
+            padding: 2rem 1.5rem;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            flex: 1;
+            min-width: 180px;
+            max-width: 220px;
+            transition: transform 0.3s ease;
+        }
+
+        .semaforo-card:hover {
+            transform: translateY(-8px);
+        }
+
+        .led-circulo {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin: 0 auto 1rem;
+            box-shadow: 0 0 30px currentColor;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+        }
+
+        .led-verde { background: #22c55e; color: #22c55e; box-shadow: 0 0 25px #22c55e; }
+        .led-amarillo { background: #eab308; color: #eab308; box-shadow: 0 0 25px #eab308; }
+        .led-rojo { background: #ef4444; color: #ef4444; box-shadow: 0 0 25px #ef4444; }
+
+        .semaforo-label {
+            font-weight: 700;
+            font-size: 1rem;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+
+        .semaforo-dist {
+            font-size: 0.9rem;
+            color: #6d28d9;
+            font-weight: 600;
+        }
+
+        .semaforo-desc {
+            font-size: 0.85rem;
+            color: #718096;
+            margin-top: 0.4rem;
+        }
+
+        /* Botón */
+        .btn-volver {
+            display: inline-block;
+            background: linear-gradient(135deg, #7c3aed, #6d28d9);
+            color: #fff;
+            padding: 1.3rem 3.5rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: all 0.3s ease;
+            margin: 2rem 0;
+            box-shadow: 
+                0 10px 30px rgba(124, 58, 237, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-volver::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn-volver:hover {
+            transform: translateY(-3px);
+            box-shadow: 
+                0 15px 40px rgba(124, 58, 237, 0.6),
+                inset 0 1px 0 rgba(255, 255, 255, 0.4);
+        }
+
+        .btn-volver:hover::before {
+            left: 100%;
+        }
+
+        /* Footer */
+        .footer {
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.95), rgba(109, 40, 217, 0.95));
+            backdrop-filter: blur(10px);
+            color: rgba(255, 255, 255, 0.9);
+            text-align: center;
+            padding: 3rem;
+            margin-top: 5rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        .footer-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .seccion {
+                padding: 2rem;
+            }
+
+            .icon-sensor {
+                font-size: 3rem;
+            }
+
+            .imagen-wrapper {
+                height: 300px;
+            }
+
+            .semaforo-visual {
+                gap: 1rem;
+            }
+        }
+
+        /* Animaciones de entrada */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Partículas -->
+    <div id="particles"></div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="icon-sensor">📡</div>
+        <h1 class="titulo-principal">SENSOR ULTRASÓNICO<br>CON SEMÁFORO DE LEDS Y BUZZER</h1>
+        <p class="subtitulo">Detección de Distancia con Señal Visual y Sonora</p>
+    </header>
+
+    <!-- Contenido -->
+    <main class="contenido">
+        <center>
+            <a href="index.html" class="btn-volver">← Volver al Inicio</a>
+        </center>
+
+        <!-- Introducción -->
+        <section class="seccion">
+            <h2 class="seccion-titulo">¿Qué es un Sensor Ultrasónico?</h2>
+            <p class="intro-text">
+                El <strong>sensor ultrasónico HC-SR04</strong> es un módulo que mide distancias emitiendo pulsos de 
+                sonido a una frecuencia de 40 kHz (ultrasonido) y calculando el tiempo que tarda el eco en regresar. 
+                Con este principio puede detectar objetos con precisión entre 2 cm y 400 cm.
+            </p>
+            <p class="intro-text">
+                Este proyecto integra el sensor HC-SR04 con Arduino para construir un <strong>sistema de 
+                alerta por proximidad</strong>: un semáforo de tres LEDs (verde, amarillo y rojo) y un buzzer 
+                indican visualmente y sonoramente qué tan cerca se encuentra un obstáculo, como los sensores 
+                de estacionamiento de los automóviles modernos.
+            </p>
+
+            <div class="destacado-box">
+                <div class="destacado-titulo">🔊 Principio de Funcionamiento</div>
+                <div class="destacado-texto">
+                    El sensor envía un pulso ultrasónico de 10 µs por el pin <strong>TRIG</strong>. La señal 
+                    rebota en el objeto y regresa al pin <strong>ECHO</strong>. Arduino mide la duración del 
+                    pulso de retorno y calcula la distancia con la fórmula: 
+                    <strong>Distancia (cm) = Duración (µs) / 58</strong>.
+                    Según el resultado, activa el LED correspondiente y el buzzer con diferente frecuencia.
+                </div>
+            </div>
+
+            <!-- Semáforo visual -->
+            <div class="semaforo-visual">
+                <div class="semaforo-card">
+                    <div class="led-circulo led-verde">🟢</div>
+                    <div class="semaforo-label">LED Verde</div>
+                    <div class="semaforo-dist">&gt; 30 cm</div>
+                    <div class="semaforo-desc">Zona segura. Sin alerta sonora.</div>
+                </div>
+                <div class="semaforo-card">
+                    <div class="led-circulo led-amarillo">🟡</div>
+                    <div class="semaforo-label">LED Amarillo</div>
+                    <div class="semaforo-dist">15 – 30 cm</div>
+                    <div class="semaforo-desc">Precaución. Buzzer intermitente lento.</div>
+                </div>
+                <div class="semaforo-card">
+                    <div class="led-circulo led-rojo">🔴</div>
+                    <div class="semaforo-label">LED Rojo</div>
+                    <div class="semaforo-dist">&lt; 15 cm</div>
+                    <div class="semaforo-desc">¡Peligro! Buzzer continuo rápido.</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Foto 1: Circuito -->
+        <section class="seccion">
+            <h2 class="seccion-titulo">Circuito Implementado</h2>
+            <p class="intro-text" style="text-align: center;">
+                A continuación se muestra el circuito completo con Arduino, sensor HC-SR04, semáforo de LEDs y buzzer:
+            </p>
+
+            <div class="imagen-destacada">
+                <div class="imagen-badge">📷 CIRCUITO COMPLETO</div>
+                <div class="imagen-wrapper">
+                    <img src="sensor-ultrasonico-circuito.jpg" alt="Circuito Arduino con sensor ultrasónico, semáforo de LEDs y buzzer"
+                         onerror="this.style.display='none'; this.parentElement.querySelector('.imagen-placeholder').style.display='flex';">
+                    <div class="imagen-placeholder" style="display:none;">
+                        <span class="placeholder-icon">🖼️</span>
+                        <p>Reemplaza "sensor-ultrasonico-circuito.jpg" con tu imagen</p>
+                    </div>
+                </div>
+                <div class="imagen-info">
+                    <h3 class="imagen-titulo">Montaje del Circuito en Protoboard</h3>
+                    <p class="imagen-descripcion">
+                        Vista completa del circuito mostrando el Arduino UNO conectado al sensor HC-SR04 
+                        (pines TRIG y ECHO), tres LEDs (verde, amarillo y rojo) con sus respectivas resistencias 
+                        de 220Ω, y el buzzer pasivo. Los LEDs se conectan a pines digitales y el sensor a 
+                        pines digitales adicionales, todo montado sobre protoboard sin necesidad de soldadura.
+                    </p>
+                </div>
+            </div>
+
+            <p class="intro-text" style="text-align: center; margin-top: 0; font-size: 0.95rem; color: #64748b;">
+                <em>Nota: Reemplaza "sensor-ultrasonico-circuito.jpg" con el nombre de tu archivo de imagen.</em>
+            </p>
+        </section>
+
+        <!-- Foto 2: Diagrama de conexiones -->
+        <section class="seccion">
+            <h2 class="seccion-titulo">Diagrama de Conexiones</h2>
+            <p class="intro-text" style="text-align: center;">
+                Diagrama esquemático con el mapeo de pines y la disposición de todos los componentes:
+            </p>
+
+            <div class="imagen-destacada">
+                <div class="imagen-badge">🗺️ DIAGRAMA DE PINES</div>
+                <div class="imagen-wrapper">
+                    <img src="sensor-ultrasonico-diagrama.jpg" alt="Diagrama de conexiones del sensor ultrasónico con semáforo y buzzer"
+                         onerror="this.style.display='none'; this.parentElement.querySelector('.imagen-placeholder').style.display='flex';">
+                    <div class="imagen-placeholder" style="display:none;">
+                        <span class="placeholder-icon">🖼️</span>
+                        <p>Reemplaza "sensor-ultrasonico-diagrama.jpg" con tu imagen</p>
+                    </div>
+                </div>
+                <div class="imagen-info">
+                    <h3 class="imagen-titulo">Esquema de Pines Arduino</h3>
+                    <p class="imagen-descripcion">
+                        Diagrama de conexiones detallado: <strong>TRIG → Pin 9</strong>, <strong>ECHO → Pin 10</strong>, 
+                        <strong>LED verde → Pin 4</strong>, <strong>LED amarillo → Pin 3</strong>, 
+                        <strong>LED rojo → Pin 2</strong>, <strong>Buzzer → Pin 8</strong>. 
+                        El sensor opera a 5V y GND de Arduino. Cada LED incluye una resistencia limitadora de 
+                        220Ω en serie para protegerlo de sobrecorriente.
+                    </p>
+                </div>
+            </div>
+
+            <p class="intro-text" style="text-align: center; margin-top: 0; font-size: 0.95rem; color: #64748b;">
+                <em>Nota: Reemplaza "sensor-ultrasonico-diagrama.jpg" con el nombre de tu archivo de imagen.</em>
+            </p>
+        </section>
+
+        <!-- Componentes -->
+        <section class="seccion">
+            <h2 class="seccion-titulo">Componentes del Circuito</h2>
+            <p class="intro-text">
+                Materiales necesarios para construir el sistema de detección de proximidad con alerta visual y sonora:
+            </p>
+
+            <ul class="caracteristicas-lista">
+                <li>
+                    <strong>Arduino UNO:</strong> Microcontrolador principal que procesa las lecturas del sensor, 
+                    calcula la distancia y controla los LEDs y el buzzer según los rangos programados.
+                </li>
+                <li>
+                    <strong>Sensor HC-SR04:</strong> Módulo ultrasónico con 4 pines (VCC, GND, TRIG, ECHO). 
+                    Rango de detección de 2 cm a 400 cm con precisión de ±3 mm y ángulo de medición de 15°.
+                </li>
+                <li>
+                    <strong>LED Verde:</strong> Indica zona segura (distancia mayor a 30 cm). Requiere resistencia 
+                    de 220Ω en serie para limitar la corriente a ~20mA.
+                </li>
+                <li>
+                    <strong>LED Amarillo:</strong> Indica zona de precaución (entre 15 y 30 cm). Se activa junto 
+                    con el buzzer en modo intermitente lento (beeps cada 500ms).
+                </li>
+                <li>
+                    <strong>LED Rojo:</strong> Indica zona de peligro (menos de 15 cm). El buzzer suena 
+                    continuamente a alta frecuencia para alertar al usuario de inmediato.
+                </li>
+                <li>
+                    <strong>Buzzer Pasivo:</strong> Genera sonido mediante la función tone() de Arduino, 
+                    permitiendo variar la frecuencia según la urgencia de la alerta (500 Hz a 2000 Hz).
+                </li>
+                <li>
+                    <strong>3 Resistencias de 220Ω:</strong> Una por cada LED para protegerlos de 
+                    sobrecorriente y garantizar su funcionamiento óptimo.
+                </li>
+                <li>
+                    <strong>Protoboard y Cables Dupont:</strong> Para montaje temporal sin soldadura, 
+                    facilitando conexiones y modificaciones del circuito durante el desarrollo.
+                </li>
+            </ul>
+        </section>
+
+        <!-- Funcionamiento -->
+        <section class="seccion">
+            <h2 class="seccion-titulo">¿Cómo Funciona?</h2>
+            <p class="intro-text">
+                El sistema opera mediante los siguientes principios electrónicos y de programación:
+            </p>
+
+            <ul class="caracteristicas-lista">
+                <li>
+                    <strong>Emisión del Pulso:</strong> Arduino envía un pulso HIGH de 10 µs al pin TRIG del 
+                    sensor, lo que dispara una ráfaga de 8 ciclos de sonido ultrasónico a 40 kHz.
+                </li>
+                <li>
+                    <strong>Recepción del Eco:</strong> El pin ECHO permanece en HIGH durante el tiempo que 
+                    tarda el sonido en viajar al obstáculo y regresar. Arduino mide este tiempo con pulseIn().
+                </li>
+                <li>
+                    <strong>Cálculo de Distancia:</strong> La distancia se calcula dividiendo la duración del 
+                    eco entre 58 (velocidad del sonido a temperatura ambiente): Distancia = pulseIn(ECHO, HIGH) / 58.
+                </li>
+                <li>
+                    <strong>Lógica del Semáforo:</strong> El código evalúa el rango de distancia con estructuras 
+                    if-else, apagando todos los LEDs primero y encendiendo únicamente el que corresponde al rango medido.
+                </li>
+                <li>
+                    <strong>Control del Buzzer:</strong> Usa tone(pin, frecuencia) para el LED rojo (alerta continua) 
+                    y noTone() para el verde (silencio). Para el amarillo, alterna tone/noTone con delay para crear 
+                    el efecto de beep intermitente.
+                </li>
+                <li>
+                    <strong>Ciclo Continuo:</strong> El loop() se ejecuta cada ~60ms, actualizando en tiempo real 
+                    la lectura de distancia y el estado del semáforo y buzzer.
+                </li>
+            </ul>
+
+            <div class="destacado-box" style="margin-top: 3rem;">
+                <div class="destacado-titulo">🔬 Ejemplo de Código Arduino</div>
+                <div class="destacado-texto">
+                    <strong>Estructura básica del programa:</strong>
+                    <br><br>
+                    1. <strong>setup():</strong> Define pines TRIG como OUTPUT, ECHO como INPUT, y los pines 
+                    de LEDs y buzzer como OUTPUT. Inicia el monitor serial a 9600 baudios.
+                    <br><br>
+                    2. <strong>loop():</strong> Genera el pulso TRIG, mide el tiempo de ECHO con pulseIn(), 
+                    calcula la distancia y ejecuta la lógica del semáforo con if-else.
+                    <br><br>
+                    3. <strong>Calibración:</strong> Los umbrales de 15 cm y 30 cm pueden ajustarse según 
+                    el caso de uso: estacionamiento, alarma de seguridad, robot seguidor de línea, etc.
+                </div>
+            </div>
+        </section>
+
+        <!-- Aplicaciones -->
+        <section class="seccion">
+            <h2 class="seccion-titulo">Aplicaciones Prácticas</h2>
+            <p class="intro-text">
+                Este tipo de circuito tiene múltiples aplicaciones en proyectos reales de electrónica y robótica:
+            </p>
+
+            <ul class="caracteristicas-lista">
+                <li>
+                    <strong>Sensor de Estacionamiento:</strong> Sistema de asistencia al parqueo que alerta 
+                    al conductor mediante LEDs y buzzer a medida que el vehículo se acerca a un obstáculo.
+                </li>
+                <li>
+                    <strong>Robots con Evasión de Obstáculos:</strong> Vehículos autónomos que detectan 
+                    paredes u objetos y cambian de dirección automáticamente para evitar colisiones.
+                </li>
+                <li>
+                    <strong>Sistemas de Seguridad:</strong> Alarmas de intrusión que se activan cuando 
+                    una persona entra en el rango de detección del sensor, ideal para puertas y pasillos.
+                </li>
+                <li>
+                    <strong>Asistencia para Discapacitados Visuales:</strong> Bastones o pulseras 
+                    electrónicas que alertan mediante vibración o sonido sobre obstáculos cercanos.
+                </li>
+                <li>
+                    <strong>Automatización de Procesos:</strong> Sistemas industriales que detectan la 
+                    presencia de piezas en una línea de producción y controlan actuadores en consecuencia.
+                </li>
+            </ul>
+        </section>
+
+        <center>
+            <a href="index.html" class="btn-volver">← Volver al Inicio</a>
+        </center>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p class="footer-text">📡 Sensor Ultrasónico HC-SR04 con Semáforo de LEDs y Buzzer 🚦</p>
+        <p style="margin-top: 0.5rem; opacity: 0.8;">Detección de Distancia y Alertas en Tiempo Real</p>
+    </footer>
+
+    <script>
+        // Crear partículas flotantes
+        function createParticles() {
+            const container = document.getElementById('particles');
+            for (let i = 0; i < 30; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 8 + 's';
+                particle.style.animationDuration = (5 + Math.random() * 5) + 's';
+                container.appendChild(particle);
+            }
+        }
+
+        window.addEventListener('load', createParticles);
+
+        // Animación de entrada para secciones
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.seccion').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(50px)';
+            el.style.transition = 'all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>
