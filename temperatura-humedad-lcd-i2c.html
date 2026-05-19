@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lectura de Temperatura y Humedad con LCD y Módulo I2C</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background: linear-gradient(135deg, #000d1a 0%, #001a33 50%, #00112b 100%);
+            color: #c8e6ff;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image:
+                linear-gradient(90deg, rgba(0, 180, 255, 0.04) 1px, transparent 1px),
+                linear-gradient(0deg, rgba(0, 180, 255, 0.04) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .bg-gradient {
+            position: fixed;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.12;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .gradient-blue {
+            top: -250px; right: -250px;
+            background: radial-gradient(circle, #00aaff, transparent);
+            animation: pulse 8s ease-in-out infinite;
+        }
+
+        .gradient-cyan {
+            bottom: -200px; left: -200px;
+            background: radial-gradient(circle, #00e5ff, transparent);
+            animation: pulse 8s ease-in-out infinite 2s;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.12; }
+            50% { opacity: 0.22; }
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #003366 0%, #004080 50%, #0055aa 100%);
+            padding: 3.5rem 2rem;
+            text-align: center;
+            position: relative;
+            z-index: 10;
+            border-bottom: 4px solid #00b4ff;
+            box-shadow:
+                0 10px 40px rgba(0, 180, 255, 0.4),
+                inset 0 -1px 0 rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 300%; height: 100%;
+            background: linear-gradient(90deg,
+                transparent 0%,
+                rgba(0, 180, 255, 0.12) 50%,
+                transparent 100%);
+            animation: headerShine 4s ease-in-out infinite;
+        }
+
+        @keyframes headerShine {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        /* LCD display simulado en el header */
+        .lcd-deco {
+            display: inline-block;
+            background: #0a1a4a;
+            border: 3px solid #00b4ff;
+            border-radius: 8px;
+            padding: 0.8rem 2rem;
+            margin-bottom: 1.5rem;
+            font-family: 'Orbitron', monospace;
+            font-size: clamp(0.75rem, 1.5vw, 1rem);
+            color: #00e5ff;
+            letter-spacing: 2px;
+            box-shadow:
+                0 0 20px rgba(0, 180, 255, 0.5),
+                inset 0 0 30px rgba(0, 50, 120, 0.8);
+            text-shadow: 0 0 8px rgba(0, 229, 255, 0.8);
+            position: relative;
+            z-index: 2;
+        }
+
+        .lcd-line { display: block; line-height: 1.8; }
+
+        .lcd-cursor {
+            display: inline-block;
+            width: 10px;
+            height: 1.1em;
+            background: #00e5ff;
+            vertical-align: text-bottom;
+            animation: cursorBlink 1s step-end infinite;
+            margin-left: 2px;
+        }
+
+        @keyframes cursorBlink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        .led-indicator {
+            position: absolute;
+            width: 12px; height: 12px;
+            background: #00b4ff;
+            border-radius: 50%;
+            box-shadow: 0 0 20px #00b4ff, 0 0 40px rgba(0,180,255,0.4);
+            animation: blink 1.5s ease-in-out infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.2; }
+        }
+
+        .led-tl { top: 30px; left: 30px; }
+        .led-tr { top: 30px; right: 30px; animation-delay: 0.4s; }
+        .led-bl { bottom: 30px; left: 30px; animation-delay: 0.8s; }
+        .led-br { bottom: 30px; right: 30px; animation-delay: 1.2s; }
+
+        .titulo-principal {
+            font-family: 'Orbitron', monospace;
+            font-size: clamp(1.6rem, 4.5vw, 3.8rem);
+            font-weight: 900;
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            text-shadow:
+                0 0 30px rgba(0, 180, 255, 0.9),
+                0 4px 6px rgba(0, 0, 0, 0.5),
+                0 8px 20px rgba(0, 0, 0, 0.3);
+            margin: 0;
+            position: relative;
+            z-index: 2;
+            line-height: 1.3;
+        }
+
+        .subtitulo {
+            font-family: 'Orbitron', monospace;
+            font-size: clamp(0.8rem, 1.8vw, 1.1rem);
+            color: #7dd8ff;
+            margin-top: 1rem;
+            letter-spacing: 4px;
+            text-shadow: 0 0 10px rgba(125, 216, 255, 0.5);
+        }
+
+        /* Contenedor */
+        .contenido {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Sección */
+        .seccion {
+            background: linear-gradient(135deg,
+                rgba(0, 20, 50, 0.88) 0%,
+                rgba(0, 10, 30, 0.96) 100%);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(0, 180, 255, 0.3);
+            border-radius: 20px;
+            padding: 3rem;
+            margin: 3rem 0;
+            box-shadow:
+                0 10px 40px rgba(0, 0, 0, 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.04);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .seccion::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 4px;
+            background: linear-gradient(90deg, #00b4ff, #00e5ff, #0088cc, #00b4ff);
+            background-size: 200% 100%;
+            animation: borderFlow 3s linear infinite;
+        }
+
+        @keyframes borderFlow {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 200% 0%; }
+        }
+
+        .seccion-titulo {
+            font-family: 'Orbitron', monospace;
+            font-size: clamp(1.6rem, 3.5vw, 2.5rem);
+            font-weight: 900;
+            color: #00b4ff;
+            margin-bottom: 2rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            text-shadow: 0 0 20px rgba(0, 180, 255, 0.5);
+            position: relative;
+            padding-bottom: 1rem;
+        }
+
+        .seccion-titulo::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0;
+            width: 120px; height: 4px;
+            background: linear-gradient(90deg, #00b4ff, #00e5ff, transparent);
+            border-radius: 2px;
+        }
+
+        .seccion-texto {
+            font-size: 1.15rem;
+            line-height: 1.9;
+            color: #a8d4f0;
+            margin-bottom: 1.5rem;
+        }
+
+        .seccion-texto strong { color: #00e5ff; }
+
+        /* Paso a paso */
+        .paso-item {
+            display: grid;
+            grid-template-columns: 90px 1fr;
+            gap: 2.5rem;
+            margin: 3.5rem 0;
+            align-items: start;
+        }
+
+        .paso-numero {
+            width: 90px; height: 90px;
+            background: linear-gradient(135deg, #004080, #0055aa);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Orbitron', monospace;
+            font-size: 2.2rem;
+            font-weight: 900;
+            color: #00e5ff;
+            box-shadow:
+                0 8px 25px rgba(0, 180, 255, 0.5),
+                inset 0 2px 0 rgba(255, 255, 255, 0.2);
+            border: 4px solid #00b4ff;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .paso-numero::before {
+            content: '';
+            position: absolute;
+            top: -4px; left: -4px; right: -4px; bottom: -4px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #00b4ff, #0044aa);
+            z-index: -1;
+            filter: blur(12px);
+            opacity: 0.6;
+        }
+
+        .paso-contenido {
+            background: rgba(0, 20, 55, 0.6);
+            border: 1px solid rgba(0, 180, 255, 0.25);
+            border-radius: 15px;
+            padding: 2.5rem;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .paso-titulo {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #7dd8ff;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 10px rgba(125, 216, 255, 0.3);
+        }
+
+        .paso-descripcion {
+            font-size: 1.08rem;
+            line-height: 1.85;
+            color: #a8d4f0;
+            margin-bottom: 1.2rem;
+        }
+
+        .paso-descripcion strong { color: #00e5ff; }
+
+        .paso-imagen {
+            width: 100%;
+            height: 400px;
+            overflow: hidden;
+            border-radius: 12px;
+            border: 3px solid rgba(0, 180, 255, 0.4);
+            box-shadow:
+                0 8px 30px rgba(0, 0, 0, 0.6),
+                0 0 40px rgba(0, 180, 255, 0.15);
+            margin-top: 1.5rem;
+            background: #000d1a;
+        }
+
+        .paso-imagen img {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+
+        .paso-item:hover .paso-imagen img { transform: scale(1.06); }
+
+        /* Video */
+        .video-section {
+            background: linear-gradient(135deg, rgba(0,180,255,0.07), rgba(0,100,200,0.07));
+            border: 3px solid rgba(0, 180, 255, 0.4);
+            border-radius: 20px;
+            padding: 2.5rem;
+            margin: 3rem 0;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.6);
+        }
+
+        .video-wrapper {
+            position: relative;
+            width: 100%;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow:
+                0 10px 40px rgba(0, 0, 0, 0.6),
+                0 0 60px rgba(0, 180, 255, 0.2);
+            border: 3px solid rgba(0, 229, 255, 0.4);
+            max-width: 800px;
+            margin: 1.5rem auto 0;
+        }
+
+        .video-badge {
+            position: absolute;
+            top: 15px; left: 15px;
+            background: linear-gradient(135deg, #004080, #003366);
+            color: #00e5ff;
+            padding: 0.8rem 1.5rem;
+            border-radius: 25px;
+            font-family: 'Orbitron', monospace;
+            font-weight: 700;
+            font-size: 0.85rem;
+            letter-spacing: 2px;
+            z-index: 2;
+            box-shadow: 0 5px 15px rgba(0, 180, 255, 0.5);
+            border: 2px solid #00b4ff;
+        }
+
+        video { width: 100%; height: auto; display: block; }
+
+        /* Componentes grid */
+        .componentes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 2.5rem 0;
+        }
+
+        .componente-card {
+            background: linear-gradient(135deg, rgba(0,64,128,0.15), rgba(0,30,80,0.15));
+            border: 2px solid rgba(0, 180, 255, 0.25);
+            border-radius: 15px;
+            padding: 2rem;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .componente-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 180, 255, 0.1), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .componente-card:hover {
+            border-color: #00b4ff;
+            box-shadow: 0 12px 35px rgba(0, 180, 255, 0.3), 0 0 50px rgba(0, 180, 255, 0.15);
+            transform: translateY(-6px);
+        }
+
+        .componente-card:hover::before { left: 100%; }
+
+        .comp-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .comp-icon { font-size: 2.5rem; }
+
+        .comp-nombre {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #00b4ff;
+        }
+
+        .comp-modelo {
+            font-size: 0.9rem;
+            color: #5599cc;
+            letter-spacing: 1px;
+            margin-top: 0.2rem;
+        }
+
+        .comp-descripcion {
+            font-size: 1rem;
+            color: #8ab8d8;
+            line-height: 1.75;
+            margin-bottom: 1rem;
+        }
+
+        .comp-specs {
+            list-style: none;
+            padding: 0;
+        }
+
+        .comp-specs li {
+            font-size: 0.95rem;
+            color: #7aa8c8;
+            padding: 0.4rem 0;
+            border-bottom: 1px solid rgba(0,180,255,0.1);
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+
+        .comp-specs li:last-child { border-bottom: none; }
+
+        .comp-specs li::before {
+            content: '▸';
+            color: #00b4ff;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .comp-specs li strong { color: #00e5ff; }
+
+        /* Tech box */
+        .tech-box {
+            background: linear-gradient(135deg, rgba(0,10,30,0.88), rgba(0,20,55,0.88));
+            border-left: 6px solid #00b4ff;
+            border-radius: 15px;
+            padding: 2.5rem;
+            margin: 2.5rem 0;
+            box-shadow: 0 10px 35px rgba(0,0,0,0.5);
+        }
+
+        .tech-titulo {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #7dd8ff;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .tech-lista { list-style: none; padding: 0; }
+
+        .tech-lista li {
+            padding: 1.2rem 0;
+            border-bottom: 1px solid rgba(0,180,255,0.12);
+            font-size: 1.08rem;
+            line-height: 1.85;
+            color: #a8d4f0;
+        }
+
+        .tech-lista li:last-child { border-bottom: none; }
+        .tech-lista li strong { color: #00e5ff; font-weight: 700; }
+
+        /* Código Arduino */
+        .codigo-block {
+            background: #000d1a;
+            border: 2px solid rgba(0, 180, 255, 0.3);
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 1.5rem 0;
+            overflow-x: auto;
+            position: relative;
+        }
+
+        .codigo-block::before {
+            content: 'Arduino Code';
+            position: absolute;
+            top: 10px; right: 15px;
+            font-family: 'Orbitron', monospace;
+            font-size: 0.75rem;
+            color: #335577;
+            letter-spacing: 2px;
+        }
+
+        .codigo-block code {
+            font-family: 'Courier New', monospace;
+            font-size: 0.95rem;
+            line-height: 1.9;
+            color: #7dd8ff;
+            white-space: pre;
+            display: block;
+        }
+
+        .c-comment { color: #446688; }
+        .c-keyword { color: #ff79c6; }
+        .c-function { color: #50fa7b; }
+        .c-string { color: #f1fa8c; }
+        .c-number { color: #bd93f9; }
+        .c-type { color: #8be9fd; }
+
+        /* Diagrama de pines */
+        .pin-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            font-family: 'Rajdhani', sans-serif;
+        }
+
+        .pin-table th {
+            background: linear-gradient(135deg, #004080, #003366);
+            color: #00e5ff;
+            font-family: 'Orbitron', monospace;
+            font-size: 0.9rem;
+            letter-spacing: 2px;
+            padding: 1rem 1.5rem;
+            text-align: left;
+            border-bottom: 2px solid #00b4ff;
+        }
+
+        .pin-table td {
+            padding: 0.9rem 1.5rem;
+            border-bottom: 1px solid rgba(0,180,255,0.12);
+            color: #a8d4f0;
+            font-size: 1rem;
+        }
+
+        .pin-table tr:hover td { background: rgba(0,180,255,0.06); }
+
+        .pin-badge {
+            display: inline-block;
+            background: rgba(0,64,128,0.5);
+            border: 1px solid #00b4ff;
+            border-radius: 6px;
+            padding: 0.2rem 0.7rem;
+            font-family: 'Orbitron', monospace;
+            font-size: 0.8rem;
+            color: #00e5ff;
+        }
+
+        /* Botón */
+        .btn-volver {
+            display: inline-block;
+            background: linear-gradient(135deg, #004080, #003366);
+            color: #00e5ff;
+            padding: 1.3rem 3.5rem;
+            border: 3px solid #00b4ff;
+            border-radius: 50px;
+            text-decoration: none;
+            font-family: 'Orbitron', monospace;
+            font-weight: 700;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            transition: all 0.35s ease;
+            margin: 2rem 0;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 30px rgba(0, 180, 255, 0.4);
+        }
+
+        .btn-volver::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0,229,255,0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn-volver:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 15px 45px rgba(0,180,255,0.6), 0 0 60px rgba(0,180,255,0.3);
+        }
+
+        .btn-volver:hover::before { left: 100%; }
+
+        /* Footer */
+        .footer {
+            background: linear-gradient(135deg, #00080f, #000d1a);
+            color: #335577;
+            text-align: center;
+            padding: 2.5rem;
+            margin-top: 5rem;
+            border-top: 3px solid #00b4ff;
+            position: relative;
+            z-index: 10;
+        }
+
+        .footer-text {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.05rem;
+            color: #00b4ff;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(0,180,255,0.3);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .paso-item { grid-template-columns: 1fr; gap: 1.5rem; }
+            .paso-numero { width: 70px; height: 70px; font-size: 1.8rem; margin: 0 auto; }
+            .componentes-grid { grid-template-columns: 1fr; }
+            .seccion { padding: 2rem; }
+            .lcd-deco { font-size: 0.7rem; padding: 0.6rem 1rem; }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-gradient gradient-blue"></div>
+    <div class="bg-gradient gradient-cyan"></div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="led-indicator led-tl"></div>
+        <div class="led-indicator led-tr"></div>
+        <div class="led-indicator led-bl"></div>
+        <div class="led-indicator led-br"></div>
+
+        <div class="lcd-deco">
+            <span class="lcd-line">Temp: 26.70 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+            <span class="lcd-line">Humedad: 41.00 &nbsp;&nbsp;&nbsp;<span class="lcd-cursor"></span></span>
+        </div>
+
+        <h1 class="titulo-principal">🌡️ LECTURA DE TEMPERATURA<br>Y HUMEDAD CON LCD<br>Y MÓDULO I2C 💧</h1>
+        <p class="subtitulo">[ SENSOR DHT · ARDUINO UNO · PANTALLA LCD 16×2 ]</p>
+    </header>
+
+    <main class="contenido">
+        <center>
+            <a href="index.html" class="btn-volver">◄ VOLVER AL INICIO</a>
+        </center>
+
+        <!-- Introducción -->
+        <section class="seccion">
+            <h2 class="seccion-titulo">Introducción al Proyecto</h2>
+            <p class="seccion-texto">
+                Este proyecto implementa un <strong>sistema de monitoreo ambiental</strong> basado en Arduino 
+                que mide en tiempo real la temperatura y la humedad relativa del ambiente. Los datos se 
+                muestran de forma continua en una <strong>pantalla LCD 16×2</strong> conectada mediante el 
+                protocolo de comunicación <strong>I2C</strong>, lo que simplifica enormemente el cableado.
+            </p>
+            <p class="seccion-texto">
+                El sensor <strong>DHT11</strong> captura las lecturas ambientales y las envía al 
+                microcontrolador ATmega328P del Arduino, que procesa los datos y los formatea para su 
+                visualización. En la imagen del circuito se puede apreciar la lectura de <strong>26.70 °C 
+                de temperatura</strong> y <strong>41.00% de humedad relativa</strong>, demostrando el 
+                correcto funcionamiento del sistema.
+            </p>
+        </section>
+
+        <!-- Componentes -->
+        <section class="seccion">
+            <h2 class="seccion-titulo">Componentes del Circuito</h2>
+            <p class="seccion-texto">
+                Información detallada sobre cada componente utilizado en este proyecto:
+            </p>
+
+            <div class="componentes-grid">
+
+                <!-- Arduino UNO -->
+                <div class="componente-card">
+                    <div class="comp-header">
+                        <div class="comp-icon">🔵</div>
+                        <div>
+                            <div class="comp-nombre">Arduino UNO</div>
+                            <div class="comp-modelo">ATmega328P · 16 MHz</div>
+                        </div>
+                    </div>
+                    <p class="comp-descripcion">
+                        Microcontrolador de código abierto basado en el chip ATmega328P. 
+                        Es el cerebro del proyecto: lee el sensor, procesa los datos y 
+                        envía la información a la pantalla LCD vía I2C.
+                    </p>
+                    <ul class="comp-specs">
+                        <li><strong>Voltaje de operación:</strong> 5V</li>
+                        <li><strong>Pines digitales I/O:</strong> 14 (6 PWM)</li>
+                        <li><strong>Pines analógicos:</strong> 6</li>
+                        <li><strong>Memoria Flash:</strong> 32 KB</li>
+                        <li><strong>SRAM:</strong> 2 KB</li>
+                        <li><strong>I2C (SDA/SCL):</strong> Pines A4 / A5</li>
+                    </ul>
+                </div>
+
+                <!-- Sensor DHT11 -->
+                <div class="componente-card">
+                    <div class="comp-header">
+                        <div class="comp-icon">🌡️</div>
+                        <div>
+                            <div class="comp-nombre">Sensor DHT11</div>
+                            <div class="comp-modelo">Temperatura & Humedad</div>
+                        </div>
+                    </div>
+                    <p class="comp-descripcion">
+                        Sensor digital de temperatura y humedad relativa de bajo costo. 
+                        Utiliza un protocolo de comunicación serial de un solo hilo para 
+                        transmitir las lecturas calibradas al microcontrolador.
+                    </p>
+                    <ul class="comp-specs">
+                        <li><strong>Rango temperatura:</strong> 0°C – 50°C (±2°C)</li>
+                        <li><strong>Rango humedad:</strong> 20% – 80% HR (±5%)</li>
+                        <li><strong>Voltaje de operación:</strong> 3.3V – 5.5V</li>
+                        <li><strong>Tiempo de muestreo:</strong> 1 segundo mínimo</li>
+                        <li><strong>Resolución:</strong> 1°C / 1% HR</li>
+                        <li><strong>Protocolo:</strong> 1-Wire (señal digital)</li>
+                    </ul>
+                </div>
+
+                <!-- LCD 16x2 -->
+                <div class="componente-card">
+                    <div class="comp-header">
+                        <div class="comp-icon">📺</div>
+                        <div>
+                            <div class="comp-nombre">LCD 16×2</div>
+                            <div class="comp-modelo">Display HD44780</div>
+                        </div>
+                    </div>
+                    <p class="comp-descripcion">
+                        Pantalla de cristal líquido con retroiluminación azul y caracteres 
+                        blancos. Capaz de mostrar 2 líneas de 16 caracteres cada una. 
+                        Controlada por el chip HD44780, compatible con módulo I2C.
+                    </p>
+                    <ul class="comp-specs">
+                        <li><strong>Caracteres:</strong> 16 columnas × 2 filas</li>
+                        <li><strong>Retroiluminación:</strong> LED azul</li>
+                        <li><strong>Voltaje de operación:</strong> 5V</li>
+                        <li><strong>Controlador:</strong> HD44780</li>
+                        <li><strong>Tamaño caracter:</strong> 5×8 puntos</li>
+                        <li><strong>Interfaz nativa:</strong> 4 u 8 bits paralelo</li>
+                    </ul>
+                </div>
+
+                <!-- Módulo I2C -->
+                <div class="componente-card">
+                    <div class="comp-header">
+                        <div class="comp-icon">🔌</div>
+                        <div>
+                            <div class="comp-nombre">Módulo I2C</div>
+                            <div class="comp-modelo">PCF8574 · Adaptador LCD</div>
+                        </div>
+                    </div>
+                    <p class="comp-descripcion">
+                        Adaptador que permite controlar la pantalla LCD usando solo 2 cables 
+                        de datos (SDA y SCL) en lugar de los 6–10 cables que requiere la 
+                        conexión paralela directa. Usa el expansor de I/O PCF8574.
+                    </p>
+                    <ul class="comp-specs">
+                        <li><strong>Chip:</strong> PCF8574 / PCF8574A</li>
+                        <li><strong>Protocolo:</strong> I2C (Two-Wire Interface)</li>
+                        <li><strong>Dirección I2C:</strong> 0x27 o 0x3F (ajustable)</li>
+                        <li><strong>Cables necesarios:</strong> Solo VCC, GND, SDA, SCL</li>
+                        <li><strong>Potenciómetro:</strong> Ajuste de contraste integrado</li>
+                        <li><strong>Jumper:</strong> Control de retroiluminación</li>
+                    </ul>
+                </div>
+
+                <!-- Protoboard -->
+                <div class="componente-card">
+                    <div class="comp-header">
+                        <div class="comp-icon">🔲</div>
+                        <div>
+                            <div class="comp-nombre">Protoboard</div>
+                            <div class="comp-modelo">Tablero de conexión sin soldadura</div>
+                        </div>
+                    </div>
+                    <p class="comp-descripcion">
+                        Permite montar circuitos electrónicos temporales sin necesidad de 
+                        soldadura. Sus filas y columnas internas están eléctricamente 
+                        conectadas, facilitando el prototipado rápido.
+                    </p>
+                    <ul class="comp-specs">
+                        <li><strong>Filas centrales:</strong> Conectadas horizontalmente (a-e / f-j)</li>
+                        <li><strong>Rieles laterales:</strong> VCC (+) y GND (−)</li>
+                        <li><strong>Material:</strong> Plástico ABS con clips metálicos</li>
+                        <li><strong>Corriente máx.:</strong> 1A por contacto</li>
+                        <li><strong>Voltaje máx.:</strong> 300V</li>
+                    </ul>
+                </div>
+
+                <!-- Cables Jumper -->
+                <div class="componente-card">
+                    <div class="comp-header">
+                        <div class="comp-icon">🔗</div>
+                        <div>
+                            <div class="comp-nombre">Cables Jumper</div>
+                            <div class="comp-modelo">Macho-Macho / Macho-Hembra</div>
+                        </div>
+                    </div>
+                    <p class="comp-descripcion">
+                        Cables de conexión flexible utilizados para interconectar los 
+                        componentes en la protoboard y el Arduino. Se usan distintos 
+                        colores para identificar fácilmente cada señal.
+                    </p>
+                    <ul class="comp-specs">
+                        <li><strong>Rojo:</strong> VCC / Alimentación positiva</li>
+                        <li><strong>Negro/Café:</strong> GND / Tierra</li>
+                        <li><strong>Amarillo:</strong> Señal de datos (DHT)</li>
+                        <li><strong>Verde:</strong> SDA (datos I2C)</li>
+                        <li><strong>Azul/Blanco:</strong> SCL (reloj I2C)</li>
+                    </ul>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Diagrama de conexiones -->
+        <section class="seccion">
+            <h2 class="seccion-titulo">Diagrama de Conexiones</h2>
+            <p class="seccion-texto">
+                Tabla de conexiones entre los componentes y el Arduino UNO:
+            </p>
+
+            <div class="tech-box">
+                <h3 class="tech-titulo"><span>📡</span> Sensor DHT11 → Arduino UNO</h3>
+                <table class="pin-table">
+                    <tr>
+                        <th>Pin DHT11</th>
+                        <th>Función</th>
+                        <th>Pin Arduino</th>
+                        <th>Descripción</th>
+                    </tr>
+                    <tr>
+                        <td><span class="pin-badge">VCC</span></td>
+                        <td>Alimentación</td>
+                        <td><span class="pin-badge">5V</span></td>
+                        <td>Fuente de 5 voltios</td>
+                    </tr>
+                    <tr>
+                        <td><span class="pin-badge">DATA</span></td>
+                        <td>Señal digital</td>
+                        <td><span class="pin-badge">D2</span></td>
+                        <td>Pin digital de lectura (con resistencia 10kΩ pull-up)</td>
+                    </tr>
+                    <tr>
+                        <td><span class="pin-badge">GND</span></td>
+                        <td>Tierra</td>
+                        <td><span class="pin-badge">GND</span></td>
+                        <td>Referencia de voltaje 0V</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="tech-box">
+                <h3 class="tech-titulo"><span>🖥️</span> Módulo I2C + LCD → Arduino UNO</h3>
+                <table class="pin-table">
+                    <tr>
+                        <th>Pin Módulo I2C</th>
+                        <th>Función</th>
+                        <th>Pin Arduino</th>
+                        <th>Descripción</th>
+                    </tr>
+                    <tr>
+                        <td><span class="pin-badge">VCC</span></td>
+                        <td>Alimentación</td>
+                        <td><span class="pin-badge">5V</span></td>
+                        <td>Fuente de 5 voltios para LCD + módulo</td>
+                    </tr>
+                    <tr>
+                        <td><span class="pin-badge">GND</span></td>
+                        <td>Tierra</td>
+                        <td><span class="pin-badge">GND</span></td>
+                        <td>Tierra común del circuito</td>
+                    </tr>
+                    <tr>
+                        <td><span class="pin-badge">SDA</span></td>
+                        <td>Datos I2C</td>
+                        <td><span class="pin-badge">A4</span></td>
+                        <td>Línea de datos bidireccional del bus I2C</td>
+                    </tr>
+                    <tr>
+                        <td><span class="pin-badge">SCL</span></td>
+                        <td>Reloj I2C</td>
+                        <td><span class="pin-badge">A5</span></td>
+                        <td>Señal de reloj para sincronización del bus I2C</td>
+                    </tr>
+                </table>
+            </div>
+        </section>
+
+        <!-- Resultado: foto y video -->
+        <section class="seccion">
+            <h2 class="seccion-titulo">Resultado del Circuito</h2>
+            <p class="seccion-texto">
+                El circuito en funcionamiento muestra en la pantalla LCD las lecturas en tiempo 
+                real del sensor DHT11. La primera línea despliega la <strong>temperatura en °C</strong> 
+                y la segunda la <strong>humedad relativa en porcentaje</strong>.
+            </p>
+
+            <div class="paso-item">
+                <div class="paso-numero">📸</div>
+                <div class="paso-contenido">
+                    <h3 class="paso-titulo">Pantalla LCD mostrando Temperatura y Humedad</h3>
+                    <p class="paso-descripcion">
+                        En la fotografía se observa el circuito completo con la pantalla LCD 16×2 
+                        encendida, mostrando <strong>Temp: 26.70</strong> en la primera línea y 
+                        <strong>Humedad: 41.00</strong> en la segunda. También se aprecia el LED 
+                        rojo conectado al circuito como indicador visual adicional.
+                    </p>
+                    <div class="paso-imagen">
+                        <img src="/mnt/user-data/uploads/Pantalla_Humedad.jpg" alt="Pantalla LCD mostrando temperatura y humedad">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Video -->
+            <div class="video-section" style="margin-top: 2rem;">
+                <h3 style="font-family:'Orbitron',monospace; color:#7dd8ff; font-size:1.4rem; margin-bottom:1rem;">
+                    Demostración en Video
+                </h3>
+                <p class="seccion-texto">
+                    Video que muestra la pantalla LCD en funcionamiento, con las lecturas 
+                    actualizándose en tiempo real conforme el sensor DHT11 captura los 
+                    datos ambientales del entorno.
+                </p>
+                <div class="video-wrapper">
+                    <div class="video-badge">📺 VISTA DE LA PANTALLA</div>
+                    <video controls>
+                        <source src="/mnt/user-data/uploads/Vista_de_la_pantalla.mp4" type="video/mp4">
+                        Tu navegador no soporta videos HTML5.
+                    </video>
+                </div>
+            </div>
+        </section>
+
+        <!-- Explicación técnica -->
+        <section class="seccion">
+            <h2 class="seccion-titulo">¿Cómo Funciona el Sistema?</h2>
+
+            <div class="tech-box">
+                <h3 class="tech-titulo"><span>⚡</span> Protocolo I2C — Inter-Integrated Circuit</h3>
+                <ul class="tech-lista">
+                    <li>
+                        <strong>¿Qué es I2C?</strong> Es un protocolo de comunicación serial síncrono 
+                        que permite conectar múltiples dispositivos usando solo 2 líneas: <strong>SDA</strong> 
+                        (Serial Data) para los datos y <strong>SCL</strong> (Serial Clock) para la señal 
+                        de reloj. Fue desarrollado por Philips (ahora NXP) en 1982.
+                    </li>
+                    <li>
+                        <strong>Ventaja principal:</strong> Con el módulo I2C, la LCD 16×2 (que normalmente 
+                        requiere 6 a 10 cables) se conecta con solo 4 cables. Esto simplifica enormemente 
+                        el cableado y libera pines del Arduino para otros componentes.
+                    </li>
+                    <li>
+                        <strong>Direccionamiento:</strong> Cada dispositivo I2C tiene una dirección única 
+                        (0x27 o 0x3F en el módulo PCF8574). El Arduino envía primero la dirección del 
+                        dispositivo destino antes de transmitir los datos.
+                    </li>
+                    <li>
+                        <strong>Velocidad:</strong> El bus I2C estándar opera a 100 kHz (modo estándar) 
+                        o 400 kHz (modo rápido). Para esta aplicación se usa el modo estándar, suficiente 
+                        para actualizar la pantalla LCD con datos del sensor cada segundo.
+                    </li>
+                </ul>
+            </div>
+
+            <div class="tech-box">
+                <h3 class="tech-titulo"><span>🌡️</span> Funcionamiento del Sensor DHT11</h3>
+                <ul class="tech-lista">
+                    <li>
+                        <strong>Sensor capacitivo de humedad:</strong> El DHT11 contiene un sensor 
+                        capacitivo cuya capacitancia varía según la humedad del aire. Esta variación 
+                        es convertida a una señal digital por el circuito interno del sensor.
+                    </li>
+                    <li>
+                        <strong>Termistor NTC:</strong> Para medir temperatura, el sensor incluye un 
+                        termistor de coeficiente de temperatura negativo (NTC), cuya resistencia disminuye 
+                        al aumentar la temperatura. El circuito interno convierte este valor a lectura digital.
+                    </li>
+                    <li>
+                        <strong>Protocolo de comunicación:</strong> El DHT11 usa un protocolo de un solo hilo 
+                        (1-Wire). El Arduino envía una señal de inicio, el sensor responde con 40 bits de 
+                        datos: 16 bits de humedad, 16 bits de temperatura y 8 bits de verificación (checksum).
+                    </li>
+                    <li>
+                        <strong>Tiempo de respuesta:</strong> El sensor requiere al menos 1 segundo entre 
+                        lecturas para garantizar datos estables y precisos. La biblioteca DHT de Arduino 
+                        gestiona automáticamente estos tiempos de espera.
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Código -->
+            <div class="tech-box">
+                <h3 class="tech-titulo"><span>💻</span> Código Arduino (Estructura Base)</h3>
+                <div class="codigo-block">
+                    <code><span class="c-comment">// Bibliotecas necesarias</span>
+<span class="c-keyword">#include</span> <span class="c-string">&lt;Wire.h&gt;</span>           <span class="c-comment">// Comunicación I2C</span>
+<span class="c-keyword">#include</span> <span class="c-string">&lt;LiquidCrystal_I2C.h&gt;</span> <span class="c-comment">// Control LCD vía I2C</span>
+<span class="c-keyword">#include</span> <span class="c-string">&lt;DHT.h&gt;</span>            <span class="c-comment">// Lectura del sensor DHT</span>
+
+<span class="c-comment">// Configuración de pines y objetos</span>
+<span class="c-keyword">#define</span> <span class="c-type">DHTPIN</span>  <span class="c-number">2</span>          <span class="c-comment">// Pin digital del sensor DHT</span>
+<span class="c-keyword">#define</span> <span class="c-type">DHTTYPE</span> <span class="c-type">DHT11</span>      <span class="c-comment">// Tipo de sensor</span>
+
+<span class="c-type">DHT</span> dht(<span class="c-type">DHTPIN</span>, <span class="c-type">DHTTYPE</span>);
+<span class="c-type">LiquidCrystal_I2C</span> lcd(<span class="c-number">0x27</span>, <span class="c-number">16</span>, <span class="c-number">2</span>); <span class="c-comment">// Dirección I2C, columnas, filas</span>
+
+<span class="c-keyword">void</span> <span class="c-function">setup</span>() {
+  lcd.<span class="c-function">init</span>();          <span class="c-comment">// Inicializar pantalla LCD</span>
+  lcd.<span class="c-function">backlight</span>();     <span class="c-comment">// Activar retroiluminación</span>
+  dht.<span class="c-function">begin</span>();         <span class="c-comment">// Inicializar sensor DHT</span>
+}
+
+<span class="c-keyword">void</span> <span class="c-function">loop</span>() {
+  <span class="c-type">float</span> temp = dht.<span class="c-function">readTemperature</span>();  <span class="c-comment">// Leer temperatura (°C)</span>
+  <span class="c-type">float</span> hum  = dht.<span class="c-function">readHumidity</span>();     <span class="c-comment">// Leer humedad (%)</span>
+
+  lcd.<span class="c-function">setCursor</span>(<span class="c-number">0</span>, <span class="c-number">0</span>);              <span class="c-comment">// Fila 1, columna 1</span>
+  lcd.<span class="c-function">print</span>(<span class="c-string">"Temp:"</span>);
+  lcd.<span class="c-function">print</span>(temp);
+
+  lcd.<span class="c-function">setCursor</span>(<span class="c-number">0</span>, <span class="c-number">1</span>);              <span class="c-comment">// Fila 2, columna 1</span>
+  lcd.<span class="c-function">print</span>(<span class="c-string">"Humedad:"</span>);
+  lcd.<span class="c-function">print</span>(hum);
+
+  <span class="c-function">delay</span>(<span class="c-number">2000</span>);                       <span class="c-comment">// Esperar 2 segundos</span>
+}</code>
+                </div>
+                <ul class="tech-lista" style="margin-top:1rem;">
+                    <li>
+                        <strong>Wire.h:</strong> Biblioteca nativa de Arduino que implementa el protocolo 
+                        I2C, necesaria para que el módulo LCD se comunique con el Arduino.
+                    </li>
+                    <li>
+                        <strong>LiquidCrystal_I2C.h:</strong> Biblioteca de alto nivel que abstrae el 
+                        control del LCD vía I2C, permitiendo usar funciones simples como print() y setCursor().
+                    </li>
+                    <li>
+                        <strong>DHT.h:</strong> Biblioteca que maneja el protocolo de comunicación del 
+                        sensor DHT, incluyendo los tiempos de señal, lectura de bits y validación de datos.
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <center>
+            <a href="index.html" class="btn-volver">◄ VOLVER AL INICIO</a>
+        </center>
+    </main>
+
+    <footer class="footer">
+        <p class="footer-text">[ TEMPERATURA Y HUMEDAD · LCD I2C · ARDUINO UNO · DHT11 ]</p>
+        <p style="margin-top: 0.5rem; color: #224455;">Sistemas de Monitoreo Ambiental · Protocolo I2C · Electrónica Digital</p>
+    </footer>
+
+    <script>
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.08 });
+
+        document.querySelectorAll('.seccion, .paso-item, .componente-card').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(40px)';
+            el.style.transition = 'all 0.7s ease';
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>
