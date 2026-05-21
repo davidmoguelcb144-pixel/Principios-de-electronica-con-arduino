@@ -1,0 +1,1028 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mensaje LCD I2C - Arduino</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background: linear-gradient(135deg, #001a0d 0%, #002a10 50%, #001508 100%);
+            color: #b8f0c8;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image:
+                linear-gradient(90deg, rgba(0, 255, 100, 0.03) 1px, transparent 1px),
+                linear-gradient(0deg, rgba(0, 255, 100, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .bg-gradient {
+            position: fixed;
+            width: 600px; height: 600px;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.12;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .gradient-green {
+            top: -250px; right: -250px;
+            background: radial-gradient(circle, #00cc55, transparent);
+            animation: pulse 8s ease-in-out infinite;
+        }
+
+        .gradient-teal {
+            bottom: -200px; left: -200px;
+            background: radial-gradient(circle, #00ff88, transparent);
+            animation: pulse 8s ease-in-out infinite 2s;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.12; }
+            50% { opacity: 0.22; }
+        }
+
+        /* ── HEADER ─────────────────────────────────── */
+        .header {
+            background: linear-gradient(135deg, #003318 0%, #004d22 50%, #006630 100%);
+            padding: 3.5rem 2rem;
+            text-align: center;
+            position: relative;
+            z-index: 10;
+            border-bottom: 4px solid #00cc55;
+            box-shadow: 0 10px 40px rgba(0,204,85,0.4), inset 0 -1px 0 rgba(255,255,255,0.08);
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 300%; height: 100%;
+            background: linear-gradient(90deg, transparent 0%, rgba(0,204,85,0.1) 50%, transparent 100%);
+            animation: headerShine 4s ease-in-out infinite;
+        }
+
+        @keyframes headerShine { 0% { left: -100%; } 100% { left: 100%; } }
+
+        /* LCD simulada en header */
+        .lcd-deco {
+            display: inline-block;
+            background: #1a3300;
+            border: 3px solid #00cc55;
+            border-radius: 8px;
+            padding: 1rem 2.5rem;
+            margin-bottom: 1.8rem;
+            font-family: 'Courier New', monospace;
+            font-size: clamp(0.85rem, 1.8vw, 1.15rem);
+            color: #aaff44;
+            letter-spacing: 3px;
+            box-shadow: 0 0 25px rgba(0,204,85,0.5), inset 0 0 40px rgba(0,60,0,0.8);
+            text-shadow: 0 0 8px rgba(170,255,68,0.9);
+            position: relative;
+            z-index: 2;
+        }
+
+        .lcd-line { display: block; line-height: 2; }
+
+        .lcd-cursor {
+            display: inline-block;
+            width: 10px; height: 1em;
+            background: #aaff44;
+            vertical-align: text-bottom;
+            animation: cursorBlink 1s step-end infinite;
+            margin-left: 2px;
+        }
+
+        @keyframes cursorBlink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+        .led-indicator {
+            position: absolute;
+            width: 12px; height: 12px;
+            background: #00cc55;
+            border-radius: 50%;
+            box-shadow: 0 0 20px #00cc55, 0 0 40px rgba(0,204,85,0.4);
+            animation: blink 1.5s ease-in-out infinite;
+        }
+
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
+
+        .led-tl { top: 30px; left: 30px; }
+        .led-tr { top: 30px; right: 30px; animation-delay: 0.4s; }
+        .led-bl { bottom: 30px; left: 30px; animation-delay: 0.8s; }
+        .led-br { bottom: 30px; right: 30px; animation-delay: 1.2s; }
+
+        .titulo-principal {
+            font-family: 'Orbitron', monospace;
+            font-size: clamp(2rem, 5.5vw, 4.5rem);
+            font-weight: 900;
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            text-shadow: 0 0 30px rgba(0,204,85,0.9), 0 4px 6px rgba(0,0,0,0.5);
+            margin: 0;
+            position: relative;
+            z-index: 2;
+            line-height: 1.2;
+        }
+
+        .subtitulo {
+            font-family: 'Orbitron', monospace;
+            font-size: clamp(0.8rem, 1.8vw, 1.1rem);
+            color: #66ff99;
+            margin-top: 1rem;
+            letter-spacing: 4px;
+            text-shadow: 0 0 10px rgba(102,255,153,0.5);
+        }
+
+        /* ── LAYOUT ─────────────────────────────────── */
+        .contenido {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        .seccion {
+            background: linear-gradient(135deg, rgba(0,30,12,0.88) 0%, rgba(0,15,5,0.96) 100%);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(0,204,85,0.3);
+            border-radius: 20px;
+            padding: 3rem;
+            margin: 3rem 0;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.03);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .seccion::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 4px;
+            background: linear-gradient(90deg, #00cc55, #aaff44, #00994d, #00cc55);
+            background-size: 200% 100%;
+            animation: borderFlow 3s linear infinite;
+        }
+
+        @keyframes borderFlow { 0% { background-position: 0% 0%; } 100% { background-position: 200% 0%; } }
+
+        .seccion-titulo {
+            font-family: 'Orbitron', monospace;
+            font-size: clamp(1.6rem, 3.5vw, 2.5rem);
+            font-weight: 900;
+            color: #00cc55;
+            margin-bottom: 2rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            text-shadow: 0 0 20px rgba(0,204,85,0.5);
+            position: relative;
+            padding-bottom: 1rem;
+        }
+
+        .seccion-titulo::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0;
+            width: 120px; height: 4px;
+            background: linear-gradient(90deg, #00cc55, #aaff44, transparent);
+            border-radius: 2px;
+        }
+
+        .seccion-texto {
+            font-size: 1.15rem;
+            line-height: 1.9;
+            color: #90d8a8;
+            margin-bottom: 1.5rem;
+        }
+
+        .seccion-texto strong { color: #aaff44; }
+
+        /* ── MATERIALES GRID ────────────────────────── */
+        .materiales-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+            gap: 2rem;
+            margin: 2.5rem 0;
+        }
+
+        .material-card {
+            background: linear-gradient(135deg, rgba(0,60,20,0.2), rgba(0,30,10,0.2));
+            border: 2px solid rgba(0,204,85,0.25);
+            border-radius: 15px;
+            padding: 2rem;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .material-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0,204,85,0.1), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .material-card:hover {
+            border-color: #00cc55;
+            box-shadow: 0 12px 35px rgba(0,204,85,0.3), 0 0 50px rgba(0,204,85,0.12);
+            transform: translateY(-6px);
+        }
+
+        .material-card:hover::before { left: 100%; }
+
+        .mat-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.2rem; }
+        .mat-icon { font-size: 2.5rem; }
+
+        .mat-nombre {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #00cc55;
+        }
+
+        .mat-modelo { font-size: 0.88rem; color: #3d8f5a; letter-spacing: 1px; margin-top: 0.2rem; }
+
+        .mat-descripcion { font-size: 1rem; color: #78b890; line-height: 1.75; margin-bottom: 1rem; }
+
+        .mat-specs { list-style: none; padding: 0; }
+
+        .mat-specs li {
+            font-size: 0.95rem;
+            color: #66a87a;
+            padding: 0.4rem 0;
+            border-bottom: 1px solid rgba(0,204,85,0.1);
+            display: flex; align-items: flex-start; gap: 0.5rem;
+        }
+
+        .mat-specs li:last-child { border-bottom: none; }
+        .mat-specs li::before { content: '▸'; color: #00cc55; flex-shrink: 0; margin-top: 1px; }
+        .mat-specs li strong { color: #aaff44; }
+
+        /* ── PASOS ──────────────────────────────────── */
+        .paso-item {
+            display: grid;
+            grid-template-columns: 90px 1fr;
+            gap: 2.5rem;
+            margin: 3.5rem 0;
+            align-items: start;
+        }
+
+        .paso-numero {
+            width: 90px; height: 90px;
+            background: linear-gradient(135deg, #004d22, #006630);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'Orbitron', monospace;
+            font-size: 2.2rem; font-weight: 900;
+            color: #aaff44;
+            box-shadow: 0 8px 25px rgba(0,204,85,0.5), inset 0 2px 0 rgba(255,255,255,0.15);
+            border: 4px solid #00cc55;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .paso-numero::before {
+            content: '';
+            position: absolute;
+            top: -4px; left: -4px; right: -4px; bottom: -4px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #00cc55, #003d18);
+            z-index: -1;
+            filter: blur(12px);
+            opacity: 0.6;
+        }
+
+        .paso-contenido {
+            background: rgba(0,30,12,0.6);
+            border: 1px solid rgba(0,204,85,0.25);
+            border-radius: 15px;
+            padding: 2.5rem;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+        }
+
+        .paso-titulo {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.45rem; font-weight: 700;
+            color: #66ff99;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 10px rgba(102,255,153,0.3);
+        }
+
+        .paso-descripcion {
+            font-size: 1.08rem;
+            line-height: 1.85;
+            color: #90d8a8;
+            margin-bottom: 1.2rem;
+        }
+
+        .paso-descripcion strong { color: #aaff44; }
+
+        /* ── IMÁGENES ───────────────────────────────── */
+        .img-frame {
+            width: 100%;
+            border-radius: 14px;
+            border: 3px solid rgba(0,204,85,0.4);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.6), 0 0 40px rgba(0,204,85,0.15);
+            margin-top: 1.5rem;
+            overflow: hidden;
+            background: #001a08;
+        }
+
+        .img-frame img {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.4s ease;
+        }
+
+        .img-frame:hover img { transform: scale(1.05); }
+
+        .img-tall { height: 420px; }
+        .img-med  { height: 350px; }
+        .img-full { height: 480px; }
+
+        /* ── VIDEO ──────────────────────────────────── */
+        .video-section {
+            background: linear-gradient(135deg, rgba(0,204,85,0.06), rgba(0,100,40,0.06));
+            border: 3px solid rgba(0,204,85,0.4);
+            border-radius: 20px;
+            padding: 2.5rem;
+            margin: 2rem 0;
+        }
+
+        .video-wrapper {
+            position: relative;
+            width: 100%; max-width: 860px;
+            margin: 1.5rem auto 0;
+            border-radius: 15px;
+            overflow: hidden;
+            border: 3px solid rgba(170,255,68,0.4);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.6), 0 0 60px rgba(0,204,85,0.18);
+        }
+
+        .video-badge {
+            position: absolute;
+            top: 15px; left: 15px;
+            background: linear-gradient(135deg, #003d18, #004d22);
+            color: #aaff44;
+            padding: 0.7rem 1.4rem;
+            border-radius: 25px;
+            font-family: 'Orbitron', monospace;
+            font-weight: 700;
+            font-size: 0.82rem;
+            letter-spacing: 2px;
+            z-index: 2;
+            border: 2px solid #00cc55;
+            box-shadow: 0 5px 15px rgba(0,204,85,0.4);
+        }
+
+        video { width: 100%; display: block; }
+
+        /* ── TECH BOX ───────────────────────────────── */
+        .tech-box {
+            background: linear-gradient(135deg, rgba(0,10,4,0.88), rgba(0,25,10,0.88));
+            border-left: 6px solid #00cc55;
+            border-radius: 15px;
+            padding: 2.5rem;
+            margin: 2.5rem 0;
+            box-shadow: 0 10px 35px rgba(0,0,0,0.5);
+        }
+
+        .tech-titulo {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.45rem; font-weight: 700;
+            color: #66ff99;
+            margin-bottom: 1.5rem;
+            display: flex; align-items: center; gap: 0.8rem;
+        }
+
+        .tech-lista { list-style: none; padding: 0; }
+
+        .tech-lista li {
+            padding: 1.1rem 0;
+            border-bottom: 1px solid rgba(0,204,85,0.12);
+            font-size: 1.08rem;
+            line-height: 1.85;
+            color: #90d8a8;
+        }
+
+        .tech-lista li:last-child { border-bottom: none; }
+        .tech-lista li strong { color: #aaff44; }
+
+        /* ── TABLA PINES ────────────────────────────── */
+        .pin-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+        }
+
+        .pin-table th {
+            background: linear-gradient(135deg, #003d18, #004d22);
+            color: #aaff44;
+            font-family: 'Orbitron', monospace;
+            font-size: 0.88rem;
+            letter-spacing: 2px;
+            padding: 1rem 1.5rem;
+            text-align: left;
+            border-bottom: 2px solid #00cc55;
+        }
+
+        .pin-table td {
+            padding: 0.9rem 1.5rem;
+            border-bottom: 1px solid rgba(0,204,85,0.12);
+            color: #90d8a8;
+            font-size: 1rem;
+        }
+
+        .pin-table tr:hover td { background: rgba(0,204,85,0.05); }
+
+        .pin-badge {
+            display: inline-block;
+            background: rgba(0,77,34,0.5);
+            border: 1px solid #00cc55;
+            border-radius: 6px;
+            padding: 0.2rem 0.7rem;
+            font-family: 'Orbitron', monospace;
+            font-size: 0.78rem;
+            color: #aaff44;
+        }
+
+        /* ── CÓDIGO ─────────────────────────────────── */
+        .codigo-block {
+            background: #000d04;
+            border: 2px solid rgba(0,204,85,0.3);
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 1.5rem 0;
+            overflow-x: auto;
+            position: relative;
+        }
+
+        .codigo-block::before {
+            content: 'Arduino Code';
+            position: absolute;
+            top: 10px; right: 15px;
+            font-family: 'Orbitron', monospace;
+            font-size: 0.72rem;
+            color: #1f5c33;
+            letter-spacing: 2px;
+        }
+
+        .codigo-block code {
+            font-family: 'Courier New', monospace;
+            font-size: 0.95rem;
+            line-height: 1.9;
+            color: #66ff99;
+            white-space: pre;
+            display: block;
+        }
+
+        .c-comment  { color: #2d7a4a; }
+        .c-keyword  { color: #ff79c6; }
+        .c-function { color: #50fa7b; }
+        .c-string   { color: #f1fa8c; }
+        .c-number   { color: #bd93f9; }
+        .c-type     { color: #8be9fd; }
+
+        /* ── BOTÓN ──────────────────────────────────── */
+        .btn-volver {
+            display: inline-block;
+            background: linear-gradient(135deg, #003d18, #004d22);
+            color: #aaff44;
+            padding: 1.3rem 3.5rem;
+            border: 3px solid #00cc55;
+            border-radius: 50px;
+            text-decoration: none;
+            font-family: 'Orbitron', monospace;
+            font-weight: 700;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            transition: all 0.35s ease;
+            margin: 2rem 0;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 30px rgba(0,204,85,0.4);
+        }
+
+        .btn-volver::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(170,255,68,0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn-volver:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 15px 45px rgba(0,204,85,0.6), 0 0 60px rgba(0,204,85,0.25);
+        }
+
+        .btn-volver:hover::before { left: 100%; }
+
+        /* ── FOOTER ─────────────────────────────────── */
+        .footer {
+            background: linear-gradient(135deg, #000a04, #000d06);
+            text-align: center;
+            padding: 2.5rem;
+            margin-top: 5rem;
+            border-top: 3px solid #00cc55;
+            position: relative;
+            z-index: 10;
+        }
+
+        .footer-text {
+            font-family: 'Orbitron', monospace;
+            font-size: 1rem;
+            color: #00cc55;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(0,204,85,0.3);
+        }
+
+        /* ── RESPONSIVE ─────────────────────────────── */
+        @media (max-width: 768px) {
+            .paso-item { grid-template-columns: 1fr; gap: 1.5rem; }
+            .paso-numero { width: 70px; height: 70px; font-size: 1.8rem; margin: 0 auto; }
+            .materiales-grid { grid-template-columns: 1fr; }
+            .seccion { padding: 2rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-gradient gradient-green"></div>
+    <div class="bg-gradient gradient-teal"></div>
+
+    <!-- HEADER -->
+    <header class="header">
+        <div class="led-indicator led-tl"></div>
+        <div class="led-indicator led-tr"></div>
+        <div class="led-indicator led-bl"></div>
+        <div class="led-indicator led-br"></div>
+
+        <div class="lcd-deco">
+            <span class="lcd-line">Hello, World! &nbsp;&nbsp;&nbsp;</span>
+            <span class="lcd-line">LCD I2C OK &nbsp;&nbsp;&nbsp;&nbsp;<span class="lcd-cursor"></span></span>
+        </div>
+
+        <h1 class="titulo-principal">💬 MENSAJE<br>LCD I2C</h1>
+        <p class="subtitulo">[ ARDUINO UNO · PANTALLA LCD 16×2 · MÓDULO I2C · TINKERCAD ]</p>
+    </header>
+
+    <main class="contenido">
+        <center>
+            <a href="index.html" class="btn-volver">◄ VOLVER AL INICIO</a>
+        </center>
+
+        <!-- INTRO -->
+        <section class="seccion">
+            <h2 class="seccion-titulo">Introducción al Proyecto</h2>
+            <p class="seccion-texto">
+                Este proyecto demuestra cómo enviar y mostrar un <strong>mensaje de texto personalizado</strong> 
+                en una pantalla LCD 16×2 usando un Arduino UNO y el módulo adaptador <strong>I2C (IIC)</strong>. 
+                Es uno de los proyectos fundamentales en el aprendizaje de Arduino, ya que combina 
+                comunicación serial, manejo de displays y bibliotecas externas.
+            </p>
+            <p class="seccion-texto">
+                El circuito fue diseñado y simulado previamente en <strong>Tinkercad</strong>, una 
+                plataforma gratuita de diseño y simulación de circuitos en línea. Esto permite 
+                verificar el funcionamiento del código y el conexionado antes de implementarlo 
+                en hardware físico, ahorrando tiempo y evitando errores de cableado.
+            </p>
+            <p class="seccion-texto">
+                Gracias al módulo I2C, la conexión entre el Arduino y la pantalla se reduce a 
+                <strong>solo 4 cables</strong> (VCC, GND, SDA, SCL), en contraste con los 
+                10+ cables que requiere la conexión paralela directa.
+            </p>
+        </section>
+
+        <!-- MATERIALES -->
+        <section class="seccion">
+            <h2 class="seccion-titulo">Materiales Necesarios</h2>
+            <p class="seccion-texto">
+                Componentes requeridos para reproducir este proyecto tanto en simulación como en físico:
+            </p>
+
+            <div class="materiales-grid">
+
+                <div class="material-card">
+                    <div class="mat-header">
+                        <div class="mat-icon">🔵</div>
+                        <div>
+                            <div class="mat-nombre">Arduino UNO R3</div>
+                            <div class="mat-modelo">ATmega328P · 16 MHz</div>
+                        </div>
+                    </div>
+                    <p class="mat-descripcion">
+                        Microcontrolador principal. Ejecuta el código, gestiona la 
+                        comunicación I2C y envía los datos de texto a la pantalla LCD.
+                    </p>
+                    <ul class="mat-specs">
+                        <li><strong>Voltaje:</strong> 5V operación</li>
+                        <li><strong>Pines I2C:</strong> A4 (SDA) / A5 (SCL)</li>
+                        <li><strong>Memoria Flash:</strong> 32 KB</li>
+                        <li><strong>Conexión PC:</strong> Cable USB tipo B</li>
+                    </ul>
+                </div>
+
+                <div class="material-card">
+                    <div class="mat-header">
+                        <div class="mat-icon">📺</div>
+                        <div>
+                            <div class="mat-nombre">LCD 16×2</div>
+                            <div class="mat-modelo">Display HD44780 · Verde/Negro</div>
+                        </div>
+                    </div>
+                    <p class="mat-descripcion">
+                        Pantalla de cristal líquido con retroiluminación verde y caracteres 
+                        negros (o azul con caracteres blancos). Muestra 2 líneas de 
+                        16 caracteres ASCII cada una.
+                    </p>
+                    <ul class="mat-specs">
+                        <li><strong>Caracteres:</strong> 16 cols × 2 filas</li>
+                        <li><strong>Controlador:</strong> HD44780</li>
+                        <li><strong>Voltaje:</strong> 5V</li>
+                        <li><strong>Tamaño caracter:</strong> 5×8 píxeles</li>
+                    </ul>
+                </div>
+
+                <div class="material-card">
+                    <div class="mat-header">
+                        <div class="mat-icon">🔌</div>
+                        <div>
+                            <div class="mat-nombre">Módulo I2C / IIC</div>
+                            <div class="mat-modelo">PCF8574 · Adaptador LCD</div>
+                        </div>
+                    </div>
+                    <p class="mat-descripcion">
+                        Adaptador que se suelda o conecta a los pines de la LCD. Convierte 
+                        la interfaz paralela de 8 bits del display en comunicación I2C 
+                        de 2 cables, simplificando enormemente el cableado.
+                    </p>
+                    <ul class="mat-specs">
+                        <li><strong>Chip:</strong> PCF8574 / PCF8574A</li>
+                        <li><strong>Dirección I2C:</strong> 0x27 o 0x3F</li>
+                        <li><strong>Cables datos:</strong> Solo SDA y SCL</li>
+                        <li><strong>Potenciómetro:</strong> Ajuste de contraste</li>
+                    </ul>
+                </div>
+
+                <div class="material-card">
+                    <div class="mat-header">
+                        <div class="mat-icon">🔲</div>
+                        <div>
+                            <div class="mat-nombre">Protoboard</div>
+                            <div class="mat-modelo">Breadboard sin soldadura</div>
+                        </div>
+                    </div>
+                    <p class="mat-descripcion">
+                        Tablero de prototipos que permite realizar conexiones temporales 
+                        sin soldadura. Ideal para proyectos educativos donde el circuito 
+                        puede modificarse fácilmente.
+                    </p>
+                    <ul class="mat-specs">
+                        <li><strong>Rieles:</strong> VCC (+) y GND (−) laterales</li>
+                        <li><strong>Filas:</strong> Conectadas horizontalmente</li>
+                        <li><strong>Corriente máx.:</strong> 1A por contacto</li>
+                        <li><strong>Voltaje máx.:</strong> 300V</li>
+                    </ul>
+                </div>
+
+                <div class="material-card">
+                    <div class="mat-header">
+                        <div class="mat-icon">🔗</div>
+                        <div>
+                            <div class="mat-nombre">Cables Jumper</div>
+                            <div class="mat-modelo">M-M / M-H · Varios colores</div>
+                        </div>
+                    </div>
+                    <p class="mat-descripcion">
+                        Cables de conexión usados para interconectar los componentes. 
+                        El código de colores facilita identificar cada señal y 
+                        reduce errores de cableado.
+                    </p>
+                    <ul class="mat-specs">
+                        <li><strong>Rojo:</strong> VCC (5V)</li>
+                        <li><strong>Negro:</strong> GND (tierra)</li>
+                        <li><strong>Verde:</strong> SDA (datos I2C)</li>
+                        <li><strong>Naranja/Amarillo:</strong> SCL (reloj I2C)</li>
+                    </ul>
+                </div>
+
+                <div class="material-card">
+                    <div class="mat-header">
+                        <div class="mat-icon">💻</div>
+                        <div>
+                            <div class="mat-nombre">Tinkercad</div>
+                            <div class="mat-modelo">Simulador online · Autodesk</div>
+                        </div>
+                    </div>
+                    <p class="mat-descripcion">
+                        Plataforma gratuita de simulación de circuitos en el navegador. 
+                        Permite diseñar, conectar componentes virtuales y ejecutar 
+                        código Arduino antes de construir el circuito físico.
+                    </p>
+                    <ul class="mat-specs">
+                        <li><strong>Acceso:</strong> tinkercad.com (gratuito)</li>
+                        <li><strong>Componentes:</strong> Arduino, LCD, sensores…</li>
+                        <li><strong>IDE integrado:</strong> Editor de código Arduino</li>
+                        <li><strong>Sin instalación:</strong> Corre en el navegador</li>
+                    </ul>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- PROCESO -->
+        <section class="seccion">
+            <h2 class="seccion-titulo">Proceso de Desarrollo</h2>
+            <p class="seccion-texto">
+                Pasos seguidos para diseñar, simular e implementar el proyecto de mensaje en LCD I2C:
+            </p>
+
+            <!-- Paso 1 -->
+            <div class="paso-item">
+                <div class="paso-numero">1</div>
+                <div class="paso-contenido">
+                    <h3 class="paso-titulo">Diseño del Circuito en Tinkercad</h3>
+                    <p class="paso-descripcion">
+                        El primer paso fue crear el circuito en <strong>Tinkercad</strong>. Se colocó 
+                        el Arduino UNO, la pantalla LCD 16×2 y el módulo I2C en el área de trabajo 
+                        virtual. Los cables se conectaron según el esquema: VCC y GND del módulo I2C 
+                        a 5V y GND del Arduino, y las líneas <strong>SDA → A4</strong> y <strong>SCL → A5</strong>.
+                    </p>
+                    <p class="paso-descripcion">
+                        La simulación permitió verificar que el cableado era correcto antes de 
+                        escribir una sola línea de código, evitando posibles cortocircuitos 
+                        o conexiones erróneas en el hardware real.
+                    </p>
+                    <div class="img-frame img-tall">
+                        <img src="/mnt/user-data/uploads/Mensaje_Tinker.jpg" alt="Circuito en Tinkercad - LCD I2C con Arduino">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Paso 2 -->
+            <div class="paso-item">
+                <div class="paso-numero">2</div>
+                <div class="paso-contenido">
+                    <h3 class="paso-titulo">Programación del Arduino</h3>
+                    <p class="paso-descripcion">
+                        Se escribió el código en el <strong>IDE integrado de Tinkercad</strong> 
+                        (o en Arduino IDE). Se incluyeron las bibliotecas <strong>Wire.h</strong> 
+                        y <strong>LiquidCrystal_I2C.h</strong>, se configuró la dirección I2C del 
+                        módulo (0x27) y se programó el mensaje a mostrar en la pantalla.
+                    </p>
+                    <p class="paso-descripcion">
+                        La función <strong>lcd.print()</strong> permite enviar cualquier cadena de 
+                        texto a la pantalla. Se puede mostrar texto en ambas filas usando 
+                        <strong>lcd.setCursor(columna, fila)</strong> para posicionar el cursor.
+                    </p>
+
+                    <div class="tech-box" style="margin-top:1.5rem;">
+                        <h3 class="tech-titulo"><span>💻</span> Código Arduino — Mensaje en LCD I2C</h3>
+                        <div class="codigo-block">
+                            <code><span class="c-comment">// Bibliotecas necesarias</span>
+<span class="c-keyword">#include</span> <span class="c-string">&lt;Wire.h&gt;</span>               <span class="c-comment">// Protocolo I2C</span>
+<span class="c-keyword">#include</span> <span class="c-string">&lt;LiquidCrystal_I2C.h&gt;</span>  <span class="c-comment">// Control de LCD vía I2C</span>
+
+<span class="c-comment">// Crear objeto LCD: dirección 0x27, 16 cols, 2 filas</span>
+<span class="c-type">LiquidCrystal_I2C</span> lcd(<span class="c-number">0x27</span>, <span class="c-number">16</span>, <span class="c-number">2</span>);
+
+<span class="c-keyword">void</span> <span class="c-function">setup</span>() {
+  lcd.<span class="c-function">init</span>();          <span class="c-comment">// Inicializar pantalla</span>
+  lcd.<span class="c-function">backlight</span>();     <span class="c-comment">// Encender retroiluminación</span>
+  lcd.<span class="c-function">clear</span>();         <span class="c-comment">// Limpiar pantalla</span>
+
+  <span class="c-comment">// Escribir en la fila 0 (primera línea)</span>
+  lcd.<span class="c-function">setCursor</span>(<span class="c-number">0</span>, <span class="c-number">0</span>);
+  lcd.<span class="c-function">print</span>(<span class="c-string">"Hello, World!"</span>);
+
+  <span class="c-comment">// Escribir en la fila 1 (segunda línea)</span>
+  lcd.<span class="c-function">setCursor</span>(<span class="c-number">0</span>, <span class="c-number">1</span>);
+  lcd.<span class="c-function">print</span>(<span class="c-string">"LCD I2C - Arduino"</span>);
+}
+
+<span class="c-keyword">void</span> <span class="c-function">loop</span>() {
+  <span class="c-comment">// El mensaje se muestra de forma continua.</span>
+  <span class="c-comment">// Se puede agregar scroll o animaciones aquí.</span>
+}</code>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Paso 3 -->
+            <div class="paso-item">
+                <div class="paso-numero">3</div>
+                <div class="paso-contenido">
+                    <h3 class="paso-titulo">Simulación y Prueba en Tinkercad</h3>
+                    <p class="paso-descripcion">
+                        Con el circuito cableado y el código listo, se ejecutó la simulación 
+                        en Tinkercad presionando el botón <strong>"Iniciar simulación"</strong>. 
+                        La pantalla LCD virtual mostró el mensaje programado en ambas líneas, 
+                        confirmando que tanto el cableado como el código eran correctos.
+                    </p>
+                    <p class="paso-descripcion">
+                        Tinkercad simula el comportamiento real del hardware: si la dirección 
+                        I2C no coincide, la pantalla no mostrará nada; si los pines SDA/SCL 
+                        están invertidos, la comunicación fallará. Estos errores se detectan 
+                        y corrigen fácilmente en la simulación.
+                    </p>
+
+                    <!-- VIDEO -->
+                    <div class="video-section">
+                        <h3 style="font-family:'Orbitron',monospace; color:#66ff99; font-size:1.3rem; margin-bottom:0.8rem;">
+                            📹 Video de Demostración
+                        </h3>
+                        <p class="seccion-texto" style="margin-bottom:0;">
+                            Demostración en video del circuito LCD I2C mostrando el mensaje 
+                            <strong>"Hello, World!"</strong> y el correcto funcionamiento de la 
+                            retroiluminación y los caracteres en la pantalla.
+                        </p>
+                        <div class="video-wrapper">
+                            <div class="video-badge">🖥️ HELLO BEACH — DEMO</div>
+                            <video controls>
+                                <source src="/mnt/user-data/uploads/Hello_Beach.mp4" type="video/mp4">
+                                Tu navegador no soporta videos HTML5.
+                            </video>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- CONEXIONES -->
+        <section class="seccion">
+            <h2 class="seccion-titulo">Diagrama de Conexiones</h2>
+
+            <div class="tech-box">
+                <h3 class="tech-titulo"><span>🔌</span> Módulo I2C + LCD 16×2 → Arduino UNO</h3>
+                <table class="pin-table">
+                    <tr>
+                        <th>Pin Módulo I2C</th>
+                        <th>Función</th>
+                        <th>Pin Arduino</th>
+                        <th>Cable</th>
+                    </tr>
+                    <tr>
+                        <td><span class="pin-badge">VCC</span></td>
+                        <td>Alimentación</td>
+                        <td><span class="pin-badge">5V</span></td>
+                        <td style="color:#ff6666;">● Rojo</td>
+                    </tr>
+                    <tr>
+                        <td><span class="pin-badge">GND</span></td>
+                        <td>Tierra</td>
+                        <td><span class="pin-badge">GND</span></td>
+                        <td style="color:#888;">● Negro</td>
+                    </tr>
+                    <tr>
+                        <td><span class="pin-badge">SDA</span></td>
+                        <td>Datos I2C (bidireccional)</td>
+                        <td><span class="pin-badge">A4</span></td>
+                        <td style="color:#44cc66;">● Verde</td>
+                    </tr>
+                    <tr>
+                        <td><span class="pin-badge">SCL</span></td>
+                        <td>Reloj I2C (sincronización)</td>
+                        <td><span class="pin-badge">A5</span></td>
+                        <td style="color:#ffaa44;">● Naranja</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="tech-box">
+                <h3 class="tech-titulo"><span>📡</span> Conceptos Clave del Proyecto</h3>
+                <ul class="tech-lista">
+                    <li>
+                        <strong>Dirección I2C:</strong> El módulo PCF8574 tiene una dirección 
+                        de 7 bits configurable mediante jumpers físicos. Las más comunes son 
+                        <strong>0x27</strong> (PCF8574) y <strong>0x3F</strong> (PCF8574A). 
+                        Si la pantalla no muestra nada, verificar la dirección con un 
+                        scanner I2C.
+                    </li>
+                    <li>
+                        <strong>Función setCursor(col, row):</strong> Posiciona el cursor en 
+                        una columna (0–15) y fila (0 = primera, 1 = segunda) específica 
+                        antes de escribir texto. El parámetro columna indica el caracter 
+                        donde comenzará la escritura.
+                    </li>
+                    <li>
+                        <strong>Función lcd.print():</strong> Envía una cadena de texto, 
+                        número o variable a la posición actual del cursor. Acepta strings, 
+                        enteros, floats y tipos char. Admite hasta 16 caracteres por línea.
+                    </li>
+                    <li>
+                        <strong>Contraste del LCD:</strong> El potenciómetro integrado 
+                        en el módulo I2C ajusta el contraste de los caracteres. Si la 
+                        pantalla está encendida pero no se ve el texto, girar el 
+                        potenciómetro lentamente hasta que aparezcan los caracteres.
+                    </li>
+                    <li>
+                        <strong>Retroiluminación:</strong> Se activa con <strong>lcd.backlight()</strong> 
+                        y se apaga con <strong>lcd.noBacklight()</strong>. En el módulo I2C hay 
+                        un jumper que habilita o deshabilita el control de retroiluminación 
+                        por software.
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- TINKERCAD INFO -->
+        <section class="seccion">
+            <h2 class="seccion-titulo">¿Por Qué Usar Tinkercad?</h2>
+
+            <div class="materiales-grid" style="grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));">
+
+                <div class="material-card">
+                    <div class="mat-icon" style="font-size:2.8rem; margin-bottom:1rem;">🆓</div>
+                    <div class="mat-nombre" style="margin-bottom:0.8rem;">Completamente Gratuito</div>
+                    <p class="mat-descripcion">
+                        Tinkercad es una plataforma gratuita de Autodesk. Solo requiere 
+                        crear una cuenta para guardar proyectos y acceder desde cualquier 
+                        dispositivo con navegador web.
+                    </p>
+                </div>
+
+                <div class="material-card">
+                    <div class="mat-icon" style="font-size:2.8rem; margin-bottom:1rem;">🛡️</div>
+                    <div class="mat-nombre" style="margin-bottom:0.8rem;">Sin Riesgo de Daño</div>
+                    <p class="mat-descripcion">
+                        Los errores en simulación no dañan componentes reales. 
+                        Se pueden probar conexiones incorrectas, cortocircuitos y 
+                        código erróneo sin ningún riesgo para el hardware.
+                    </p>
+                </div>
+
+                <div class="material-card">
+                    <div class="mat-icon" style="font-size:2.8rem; margin-bottom:1rem;">⚡</div>
+                    <div class="mat-nombre" style="margin-bottom:0.8rem;">Prototipado Rápido</div>
+                    <p class="mat-descripcion">
+                        Permite diseñar y probar circuitos en minutos. Los componentes 
+                        se arrastran al área de trabajo y las conexiones se hacen 
+                        con un clic, sin necesidad de tener hardware físico disponible.
+                    </p>
+                </div>
+
+                <div class="material-card">
+                    <div class="mat-icon" style="font-size:2.8rem; margin-bottom:1rem;">📚</div>
+                    <div class="mat-nombre" style="margin-bottom:0.8rem;">Ideal para Aprendizaje</div>
+                    <p class="mat-descripcion">
+                        Ampliamente utilizado en educación para enseñar electrónica y 
+                        programación Arduino. Incluye tutoriales integrados, proyectos 
+                        de ejemplo y una gran biblioteca de componentes.
+                    </p>
+                </div>
+
+            </div>
+        </section>
+
+        <center>
+            <a href="index.html" class="btn-volver">◄ VOLVER AL INICIO</a>
+        </center>
+    </main>
+
+    <footer class="footer">
+        <p class="footer-text">[ MENSAJE LCD I2C · ARDUINO UNO · MÓDULO PCF8574 · TINKERCAD ]</p>
+        <p style="margin-top:0.5rem; color:#1a5c30;">Electrónica Digital · Protocolo I2C · Simulación · Prototipado</p>
+    </footer>
+
+    <script>
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.08 });
+
+        document.querySelectorAll('.seccion, .paso-item, .material-card').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(40px)';
+            el.style.transition = 'all 0.7s ease';
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>
