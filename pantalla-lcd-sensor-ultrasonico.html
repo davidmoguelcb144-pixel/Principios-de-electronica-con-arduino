@@ -1,0 +1,1215 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pantalla LCD con Sensor Ultrasónico</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background: linear-gradient(135deg, #001a0d 0%, #002a10 50%, #001508 100%);
+            color: #b8f0c8;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image:
+                linear-gradient(90deg, rgba(0, 255, 100, 0.03) 1px, transparent 1px),
+                linear-gradient(0deg, rgba(0, 255, 100, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .bg-gradient {
+            position: fixed;
+            width: 600px; height: 600px;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.12;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .gradient-green {
+            top: -250px; right: -250px;
+            background: radial-gradient(circle, #00cc55, transparent);
+            animation: pulse 8s ease-in-out infinite;
+        }
+
+        .gradient-teal {
+            bottom: -200px; left: -200px;
+            background: radial-gradient(circle, #00ff88, transparent);
+            animation: pulse 8s ease-in-out infinite 2s;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.12; }
+            50% { opacity: 0.22; }
+        }
+
+        /* ── HEADER ─────────────────────────────────── */
+        .header {
+            background: linear-gradient(135deg, #003318 0%, #004d22 50%, #006630 100%);
+            padding: 3.5rem 2rem;
+            text-align: center;
+            position: relative;
+            z-index: 10;
+            border-bottom: 4px solid #00cc55;
+            box-shadow: 0 10px 40px rgba(0,204,85,0.4), inset 0 -1px 0 rgba(255,255,255,0.08);
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 300%; height: 100%;
+            background: linear-gradient(90deg, transparent 0%, rgba(0,204,85,0.1) 50%, transparent 100%);
+            animation: headerShine 4s ease-in-out infinite;
+        }
+
+        @keyframes headerShine { 0% { left: -100%; } 100% { left: 100%; } }
+
+        /* LCD simulada en header */
+        .lcd-deco {
+            display: inline-block;
+            background: #001a33;
+            border: 3px solid #00aaff;
+            border-radius: 8px;
+            padding: 1rem 2.5rem;
+            margin-bottom: 1.8rem;
+            font-family: 'Courier New', monospace;
+            font-size: clamp(0.85rem, 1.8vw, 1.15rem);
+            color: #44ccff;
+            letter-spacing: 3px;
+            box-shadow: 0 0 25px rgba(0,170,255,0.5), inset 0 0 40px rgba(0,30,60,0.8);
+            text-shadow: 0 0 8px rgba(68,204,255,0.9);
+            position: relative;
+            z-index: 2;
+        }
+
+        .lcd-line { display: block; line-height: 2; }
+
+        .lcd-cursor {
+            display: inline-block;
+            width: 10px; height: 1em;
+            background: #44ccff;
+            vertical-align: text-bottom;
+            animation: cursorBlink 1s step-end infinite;
+            margin-left: 2px;
+        }
+
+        @keyframes cursorBlink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+        .led-indicator {
+            position: absolute;
+            width: 12px; height: 12px;
+            background: #00cc55;
+            border-radius: 50%;
+            box-shadow: 0 0 20px #00cc55, 0 0 40px rgba(0,204,85,0.4);
+            animation: blink 1.5s ease-in-out infinite;
+        }
+
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
+
+        .led-tl { top: 30px; left: 30px; }
+        .led-tr { top: 30px; right: 30px; animation-delay: 0.4s; }
+        .led-bl { bottom: 30px; left: 30px; animation-delay: 0.8s; }
+        .led-br { bottom: 30px; right: 30px; animation-delay: 1.2s; }
+
+        .titulo-principal {
+            font-family: 'Orbitron', monospace;
+            font-size: clamp(2rem, 5.5vw, 4.5rem);
+            font-weight: 900;
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            text-shadow: 0 0 30px rgba(0,204,85,0.9), 0 4px 6px rgba(0,0,0,0.5);
+            margin: 0;
+            position: relative;
+            z-index: 2;
+            line-height: 1.2;
+        }
+
+        .subtitulo {
+            font-family: 'Orbitron', monospace;
+            font-size: clamp(0.8rem, 1.8vw, 1.1rem);
+            color: #66ff99;
+            margin-top: 1rem;
+            letter-spacing: 4px;
+            text-shadow: 0 0 10px rgba(102,255,153,0.5);
+        }
+
+        /* ── LAYOUT ─────────────────────────────────── */
+        .contenido {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        .seccion {
+            background: linear-gradient(135deg, rgba(0,30,12,0.88) 0%, rgba(0,15,5,0.96) 100%);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(0,204,85,0.3);
+            border-radius: 20px;
+            padding: 3rem;
+            margin: 3rem 0;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.03);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .seccion::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 4px;
+            background: linear-gradient(90deg, #00cc55, #aaff44, #00994d, #00cc55);
+            background-size: 200% 100%;
+            animation: borderFlow 3s linear infinite;
+        }
+
+        @keyframes borderFlow { 0% { background-position: 0% 0%; } 100% { background-position: 200% 0%; } }
+
+        .seccion-titulo {
+            font-family: 'Orbitron', monospace;
+            font-size: clamp(1.6rem, 3.5vw, 2.5rem);
+            font-weight: 900;
+            color: #00cc55;
+            margin-bottom: 2rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            text-shadow: 0 0 20px rgba(0,204,85,0.5);
+            position: relative;
+            padding-bottom: 1rem;
+        }
+
+        .seccion-titulo::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0;
+            width: 120px; height: 4px;
+            background: linear-gradient(90deg, #00cc55, #aaff44, transparent);
+            border-radius: 2px;
+        }
+
+        .seccion-texto {
+            font-size: 1.15rem;
+            line-height: 1.9;
+            color: #90d8a8;
+            margin-bottom: 1.5rem;
+        }
+
+        .seccion-texto strong { color: #aaff44; }
+
+        /* ── MATERIALES GRID ────────────────────────── */
+        .materiales-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+            gap: 2rem;
+            margin: 2.5rem 0;
+        }
+
+        .material-card {
+            background: linear-gradient(135deg, rgba(0,60,20,0.2), rgba(0,30,10,0.2));
+            border: 2px solid rgba(0,204,85,0.25);
+            border-radius: 15px;
+            padding: 2rem;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .material-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0,204,85,0.1), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .material-card:hover {
+            border-color: #00cc55;
+            box-shadow: 0 12px 35px rgba(0,204,85,0.3), 0 0 50px rgba(0,204,85,0.12);
+            transform: translateY(-6px);
+        }
+
+        .material-card:hover::before { left: 100%; }
+
+        .mat-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.2rem; }
+        .mat-icon { font-size: 2.5rem; }
+
+        .mat-nombre {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #00cc55;
+        }
+
+        .mat-modelo { font-size: 0.88rem; color: #3d8f5a; letter-spacing: 1px; margin-top: 0.2rem; }
+        .mat-descripcion { font-size: 1rem; color: #78b890; line-height: 1.75; margin-bottom: 1rem; }
+
+        .mat-specs { list-style: none; padding: 0; }
+
+        .mat-specs li {
+            font-size: 0.95rem;
+            color: #66a87a;
+            padding: 0.4rem 0;
+            border-bottom: 1px solid rgba(0,204,85,0.1);
+            display: flex; align-items: flex-start; gap: 0.5rem;
+        }
+
+        .mat-specs li:last-child { border-bottom: none; }
+        .mat-specs li::before { content: '▸'; color: #00cc55; flex-shrink: 0; margin-top: 1px; }
+        .mat-specs li strong { color: #aaff44; }
+
+        /* ── PASOS ──────────────────────────────────── */
+        .paso-item {
+            display: grid;
+            grid-template-columns: 90px 1fr;
+            gap: 2.5rem;
+            margin: 3.5rem 0;
+            align-items: start;
+        }
+
+        .paso-numero {
+            width: 90px; height: 90px;
+            background: linear-gradient(135deg, #004d22, #006630);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'Orbitron', monospace;
+            font-size: 2.2rem; font-weight: 900;
+            color: #aaff44;
+            box-shadow: 0 8px 25px rgba(0,204,85,0.5), inset 0 2px 0 rgba(255,255,255,0.15);
+            border: 4px solid #00cc55;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .paso-numero::before {
+            content: '';
+            position: absolute;
+            top: -4px; left: -4px; right: -4px; bottom: -4px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #00cc55, #003d18);
+            z-index: -1;
+            filter: blur(12px);
+            opacity: 0.6;
+        }
+
+        .paso-contenido {
+            background: rgba(0,30,12,0.6);
+            border: 1px solid rgba(0,204,85,0.25);
+            border-radius: 15px;
+            padding: 2.5rem;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+        }
+
+        .paso-titulo {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.45rem; font-weight: 700;
+            color: #66ff99;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 10px rgba(102,255,153,0.3);
+        }
+
+        .paso-descripcion {
+            font-size: 1.08rem;
+            line-height: 1.85;
+            color: #90d8a8;
+            margin-bottom: 1.2rem;
+        }
+
+        .paso-descripcion strong { color: #aaff44; }
+
+        /* ── IMÁGENES ───────────────────────────────── */
+        .img-frame {
+            width: 100%;
+            border-radius: 14px;
+            border: 3px solid rgba(0,204,85,0.4);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.6), 0 0 40px rgba(0,204,85,0.15);
+            margin-top: 1.5rem;
+            overflow: hidden;
+            background: #001a08;
+        }
+
+        .img-frame img {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.4s ease;
+        }
+
+        .img-frame:hover img { transform: scale(1.05); }
+
+        .img-tall { height: 420px; }
+        .img-med  { height: 350px; }
+        .img-full { height: 480px; }
+
+        .img-grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        /* ── VIDEO ──────────────────────────────────── */
+        .video-section {
+            background: linear-gradient(135deg, rgba(0,204,85,0.06), rgba(0,100,40,0.06));
+            border: 3px solid rgba(0,204,85,0.4);
+            border-radius: 20px;
+            padding: 2.5rem;
+            margin: 2rem 0;
+        }
+
+        .video-wrapper {
+            position: relative;
+            width: 100%; max-width: 860px;
+            margin: 1.5rem auto 0;
+            border-radius: 15px;
+            overflow: hidden;
+            border: 3px solid rgba(170,255,68,0.4);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.6), 0 0 60px rgba(0,204,85,0.18);
+        }
+
+        .video-badge {
+            position: absolute;
+            top: 15px; left: 15px;
+            background: linear-gradient(135deg, #003d18, #004d22);
+            color: #aaff44;
+            padding: 0.7rem 1.4rem;
+            border-radius: 25px;
+            font-family: 'Orbitron', monospace;
+            font-weight: 700;
+            font-size: 0.82rem;
+            letter-spacing: 2px;
+            z-index: 2;
+            border: 2px solid #00cc55;
+            box-shadow: 0 5px 15px rgba(0,204,85,0.4);
+        }
+
+        video { width: 100%; display: block; }
+
+        /* ── TECH BOX ───────────────────────────────── */
+        .tech-box {
+            background: linear-gradient(135deg, rgba(0,10,4,0.88), rgba(0,25,10,0.88));
+            border-left: 6px solid #00cc55;
+            border-radius: 15px;
+            padding: 2.5rem;
+            margin: 2.5rem 0;
+            box-shadow: 0 10px 35px rgba(0,0,0,0.5);
+        }
+
+        .tech-titulo {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.45rem; font-weight: 700;
+            color: #66ff99;
+            margin-bottom: 1.5rem;
+            display: flex; align-items: center; gap: 0.8rem;
+        }
+
+        .tech-lista { list-style: none; padding: 0; }
+
+        .tech-lista li {
+            padding: 1.1rem 0;
+            border-bottom: 1px solid rgba(0,204,85,0.12);
+            font-size: 1.08rem;
+            line-height: 1.85;
+            color: #90d8a8;
+        }
+
+        .tech-lista li:last-child { border-bottom: none; }
+        .tech-lista li strong { color: #aaff44; }
+
+        /* ── TABLA PINES ────────────────────────────── */
+        .pin-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+        }
+
+        .pin-table th {
+            background: linear-gradient(135deg, #003d18, #004d22);
+            color: #aaff44;
+            font-family: 'Orbitron', monospace;
+            font-size: 0.88rem;
+            letter-spacing: 2px;
+            padding: 1rem 1.5rem;
+            text-align: left;
+            border-bottom: 2px solid #00cc55;
+        }
+
+        .pin-table td {
+            padding: 0.9rem 1.5rem;
+            border-bottom: 1px solid rgba(0,204,85,0.12);
+            color: #90d8a8;
+            font-size: 1rem;
+        }
+
+        .pin-table tr:hover td { background: rgba(0,204,85,0.05); }
+
+        .pin-badge {
+            display: inline-block;
+            background: rgba(0,77,34,0.5);
+            border: 1px solid #00cc55;
+            border-radius: 6px;
+            padding: 0.2rem 0.7rem;
+            font-family: 'Orbitron', monospace;
+            font-size: 0.78rem;
+            color: #aaff44;
+        }
+
+        /* ── CÓDIGO ─────────────────────────────────── */
+        .codigo-block {
+            background: #000d04;
+            border: 2px solid rgba(0,204,85,0.3);
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 1.5rem 0;
+            overflow-x: auto;
+            position: relative;
+        }
+
+        .codigo-block::before {
+            content: 'Arduino Code';
+            position: absolute;
+            top: 10px; right: 15px;
+            font-family: 'Orbitron', monospace;
+            font-size: 0.72rem;
+            color: #1f5c33;
+            letter-spacing: 2px;
+        }
+
+        .codigo-block code {
+            font-family: 'Courier New', monospace;
+            font-size: 0.95rem;
+            line-height: 1.9;
+            color: #66ff99;
+            white-space: pre;
+            display: block;
+        }
+
+        .c-comment  { color: #2d7a4a; }
+        .c-keyword  { color: #ff79c6; }
+        .c-function { color: #50fa7b; }
+        .c-string   { color: #f1fa8c; }
+        .c-number   { color: #bd93f9; }
+        .c-include  { color: #ffb86c; }
+
+        /* ── SENSOR DIAGRAM ─────────────────────────── */
+        .sensor-diagram {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 3rem;
+            flex-wrap: wrap;
+            margin: 2rem 0;
+        }
+
+        .sensor-box {
+            background: rgba(0,40,20,0.6);
+            border: 2px solid #00cc55;
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            min-width: 180px;
+        }
+
+        .sensor-box .s-icon { font-size: 3rem; margin-bottom: 0.8rem; }
+        .sensor-box .s-name {
+            font-family: 'Orbitron', monospace;
+            font-size: 1rem;
+            color: #aaff44;
+            font-weight: 700;
+        }
+        .sensor-box .s-desc { font-size: 0.9rem; color: #78b890; margin-top: 0.4rem; }
+
+        .arrow {
+            font-size: 2.5rem;
+            color: #00cc55;
+            text-shadow: 0 0 15px rgba(0,204,85,0.7);
+        }
+
+        /* ── FOOTER ─────────────────────────────────── */
+        .footer {
+            background: linear-gradient(135deg, #001a0d, #002a10);
+            border-top: 2px solid rgba(0,204,85,0.3);
+            padding: 3rem 2rem;
+            text-align: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        .footer-text {
+            font-family: 'Orbitron', monospace;
+            font-size: 0.85rem;
+            color: #1f5c33;
+            letter-spacing: 2px;
+        }
+
+        .btn-volver {
+            display: inline-block;
+            background: linear-gradient(135deg, #004d22, #006630);
+            color: #aaff44;
+            padding: 1rem 2.5rem;
+            border-radius: 30px;
+            font-family: 'Orbitron', monospace;
+            font-size: 0.95rem;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-decoration: none;
+            border: 2px solid #00cc55;
+            box-shadow: 0 8px 25px rgba(0,204,85,0.3);
+            transition: all 0.3s ease;
+            margin-bottom: 3rem;
+        }
+
+        .btn-volver:hover {
+            background: linear-gradient(135deg, #006630, #008040);
+            box-shadow: 0 12px 35px rgba(0,204,85,0.5);
+            transform: translateY(-3px);
+        }
+
+        /* ── WAVES SONAR ────────────────────────────── */
+        .sonar-anim {
+            display: flex;
+            justify-content: center;
+            margin: 2rem 0;
+        }
+
+        .sonar-ring {
+            width: 60px; height: 60px;
+            border: 3px solid #00cc55;
+            border-radius: 50%;
+            position: relative;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        .sonar-ring::before,
+        .sonar-ring::after {
+            content: '';
+            position: absolute;
+            border: 2px solid rgba(0,204,85,0.4);
+            border-radius: 50%;
+            animation: sonarPulse 2s ease-out infinite;
+        }
+
+        .sonar-ring::before { width: 100px; height: 100px; animation-delay: 0.5s; }
+        .sonar-ring::after  { width: 150px; height: 150px; }
+
+        @keyframes sonarPulse {
+            0%   { transform: scale(0.5); opacity: 0.8; }
+            100% { transform: scale(1.8); opacity: 0; }
+        }
+
+        .sonar-core {
+            width: 20px; height: 20px;
+            background: #00cc55;
+            border-radius: 50%;
+            box-shadow: 0 0 15px #00cc55;
+        }
+
+        @media (max-width: 768px) {
+            .paso-item { grid-template-columns: 1fr; }
+            .paso-numero { margin: 0 auto; }
+            .img-grid-2 { grid-template-columns: 1fr; }
+            .sensor-diagram { gap: 1.5rem; }
+            .arrow { transform: rotate(90deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-gradient gradient-green"></div>
+    <div class="bg-gradient gradient-teal"></div>
+
+    <!-- HEADER -->
+    <header class="header">
+        <div class="led-indicator led-tl"></div>
+        <div class="led-indicator led-tr"></div>
+        <div class="led-indicator led-bl"></div>
+        <div class="led-indicator led-br"></div>
+
+        <div class="lcd-deco">
+            <span class="lcd-line">Distancia: 56.92 cm</span>
+            <span class="lcd-line">Sensor HC-SR04<span class="lcd-cursor"></span></span>
+        </div>
+
+        <h1 class="titulo-principal">Pantalla LCD<br>con Sensor Ultrasónico</h1>
+        <p class="subtitulo">Arduino UNO · HC-SR04 · LCD 16×2 I2C · Protocolo I2C</p>
+    </header>
+
+    <main class="contenido">
+
+        <!-- DESCRIPCIÓN GENERAL -->
+        <section class="seccion">
+            <h2 class="seccion-titulo">¿De qué trata este proyecto?</h2>
+
+            <p class="seccion-texto">
+                En este proyecto se integra un <strong>sensor ultrasónico HC-SR04</strong> con una 
+                <strong>pantalla LCD 16×2</strong> mediante un módulo <strong>I2C (PCF8574)</strong>, 
+                controlados por un <strong>Arduino UNO</strong>. El sistema mide en tiempo real la 
+                distancia a un objeto y la muestra en centímetros directamente en la pantalla LCD.
+            </p>
+            <p class="seccion-texto">
+                El sensor ultrasónico emite un pulso de sonido de alta frecuencia (40 kHz) y mide 
+                el tiempo que tarda el eco en regresar. Con ese tiempo, Arduino calcula la distancia 
+                usando la velocidad del sonido (<strong>340 m/s</strong>). La pantalla LCD muestra 
+                el resultado actualizado continuamente, creando un <strong>medidor de distancia 
+                digital en tiempo real</strong>.
+            </p>
+
+            <div class="sonar-anim">
+                <div class="sonar-ring"><div class="sonar-core"></div></div>
+            </div>
+
+            <div class="sensor-diagram">
+                <div class="sensor-box">
+                    <div class="s-icon">📡</div>
+                    <div class="s-name">HC-SR04</div>
+                    <div class="s-desc">Emite y recibe pulsos ultrasónicos</div>
+                </div>
+                <div class="arrow">→</div>
+                <div class="sensor-box">
+                    <div class="s-icon">🔧</div>
+                    <div class="s-name">Arduino UNO</div>
+                    <div class="s-desc">Calcula la distancia con pulseIn()</div>
+                </div>
+                <div class="arrow">→</div>
+                <div class="sensor-box">
+                    <div class="s-icon">📺</div>
+                    <div class="s-name">LCD 16×2 I2C</div>
+                    <div class="s-desc">Muestra la distancia en cm</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- MATERIALES -->
+        <section class="seccion">
+            <h2 class="seccion-titulo">Materiales Necesarios</h2>
+
+            <div class="materiales-grid">
+
+                <div class="material-card">
+                    <div class="mat-header">
+                        <div class="mat-icon">🔵</div>
+                        <div>
+                            <div class="mat-nombre">Arduino UNO</div>
+                            <div class="mat-modelo">Microcontrolador ATmega328P</div>
+                        </div>
+                    </div>
+                    <p class="mat-descripcion">Cerebro del proyecto. Procesa las señales del sensor, calcula la distancia y envía los datos a la pantalla LCD vía I2C.</p>
+                    <ul class="mat-specs">
+                        <li><strong>Voltaje:</strong> 5V de operación</li>
+                        <li><strong>Flash:</strong> 32 KB</li>
+                        <li><strong>Pines digitales:</strong> 14 (6 PWM)</li>
+                        <li><strong>Frecuencia:</strong> 16 MHz</li>
+                    </ul>
+                </div>
+
+                <div class="material-card">
+                    <div class="mat-header">
+                        <div class="mat-icon">📡</div>
+                        <div>
+                            <div class="mat-nombre">Sensor HC-SR04</div>
+                            <div class="mat-modelo">Ultrasónico de distancia</div>
+                        </div>
+                    </div>
+                    <p class="mat-descripcion">Sensor de distancia por ultrasonido. Emite pulsos acústicos de 40 kHz y mide el tiempo de retorno del eco para calcular distancias con precisión.</p>
+                    <ul class="mat-specs">
+                        <li><strong>Rango:</strong> 2 cm – 400 cm</li>
+                        <li><strong>Precisión:</strong> ±3 mm</li>
+                        <li><strong>Frecuencia:</strong> 40 kHz</li>
+                        <li><strong>Voltaje:</strong> 5V DC</li>
+                    </ul>
+                </div>
+
+                <div class="material-card">
+                    <div class="mat-header">
+                        <div class="mat-icon">📺</div>
+                        <div>
+                            <div class="mat-nombre">LCD 16×2</div>
+                            <div class="mat-modelo">Con módulo I2C PCF8574</div>
+                        </div>
+                    </div>
+                    <p class="mat-descripcion">Pantalla de cristal líquido con retroiluminación azul. El módulo I2C soldado en la parte trasera reduce las conexiones de 16 a solo 4 cables.</p>
+                    <ul class="mat-specs">
+                        <li><strong>Caracteres:</strong> 16 col × 2 filas</li>
+                        <li><strong>Retroiluminación:</strong> LED azul</li>
+                        <li><strong>Dirección I2C:</strong> 0x27 / 0x3F</li>
+                        <li><strong>Protocolo:</strong> I2C (SDA + SCL)</li>
+                    </ul>
+                </div>
+
+                <div class="material-card">
+                    <div class="mat-header">
+                        <div class="mat-icon">🔌</div>
+                        <div>
+                            <div class="mat-nombre">Módulo I2C</div>
+                            <div class="mat-modelo">PCF8574 / PCF8574A</div>
+                        </div>
+                    </div>
+                    <p class="mat-descripcion">Expansor de puertos I/O de 8 bits que convierte el protocolo I2C en señales paralelas para controlar la LCD. Incluye potenciómetro de contraste y jumper de retroiluminación.</p>
+                    <ul class="mat-specs">
+                        <li><strong>Pines de conexión:</strong> VCC, GND, SDA, SCL</li>
+                        <li><strong>Bus I2C:</strong> 7-bit address</li>
+                        <li><strong>Velocidad:</strong> hasta 400 kHz</li>
+                    </ul>
+                </div>
+
+                <div class="material-card">
+                    <div class="mat-header">
+                        <div class="mat-icon">🧪</div>
+                        <div>
+                            <div class="mat-nombre">Protoboard</div>
+                            <div class="mat-modelo">Breadboard 830 puntos</div>
+                        </div>
+                    </div>
+                    <p class="mat-descripcion">Tablilla de prototipado sin soldadura para realizar las conexiones temporales del circuito de forma ordenada y segura.</p>
+                    <ul class="mat-specs">
+                        <li><strong>Puntos:</strong> 830 conexiones</li>
+                        <li><strong>Corriente máx.:</strong> 1A por riel</li>
+                        <li><strong>Reutilizable:</strong> Sí</li>
+                    </ul>
+                </div>
+
+                <div class="material-card">
+                    <div class="mat-header">
+                        <div class="mat-icon">🌈</div>
+                        <div>
+                            <div class="mat-nombre">Cables Dupont</div>
+                            <div class="mat-modelo">Macho-Macho / Macho-Hembra</div>
+                        </div>
+                    </div>
+                    <p class="mat-descripcion">Jumpers de conexión para enlazar los componentes en la protoboard y conectar el módulo I2C al Arduino. Se necesitan cables de colores para identificar GND, VCC, señales y datos.</p>
+                    <ul class="mat-specs">
+                        <li><strong>Rojo:</strong> VCC / 5V</li>
+                        <li><strong>Negro:</strong> GND / Tierra</li>
+                        <li><strong>Azul/Blanco:</strong> SDA / SCL</li>
+                        <li><strong>Otros:</strong> Trig y Echo del sensor</li>
+                    </ul>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- FOTOS DEL PROYECTO -->
+        <section class="seccion">
+            <h2 class="seccion-titulo">Circuito Real del Proyecto</h2>
+
+            <p class="seccion-texto">
+                Las siguientes fotografías muestran el <strong>circuito físico ensamblado</strong> con el 
+                Arduino UNO, el sensor ultrasónico HC-SR04, la pantalla LCD 16×2 y el módulo I2C. 
+                Se puede observar cómo la pantalla muestra la distancia medida en tiempo real 
+                (en centímetros), actualizándose continuamente mientras el sensor detecta objetos.
+            </p>
+
+            <div class="img-grid-2">
+                <div>
+                    <div class="img-frame img-tall">
+                        <img src="Portada_Serv_IC2.jpeg" alt="Circuito LCD con sensor ultrasónico - Vista 1">
+                    </div>
+                    <p style="color:#3d8f5a; font-size:0.9rem; text-align:center; margin-top:0.7rem; font-family:'Orbitron',monospace; letter-spacing:1px;">
+                        LCD mostrando "Distancia: 56.92 cm"
+                    </p>
+                </div>
+                <div>
+                    <div class="img-frame img-tall">
+                        <img src="Serv_IC2.jpeg" alt="Circuito LCD con sensor ultrasónico - Vista 2">
+                    </div>
+                    <p style="color:#3d8f5a; font-size:0.9rem; text-align:center; margin-top:0.7rem; font-family:'Orbitron',monospace; letter-spacing:1px;">
+                        LCD mostrando "Distancia: 44.61 cm"
+                    </p>
+                </div>
+            </div>
+
+            <p class="seccion-texto" style="margin-top:1.5rem;">
+                En ambas imágenes se aprecia el <strong>sensor HC-SR04</strong> (a la derecha del Arduino) 
+                con sus dos transductores circulares: el emisor y el receptor del pulso ultrasónico. 
+                La pantalla LCD actualiza la lectura en tiempo real conforme cambia la distancia del objeto frente al sensor.
+            </p>
+        </section>
+
+        <!-- CÓMO FUNCIONA -->
+        <section class="seccion">
+            <h2 class="seccion-titulo">¿Cómo Funciona el Sistema?</h2>
+
+            <div class="paso-item">
+                <div class="paso-numero">1</div>
+                <div class="paso-contenido">
+                    <h3 class="paso-titulo">Emisión del Pulso Ultrasónico</h3>
+                    <p class="paso-descripcion">
+                        Arduino envía un pulso <strong>HIGH de 10 microsegundos</strong> al pin 
+                        <strong>TRIG</strong> del sensor HC-SR04. Esto activa el transductor emisor, 
+                        que genera una ráfaga de <strong>8 ciclos de sonido a 40 kHz</strong> 
+                        (frecuencia inaudible para humanos). El pin TRIG se conecta al 
+                        <strong>pin digital 9</strong> del Arduino.
+                    </p>
+                    <p class="paso-descripcion">
+                        El pulso viaja por el aire a la velocidad del sonido (<strong>~340 m/s</strong> 
+                        a temperatura ambiente) hasta chocar con un objeto y rebotar de regreso.
+                    </p>
+                </div>
+            </div>
+
+            <div class="paso-item">
+                <div class="paso-numero">2</div>
+                <div class="paso-contenido">
+                    <h3 class="paso-titulo">Recepción y Medición del Eco</h3>
+                    <p class="paso-descripcion">
+                        El transductor receptor del HC-SR04 detecta el eco reflejado y pone el pin 
+                        <strong>ECHO en HIGH</strong> durante el tiempo exacto que tardó el sonido 
+                        en ir y volver. Arduino mide ese tiempo usando la función 
+                        <strong>pulseIn(ECHO, HIGH)</strong>, que retorna el tiempo en microsegundos.
+                    </p>
+                </div>
+            </div>
+
+            <div class="paso-item">
+                <div class="paso-numero">3</div>
+                <div class="paso-contenido">
+                    <h3 class="paso-titulo">Cálculo de la Distancia</h3>
+                    <p class="paso-descripcion">
+                        Con el tiempo medido, Arduino calcula la distancia aplicando la fórmula física:
+                    </p>
+                    <div class="tech-box" style="margin: 1rem 0;">
+                        <h3 class="tech-titulo"><span>📐</span> Fórmula de Distancia</h3>
+                        <div class="codigo-block">
+                            <code><span class="c-comment">// Velocidad del sonido = 0.0343 cm/µs</span>
+<span class="c-comment">// El sonido recorre el camino de ida y vuelta, por eso se divide entre 2</span>
+distancia = duracion * <span class="c-number">0.0343</span> / <span class="c-number">2</span>;
+
+<span class="c-comment">// Ejemplo: si duracion = 3316 µs</span>
+<span class="c-comment">// distancia = 3316 × 0.0343 / 2 = 56.87 cm ≈ 56.92 cm</span></code>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="paso-item">
+                <div class="paso-numero">4</div>
+                <div class="paso-contenido">
+                    <h3 class="paso-titulo">Envío a la Pantalla LCD por I2C</h3>
+                    <p class="paso-descripcion">
+                        El resultado se envía a la <strong>pantalla LCD 16×2</strong> a través del 
+                        protocolo <strong>I2C</strong> usando solo 2 cables de datos (SDA y SCL). 
+                        Arduino usa la librería <strong>LiquidCrystal_I2C</strong> para posicionar el cursor 
+                        y escribir el texto. La pantalla se actualiza cada <strong>500 ms</strong> con 
+                        un <strong>lcd.clear()</strong> previo para evitar texto residual.
+                    </p>
+
+                    <!-- VIDEO -->
+                    <div class="video-section">
+                        <h3 style="font-family:'Orbitron',monospace; color:#66ff99; font-size:1.3rem; margin-bottom:0.8rem;">
+                            📹 Video de Demostración
+                        </h3>
+                        <p class="seccion-texto" style="margin-bottom:0;">
+                            Demostración en video del circuito completo: el sensor ultrasónico HC-SR04 
+                            midiendo distancias en tiempo real y mostrando los valores en la pantalla LCD 16×2 I2C.
+                        </p>
+                        <div class="video-wrapper">
+                            <div class="video-badge">📡 HC-SR04 + LCD I2C — DEMO</div>
+                            <video controls>
+                                <source src="Serv_IC2_VID.mp4" type="video/mp4">
+                                Tu navegador no soporta videos HTML5.
+                            </video>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- CÓDIGO ARDUINO -->
+        <section class="seccion">
+            <h2 class="seccion-titulo">Código Arduino</h2>
+
+            <p class="seccion-texto">
+                El siguiente sketch de Arduino implementa toda la lógica del proyecto: 
+                lectura del sensor ultrasónico, cálculo de distancia y visualización en la LCD por I2C.
+            </p>
+
+            <div class="codigo-block">
+                <code><span class="c-include">#include &lt;Wire.h&gt;</span>
+<span class="c-include">#include &lt;LiquidCrystal_I2C.h&gt;</span>
+
+<span class="c-comment">// ─── Pines del sensor HC-SR04 ───────────────────────</span>
+<span class="c-keyword">const int</span> TRIG_PIN = <span class="c-number">9</span>;
+<span class="c-keyword">const int</span> ECHO_PIN = <span class="c-number">10</span>;
+
+<span class="c-comment">// ─── LCD I2C: dirección 0x27, 16 columnas, 2 filas ──</span>
+LiquidCrystal_I2C <span class="c-function">lcd</span>(<span class="c-number">0x27</span>, <span class="c-number">16</span>, <span class="c-number">2</span>);
+
+<span class="c-keyword">void</span> <span class="c-function">setup</span>() {
+    <span class="c-function">pinMode</span>(TRIG_PIN, OUTPUT);
+    <span class="c-function">pinMode</span>(ECHO_PIN, INPUT);
+
+    lcd.<span class="c-function">init</span>();
+    lcd.<span class="c-function">backlight</span>();
+
+    lcd.<span class="c-function">setCursor</span>(<span class="c-number">0</span>, <span class="c-number">0</span>);
+    lcd.<span class="c-function">print</span>(<span class="c-string">"Sensor Ultrason."</span>);
+    lcd.<span class="c-function">setCursor</span>(<span class="c-number">0</span>, <span class="c-number">1</span>);
+    lcd.<span class="c-function">print</span>(<span class="c-string">"Iniciando..."</span>);
+    <span class="c-function">delay</span>(<span class="c-number">2000</span>);
+}
+
+<span class="c-keyword">void</span> <span class="c-function">loop</span>() {
+    <span class="c-comment">// 1. Limpiar el pin TRIG</span>
+    <span class="c-function">digitalWrite</span>(TRIG_PIN, LOW);
+    <span class="c-function">delayMicroseconds</span>(<span class="c-number">2</span>);
+
+    <span class="c-comment">// 2. Enviar pulso de 10 µs</span>
+    <span class="c-function">digitalWrite</span>(TRIG_PIN, HIGH);
+    <span class="c-function">delayMicroseconds</span>(<span class="c-number">10</span>);
+    <span class="c-function">digitalWrite</span>(TRIG_PIN, LOW);
+
+    <span class="c-comment">// 3. Medir duración del eco</span>
+    <span class="c-keyword">long</span> duracion = <span class="c-function">pulseIn</span>(ECHO_PIN, HIGH);
+
+    <span class="c-comment">// 4. Calcular distancia en cm</span>
+    <span class="c-keyword">float</span> distancia = duracion * <span class="c-number">0.0343</span> / <span class="c-number">2.0</span>;
+
+    <span class="c-comment">// 5. Mostrar en pantalla LCD</span>
+    lcd.<span class="c-function">clear</span>();
+    lcd.<span class="c-function">setCursor</span>(<span class="c-number">0</span>, <span class="c-number">0</span>);
+    lcd.<span class="c-function">print</span>(<span class="c-string">"Distancia:"</span>);
+    lcd.<span class="c-function">setCursor</span>(<span class="c-number">0</span>, <span class="c-number">1</span>);
+    lcd.<span class="c-function">print</span>(distancia, <span class="c-number">2</span>);
+    lcd.<span class="c-function">print</span>(<span class="c-string">" cm"</span>);
+
+    <span class="c-function">delay</span>(<span class="c-number">500</span>);
+}</code>
+            </div>
+
+            <div class="tech-box">
+                <h3 class="tech-titulo"><span>💡</span> Funciones Clave Explicadas</h3>
+                <ul class="tech-lista">
+                    <li>
+                        <strong>digitalWrite(TRIG, HIGH/LOW):</strong> Controla el pin TRIG para 
+                        generar el pulso de disparo de 10 µs que activa la emisión del ultrasonido.
+                    </li>
+                    <li>
+                        <strong>pulseIn(ECHO, HIGH):</strong> Espera a que el pin ECHO se ponga en HIGH 
+                        y mide cuánto tiempo permanece así (en microsegundos). Ese tiempo corresponde 
+                        al viaje de ida y vuelta del sonido.
+                    </li>
+                    <li>
+                        <strong>lcd.clear():</strong> Borra toda la pantalla antes de escribir el nuevo 
+                        valor. Esto evita que los dígitos anteriores queden visibles si el número tiene 
+                        menos caracteres.
+                    </li>
+                    <li>
+                        <strong>lcd.print(distancia, 2):</strong> Imprime el valor flotante con 2 
+                        decimales de precisión. El segundo parámetro indica cuántos decimales mostrar.
+                    </li>
+                    <li>
+                        <strong>delay(500):</strong> Pausa de 500 ms entre mediciones. Se puede reducir 
+                        para lecturas más rápidas, pero valores menores a 60 ms pueden causar interferencia 
+                        entre el pulso emitido y el eco recibido.
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- CONEXIONES -->
+        <section class="seccion">
+            <h2 class="seccion-titulo">Diagrama de Conexiones</h2>
+
+            <div class="tech-box">
+                <h3 class="tech-titulo"><span>📡</span> Sensor HC-SR04 → Arduino UNO</h3>
+                <table class="pin-table">
+                    <tr>
+                        <th>Pin HC-SR04</th>
+                        <th>Función</th>
+                        <th>Pin Arduino</th>
+                        <th>Cable</th>
+                    </tr>
+                    <tr>
+                        <td><span class="pin-badge">VCC</span></td>
+                        <td>Alimentación</td>
+                        <td><span class="pin-badge">5V</span></td>
+                        <td style="color:#ff6666;">● Rojo</td>
+                    </tr>
+                    <tr>
+                        <td><span class="pin-badge">GND</span></td>
+                        <td>Tierra</td>
+                        <td><span class="pin-badge">GND</span></td>
+                        <td style="color:#888;">● Negro</td>
+                    </tr>
+                    <tr>
+                        <td><span class="pin-badge">TRIG</span></td>
+                        <td>Pulso disparador (OUTPUT)</td>
+                        <td><span class="pin-badge">D9</span></td>
+                        <td style="color:#44aaff;">● Azul</td>
+                    </tr>
+                    <tr>
+                        <td><span class="pin-badge">ECHO</span></td>
+                        <td>Señal de eco (INPUT)</td>
+                        <td><span class="pin-badge">D10</span></td>
+                        <td style="color:#aa66ff;">● Morado</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="tech-box">
+                <h3 class="tech-titulo"><span>🔌</span> Módulo I2C + LCD 16×2 → Arduino UNO</h3>
+                <table class="pin-table">
+                    <tr>
+                        <th>Pin Módulo I2C</th>
+                        <th>Función</th>
+                        <th>Pin Arduino</th>
+                        <th>Cable</th>
+                    </tr>
+                    <tr>
+                        <td><span class="pin-badge">VCC</span></td>
+                        <td>Alimentación</td>
+                        <td><span class="pin-badge">5V</span></td>
+                        <td style="color:#ff6666;">● Rojo</td>
+                    </tr>
+                    <tr>
+                        <td><span class="pin-badge">GND</span></td>
+                        <td>Tierra</td>
+                        <td><span class="pin-badge">GND</span></td>
+                        <td style="color:#888;">● Negro</td>
+                    </tr>
+                    <tr>
+                        <td><span class="pin-badge">SDA</span></td>
+                        <td>Datos I2C (bidireccional)</td>
+                        <td><span class="pin-badge">A4</span></td>
+                        <td style="color:#44cc66;">● Verde</td>
+                    </tr>
+                    <tr>
+                        <td><span class="pin-badge">SCL</span></td>
+                        <td>Reloj I2C (sincronización)</td>
+                        <td><span class="pin-badge">A5</span></td>
+                        <td style="color:#ffaa44;">● Naranja</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="tech-box">
+                <h3 class="tech-titulo"><span>⚙️</span> Conceptos Técnicos Importantes</h3>
+                <ul class="tech-lista">
+                    <li>
+                        <strong>Velocidad del sonido:</strong> A 20°C la velocidad es 343 m/s = 
+                        0.0343 cm/µs. Si la temperatura cambia, esta constante varía ligeramente. 
+                        Para mayor precisión se puede usar un sensor de temperatura DHT11 y 
+                        ajustar la fórmula dinámicamente.
+                    </li>
+                    <li>
+                        <strong>Rango de medición del HC-SR04:</strong> El sensor funciona 
+                        correctamente entre <strong>2 cm y 400 cm</strong>. Por debajo de 2 cm 
+                        el eco llega antes de que el sensor esté listo. Por encima de 400 cm 
+                        la señal se atenúa demasiado.
+                    </li>
+                    <li>
+                        <strong>Dirección I2C del módulo PCF8574:</strong> Las más comunes son 
+                        <strong>0x27</strong> (PCF8574) y <strong>0x3F</strong> (PCF8574A). 
+                        Si la pantalla no muestra nada, usar un scanner I2C para verificar la 
+                        dirección real del módulo.
+                    </li>
+                    <li>
+                        <strong>Contraste de la pantalla:</strong> El potenciómetro en el módulo 
+                        I2C controla el contraste. Si la pantalla está encendida pero no se ve texto, 
+                        ajustar el potenciómetro girándolo lentamente hasta que aparezcan los caracteres.
+                    </li>
+                    <li>
+                        <strong>Interferencia entre disparos:</strong> Esperar al menos 
+                        <strong>60 ms</strong> entre mediciones para que el eco de un disparo 
+                        no se confunda con el disparo siguiente. El delay(500) del código 
+                        garantiza esto con amplio margen.
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- APLICACIONES -->
+        <section class="seccion">
+            <h2 class="seccion-titulo">Aplicaciones del Sistema</h2>
+
+            <div class="materiales-grid" style="grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));">
+
+                <div class="material-card">
+                    <div class="mat-icon" style="font-size:2.8rem; margin-bottom:1rem;">🚗</div>
+                    <div class="mat-nombre" style="margin-bottom:0.8rem;">Sensor de Reversa</div>
+                    <p class="mat-descripcion">
+                        Detecta obstáculos traseros en vehículos y activa alarmas sonoras o 
+                        visuales según la distancia al objeto, similar a los sensores de 
+                        estacionamiento comerciales.
+                    </p>
+                </div>
+
+                <div class="material-card">
+                    <div class="mat-icon" style="font-size:2.8rem; margin-bottom:1rem;">🤖</div>
+                    <div class="mat-nombre" style="margin-bottom:0.8rem;">Robótica</div>
+                    <p class="mat-descripcion">
+                        Los robots autónomos usan sensores ultrasónicos para detectar paredes 
+                        y obstáculos, permitiendo la navegación sin colisiones en espacios 
+                        cerrados y laberintos.
+                    </p>
+                </div>
+
+                <div class="material-card">
+                    <div class="mat-icon" style="font-size:2.8rem; margin-bottom:1rem;">💧</div>
+                    <div class="mat-nombre" style="margin-bottom:0.8rem;">Nivel de Líquidos</div>
+                    <p class="mat-descripcion">
+                        Instalado sobre un tanque, mide la distancia desde la tapa hasta la 
+                        superficie del líquido para calcular el nivel o volumen disponible 
+                        sin contacto con el fluido.
+                    </p>
+                </div>
+
+                <div class="material-card">
+                    <div class="mat-icon" style="font-size:2.8rem; margin-bottom:1rem;">🚪</div>
+                    <div class="mat-nombre" style="margin-bottom:0.8rem;">Puertas Automáticas</div>
+                    <p class="mat-descripcion">
+                        Detecta la presencia de personas a cierta distancia para activar 
+                        mecanismos de apertura automática de puertas, barreras o sistemas 
+                        de control de acceso.
+                    </p>
+                </div>
+
+            </div>
+        </section>
+
+        <center>
+            <a href="index.html" class="btn-volver">◄ VOLVER AL INICIO</a>
+        </center>
+    </main>
+
+    <footer class="footer">
+        <p class="footer-text">[ PANTALLA LCD I2C · SENSOR HC-SR04 · ARDUINO UNO · MÓDULO PCF8574 ]</p>
+        <p style="margin-top:0.5rem; color:#1a5c30;">Electrónica Digital · Sensor Ultrasónico · Protocolo I2C · Medición de Distancia</p>
+    </footer>
+
+    <script>
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.08 });
+
+        document.querySelectorAll('.seccion, .paso-item, .material-card').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(40px)';
+            el.style.transition = 'all 0.7s ease';
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>
