@@ -1,0 +1,1192 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mitos y Realidades sobre las Drogas</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,600;1,300&family=Playfair+Display:ital@1&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --card: #1a1a26;
+    --accent: #e84040;
+    --accent2: #f5a623;
+    --accent3: #4ade80;
+    --text: #f0eee8;
+    --muted: #8885a0;
+    --border: #2a2a40;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    overflow-x: hidden;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-left {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 80px 60px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .hero-tag {
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .hero-tag::before {
+    content: '';
+    display: inline-block;
+    width: 30px;
+    height: 1px;
+    background: var(--accent);
+  }
+
+  .hero h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(64px, 8vw, 110px);
+    line-height: 0.95;
+    letter-spacing: 0.02em;
+    margin-bottom: 32px;
+  }
+
+  .hero h1 span {
+    color: var(--accent);
+    display: block;
+  }
+
+  .hero-sub {
+    font-size: 16px;
+    line-height: 1.7;
+    color: var(--muted);
+    max-width: 400px;
+    margin-bottom: 48px;
+  }
+
+  .hero-cta {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: white;
+    padding: 14px 32px;
+    border: none;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(232,64,64,0.4); }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--text);
+    padding: 14px 32px;
+    border: 1px solid var(--border);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .btn-secondary:hover { border-color: var(--text); }
+
+  .hero-right {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-right::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, #1a0a0a 0%, #0f0f1a 50%, #0a1a0f 100%);
+    z-index: 1;
+  }
+
+  .hero-pattern {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .big-no {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 320px;
+    color: rgba(232,64,64,0.06);
+    line-height: 1;
+    user-select: none;
+    animation: pulse 4s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 0.5; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.02); }
+  }
+
+  .hero-stat-box {
+    position: absolute;
+    z-index: 3;
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 20px 28px;
+    backdrop-filter: blur(10px);
+  }
+
+  .hero-stat-box.s1 { bottom: 120px; right: 60px; }
+  .hero-stat-box.s2 { top: 140px; right: 140px; }
+
+  .stat-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 48px;
+    color: var(--accent);
+    line-height: 1;
+  }
+
+  .stat-label { font-size: 11px; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; margin-top: 4px; }
+
+  .hero-divider {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: var(--border);
+    z-index: 10;
+  }
+
+  /* ── SCROLL MARQUEE ── */
+  .marquee-strip {
+    background: var(--accent);
+    padding: 14px 0;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  .marquee-inner {
+    display: inline-block;
+    animation: marquee 20s linear infinite;
+  }
+
+  .marquee-inner span {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 18px;
+    letter-spacing: 0.2em;
+    margin-right: 48px;
+    color: white;
+  }
+
+  .marquee-inner span::before {
+    content: '✦';
+    margin-right: 48px;
+    opacity: 0.6;
+  }
+
+  @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
+  /* ── SECTION BASE ── */
+  section { padding: 100px 0; }
+
+  .container { max-width: 1200px; margin: 0 auto; padding: 0 40px; }
+
+  .section-label {
+    font-size: 10px;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(40px, 5vw, 68px);
+    line-height: 1;
+    margin-bottom: 16px;
+  }
+
+  /* ── MITOS Y REALIDADES ── */
+  .myths-section { background: var(--surface); }
+
+  .myths-intro {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: end;
+    margin-bottom: 70px;
+  }
+
+  .myths-desc { color: var(--muted); line-height: 1.7; font-size: 15px; }
+
+  .myth-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2px;
+    background: var(--border);
+  }
+
+  .myth-card {
+    background: var(--card);
+    padding: 40px;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.3s;
+  }
+
+  .myth-card:hover { background: #1f1f30; }
+
+  .myth-type {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    font-weight: 600;
+    padding: 6px 12px;
+    margin-bottom: 20px;
+  }
+
+  .type-myth { background: rgba(232,64,64,0.15); color: var(--accent); border: 1px solid rgba(232,64,64,0.3); }
+  .type-reality { background: rgba(74,222,128,0.1); color: var(--accent3); border: 1px solid rgba(74,222,128,0.3); }
+
+  .myth-card h3 {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 20px;
+    line-height: 1.4;
+    margin-bottom: 14px;
+  }
+
+  .myth-card p { font-size: 14px; color: var(--muted); line-height: 1.7; }
+
+  .myth-num {
+    position: absolute;
+    top: 24px;
+    right: 28px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 64px;
+    color: rgba(255,255,255,0.04);
+    line-height: 1;
+  }
+
+  /* ── DROGAS COMUNES ── */
+  .drugs-section { background: var(--bg); }
+
+  .drugs-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-top: 60px;
+  }
+
+  .drug-card {
+    border: 1px solid var(--border);
+    background: var(--card);
+    overflow: hidden;
+    transition: transform 0.3s, border-color 0.3s;
+  }
+
+  .drug-card:hover { transform: translateY(-6px); border-color: var(--accent2); }
+
+  .drug-card-img {
+    height: 180px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 80px;
+  }
+
+  .drug-card-img.alc { background: linear-gradient(135deg, #1a0d00, #2d1500); }
+  .drug-card-img.tab { background: linear-gradient(135deg, #1a1a00, #2d2a00); }
+  .drug-card-img.mar { background: linear-gradient(135deg, #001a08, #00260d); }
+  .drug-card-img.coc { background: linear-gradient(135deg, #16001a, #250028); }
+  .drug-card-img.met { background: linear-gradient(135deg, #001628, #002040); }
+  .drug-card-img.fent { background: linear-gradient(135deg, #1a0010, #260018); }
+
+  .drug-card-body { padding: 28px; }
+
+  .drug-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 26px;
+    letter-spacing: 0.05em;
+    margin-bottom: 8px;
+  }
+
+  .drug-risk {
+    display: inline-block;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    margin-bottom: 14px;
+    font-weight: 600;
+  }
+
+  .risk-high { background: rgba(232,64,64,0.2); color: var(--accent); border: 1px solid rgba(232,64,64,0.4); }
+  .risk-very-high { background: rgba(232,64,64,0.35); color: #ff7070; border: 1px solid rgba(232,64,64,0.6); }
+  .risk-med { background: rgba(245,166,35,0.15); color: var(--accent2); border: 1px solid rgba(245,166,35,0.4); }
+
+  .drug-card-body p { font-size: 13px; color: var(--muted); line-height: 1.65; }
+
+  .drug-effects {
+    margin-top: 16px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .effect-tag {
+    font-size: 11px;
+    padding: 3px 10px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    border-radius: 0;
+  }
+
+  /* ── PREVENCIÓN ── */
+  .prevention-section {
+    background: var(--surface);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .prevention-section::before {
+    content: 'PREVENIR';
+    position: absolute;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 300px;
+    color: rgba(74,222,128,0.03);
+    right: -60px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    white-space: nowrap;
+  }
+
+  .prevention-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2px;
+    background: var(--border);
+    margin-top: 60px;
+  }
+
+  .prev-card {
+    background: var(--card);
+    padding: 36px 28px;
+    transition: background 0.3s;
+    position: relative;
+  }
+
+  .prev-card:hover { background: #1c1c28; }
+
+  .prev-icon {
+    width: 52px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    background: rgba(74,222,128,0.1);
+    border: 1px solid rgba(74,222,128,0.2);
+    margin-bottom: 20px;
+  }
+
+  .prev-card h3 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 0.05em;
+    margin-bottom: 12px;
+    color: var(--accent3);
+  }
+
+  .prev-card p { font-size: 13px; color: var(--muted); line-height: 1.7; }
+
+  /* ── SEÑALES DE ALERTA ── */
+  .signs-section { background: var(--bg); }
+
+  .signs-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: start;
+    margin-top: 60px;
+  }
+
+  .signs-list { display: flex; flex-direction: column; gap: 16px; }
+
+  .sign-item {
+    display: flex;
+    gap: 20px;
+    padding: 20px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    transition: border-color 0.2s;
+  }
+
+  .sign-item:hover { border-color: var(--accent); }
+
+  .sign-icon {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    background: rgba(232,64,64,0.1);
+    border: 1px solid rgba(232,64,64,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+  }
+
+  .sign-content h4 {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 4px;
+    letter-spacing: 0.02em;
+  }
+
+  .sign-content p { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+  .cta-box {
+    background: linear-gradient(135deg, #1a0a0a, #0f0f1a);
+    border: 1px solid rgba(232,64,64,0.3);
+    padding: 48px;
+    position: sticky;
+    top: 100px;
+  }
+
+  .cta-box h3 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 38px;
+    margin-bottom: 16px;
+    line-height: 1.1;
+  }
+
+  .cta-box p { font-size: 14px; color: var(--muted); line-height: 1.7; margin-bottom: 28px; }
+
+  .hotline {
+    background: var(--accent);
+    padding: 16px 24px;
+    margin-bottom: 20px;
+  }
+
+  .hotline-label { font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase; opacity: 0.8; margin-bottom: 4px; }
+  .hotline-num { font-family: 'Bebas Neue', sans-serif; font-size: 32px; letter-spacing: 0.08em; }
+
+  .resources { display: flex; flex-direction: column; gap: 10px; }
+
+  .resource-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border: 1px solid var(--border);
+    color: var(--text);
+    text-decoration: none;
+    font-size: 13px;
+    transition: border-color 0.2s, background 0.2s;
+  }
+
+  .resource-link:hover { border-color: var(--accent3); background: rgba(74,222,128,0.05); color: var(--accent3); }
+  .resource-link span { font-size: 16px; }
+
+  /* ── ESTADÍSTICAS ── */
+  .stats-section {
+    background: var(--accent);
+    padding: 70px 0;
+  }
+
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: rgba(0,0,0,0.2);
+  }
+
+  .stat-item {
+    background: var(--accent);
+    padding: 40px;
+    text-align: center;
+  }
+
+  .stat-big {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 64px;
+    line-height: 1;
+    color: white;
+  }
+
+  .stat-desc { font-size: 12px; color: rgba(255,255,255,0.75); margin-top: 8px; letter-spacing: 0.05em; text-transform: uppercase; }
+
+  /* ── FOOTER ── */
+  footer {
+    background: #060609;
+    border-top: 1px solid var(--border);
+    padding: 60px 0 40px;
+  }
+
+  .footer-inner {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 60px;
+    margin-bottom: 48px;
+  }
+
+  .footer-brand {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    letter-spacing: 0.1em;
+    margin-bottom: 16px;
+  }
+
+  .footer-brand span { color: var(--accent); }
+
+  .footer-desc { font-size: 13px; color: var(--muted); line-height: 1.7; }
+
+  .footer-col h4 {
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 20px;
+  }
+
+  .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  .footer-col ul li a { color: var(--text); text-decoration: none; font-size: 14px; opacity: 0.7; transition: opacity 0.2s; }
+  .footer-col ul li a:hover { opacity: 1; }
+
+  .footer-bottom {
+    border-top: 1px solid var(--border);
+    padding-top: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    padding: 20px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(10,10,15,0.9);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .nav-brand {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 0.12em;
+    color: var(--text);
+    text-decoration: none;
+  }
+
+  .nav-brand span { color: var(--accent); }
+
+  .nav-links {
+    display: flex;
+    gap: 32px;
+    list-style: none;
+  }
+
+  .nav-links a {
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .nav-links a:hover { color: var(--text); }
+
+  /* SCROLL ANIMATIONS */
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+
+  .reveal.visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 900px) {
+    .hero { grid-template-columns: 1fr; }
+    .hero-right { display: none; }
+    .myths-intro { grid-template-columns: 1fr; gap: 20px; }
+    .myth-grid { grid-template-columns: 1fr; }
+    .drugs-grid { grid-template-columns: repeat(2, 1fr); }
+    .prevention-grid { grid-template-columns: repeat(2, 1fr); }
+    .signs-layout { grid-template-columns: 1fr; }
+    .stats-row { grid-template-columns: repeat(2, 1fr); }
+    .footer-inner { grid-template-columns: 1fr; gap: 30px; }
+  }
+
+  @media (max-width: 600px) {
+    .drugs-grid { grid-template-columns: 1fr; }
+    .prevention-grid { grid-template-columns: 1fr; }
+    .hero-left { padding: 100px 24px 60px; }
+    .container { padding: 0 20px; }
+    nav { padding: 16px 20px; }
+    .nav-links { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-brand">VERDAD<span>DROGA</span></a>
+  <ul class="nav-links">
+    <li><a href="#mitos">Mitos</a></li>
+    <li><a href="#drogas">Sustancias</a></li>
+    <li><a href="#prevencion">Prevención</a></li>
+    <li><a href="#señales">Señales</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-left">
+    <div class="hero-tag">Información que salva vidas</div>
+    <h1>MITOS<span>&amp; REALIDADES</span>SOBRE LAS DROGAS</h1>
+    <p class="hero-sub">Conocer la verdad es el primer paso para protegerse. Información basada en evidencia científica sobre el impacto de las drogas en el cuerpo, la mente y la sociedad.</p>
+    <div class="hero-cta">
+      <a href="#mitos" class="btn-primary">Descubrir mitos</a>
+      <a href="#prevencion" class="btn-secondary">Cómo prevenir</a>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="hero-pattern">
+      <div class="big-no">NO</div>
+    </div>
+    <div class="hero-stat-box s1">
+      <div class="stat-num">35M</div>
+      <div class="stat-label">personas con trastorno por drogas a nivel mundial</div>
+    </div>
+    <div class="hero-stat-box s2">
+      <div class="stat-num">11</div>
+      <div class="stat-label">años: edad promedio del primer consumo</div>
+    </div>
+  </div>
+  <div class="hero-divider"></div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-strip">
+  <div class="marquee-inner">
+    <span>La información es poder</span>
+    <span>Conoce la verdad</span>
+    <span>Prevención desde la educación</span>
+    <span>Rompe el ciclo</span>
+    <span>La adicción es una enfermedad tratable</span>
+    <span>No estás solo</span>
+    <span>La información es poder</span>
+    <span>Conoce la verdad</span>
+    <span>Prevención desde la educación</span>
+    <span>Rompe el ciclo</span>
+    <span>La adicción es una enfermedad tratable</span>
+    <span>No estás solo</span>
+  </div>
+</div>
+
+<!-- ESTADÍSTICAS -->
+<div class="stats-section">
+  <div class="container">
+    <div class="stats-row">
+      <div class="stat-item">
+        <div class="stat-big">1 de 8</div>
+        <div class="stat-desc">jóvenes ha probado alguna droga antes de los 15 años</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-big">70%</div>
+        <div class="stat-desc">de adicciones inician antes de los 18 años</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-big">500K</div>
+        <div class="stat-desc">muertes anuales por drogas ilegales en el mundo</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-big">80%</div>
+        <div class="stat-desc">de quienes reciben tratamiento mejoran su calidad de vida</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MITOS Y REALIDADES -->
+<section class="myths-section" id="mitos">
+  <div class="container">
+    <div class="myths-intro reveal">
+      <div>
+        <div class="section-label">Desmitificando</div>
+        <h2 class="section-title">MITOS Y<br>REALIDADES</h2>
+      </div>
+      <p class="myths-desc">Existen muchas ideas falsas sobre las drogas que pueden llevar a decisiones peligrosas. Conocer la diferencia entre mito y realidad puede literalmente salvar vidas.</p>
+    </div>
+
+    <div class="myth-grid reveal">
+
+      <div class="myth-card">
+        <div class="myth-num">01</div>
+        <div class="myth-type type-myth">✗ Mito</div>
+        <h3>"Las drogas blandas no hacen daño real"</h3>
+        <p>Se cree que sustancias como la marihuana o el alcohol son inofensivas por ser legales o populares. Esta idea minimiza sus riesgos reales.</p>
+      </div>
+
+      <div class="myth-card">
+        <div class="myth-num">01</div>
+        <div class="myth-type type-reality">✓ Realidad</div>
+        <h3>Todas las drogas alteran el cerebro y pueden causar daño</h3>
+        <p>El alcohol es responsable de 3 millones de muertes anuales. La marihuana afecta el desarrollo cerebral en jóvenes y puede generar dependencia psicológica. No hay droga completamente "segura".</p>
+      </div>
+
+      <div class="myth-card">
+        <div class="myth-num">02</div>
+        <div class="myth-type type-myth">✗ Mito</div>
+        <h3>"Probarla una vez no genera adicción"</h3>
+        <p>Muchas personas creen que pueden experimentar con drogas sin consecuencias, confiando en su fuerza de voluntad para no caer en la adicción.</p>
+      </div>
+
+      <div class="myth-card">
+        <div class="myth-num">02</div>
+        <div class="myth-type type-reality">✓ Realidad</div>
+        <h3>Una sola exposición puede alterar el sistema de recompensa del cerebro</h3>
+        <p>Sustancias como el fentanilo o el crack pueden generar dependencia tras el primer uso. El cerebro adolescente es especialmente vulnerable ya que aún está en desarrollo.</p>
+      </div>
+
+      <div class="myth-card">
+        <div class="myth-num">03</div>
+        <div class="myth-type type-myth">✗ Mito</div>
+        <h3>"Solo los débiles o los pobres se drogan"</h3>
+        <p>Se piensa que la adicción es un problema de ciertos grupos sociales o de personas sin carácter. Esto genera estigma y evita que mucha gente busque ayuda.</p>
+      </div>
+
+      <div class="myth-card">
+        <div class="myth-num">03</div>
+        <div class="myth-type type-reality">✓ Realidad</div>
+        <h3>La adicción es una enfermedad que afecta a todos sin distinción</h3>
+        <p>La adicción no discrimina edad, género, nivel económico ni educación. Es una enfermedad crónica del cerebro reconocida por la OMS. Afecta a músicos, médicos, deportistas y estudiantes.</p>
+      </div>
+
+      <div class="myth-card">
+        <div class="myth-num">04</div>
+        <div class="myth-type type-myth">✗ Mito</div>
+        <h3>"Si quiero puedo dejar de consumir cuando quiera"</h3>
+        <p>Muchos consumidores creen que tienen el control total y que parar es simplemente una decisión que pueden tomar en cualquier momento.</p>
+      </div>
+
+      <div class="myth-card">
+        <div class="myth-num">04</div>
+        <div class="myth-type type-reality">✓ Realidad</div>
+        <h3>La dependencia química modifica físicamente el cerebro</h3>
+        <p>Las drogas alteran los circuitos de dopamina y provocan síndrome de abstinencia real (convulsiones, dolor físico intenso). Dejar de consumir requiere apoyo médico y psicológico profesional.</p>
+      </div>
+
+      <div class="myth-card">
+        <div class="myth-num">05</div>
+        <div class="myth-type type-myth">✗ Mito</div>
+        <h3>"Las drogas ayudan a rendir más o ser más creativo"</h3>
+        <p>Existe la creencia de que ciertas sustancias mejoran el desempeño escolar, laboral o artístico, y que muchos artistas o genios las usaron para crear.</p>
+      </div>
+
+      <div class="myth-card">
+        <div class="myth-num">05</div>
+        <div class="myth-type type-reality">✓ Realidad</div>
+        <h3>El uso crónico deteriora las funciones cognitivas</h3>
+        <p>Si bien algunas drogas estimulan brevemente, el uso sostenido daña la memoria, concentración y toma de decisiones. Muchos artistas lograron sus obras a pesar de las drogas, no gracias a ellas.</p>
+      </div>
+
+      <div class="myth-card">
+        <div class="myth-num">06</div>
+        <div class="myth-type type-myth">✗ Mito</div>
+        <h3>"La adicción no tiene cura, una vez adicto, siempre adicto"</h3>
+        <p>Se cree que la recuperación es imposible y que quienes cayeron en la adicción no tienen esperanza de tener una vida normal.</p>
+      </div>
+
+      <div class="myth-card">
+        <div class="myth-num">06</div>
+        <div class="myth-type type-reality">✓ Realidad</div>
+        <h3>La recuperación es posible con el tratamiento adecuado</h3>
+        <p>Millones de personas en todo el mundo se han recuperado y llevan vidas plenas. Los tratamientos modernos combinan terapia, medicamentos y apoyo social con tasas de éxito altas.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- DROGAS COMUNES -->
+<section class="drugs-section" id="drogas">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-label">Sustancias más comunes</div>
+      <h2 class="section-title">CONOCE LO<br>QUE CAUSAN</h2>
+    </div>
+
+    <div class="drugs-grid reveal">
+
+      <div class="drug-card">
+        <div class="drug-card-img alc">🍺</div>
+        <div class="drug-card-body">
+          <div class="drug-name">Alcohol</div>
+          <span class="drug-risk risk-high">Riesgo alto</span>
+          <p>La droga legal más consumida. Daña el hígado, corazón y cerebro. Causa más del 30% de los accidentes de tránsito fatales.</p>
+          <div class="drug-effects">
+            <span class="effect-tag">Cirrosis</span>
+            <span class="effect-tag">Depresión</span>
+            <span class="effect-tag">Dependencia física</span>
+            <span class="effect-tag">Daño cerebral</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="drug-card">
+        <div class="drug-card-img tab">🚬</div>
+        <div class="drug-card-body">
+          <div class="drug-name">Tabaco / Nicotina</div>
+          <span class="drug-risk risk-high">Riesgo alto</span>
+          <p>Principal causa de muertes prevenibles en el mundo. Más de 8 millones de muertes anuales. Altamente adictivo desde los primeros cigarrillos.</p>
+          <div class="drug-effects">
+            <span class="effect-tag">Cáncer de pulmón</span>
+            <span class="effect-tag">Enfermedades cardiovasculares</span>
+            <span class="effect-tag">EPOC</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="drug-card">
+        <div class="drug-card-img mar">🌿</div>
+        <div class="drug-card-body">
+          <div class="drug-name">Marihuana</div>
+          <span class="drug-risk risk-med">Riesgo moderado-alto</span>
+          <p>Afecta especialmente el cerebro en desarrollo. Puede causar psicosis en personas predispuestas y deterioro cognitivo a largo plazo.</p>
+          <div class="drug-effects">
+            <span class="effect-tag">Psicosis</span>
+            <span class="effect-tag">Dependencia psicológica</span>
+            <span class="effect-tag">Memoria</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="drug-card">
+        <div class="drug-card-img coc">❄️</div>
+        <div class="drug-card-body">
+          <div class="drug-name">Cocaína / Crack</div>
+          <span class="drug-risk risk-very-high">Riesgo muy alto</span>
+          <p>Genera dependencia rápida y severa. Provoca infartos, derrames cerebrales y destrucción del tabique nasal. El crack es aún más adictivo.</p>
+          <div class="drug-effects">
+            <span class="effect-tag">Infarto</span>
+            <span class="effect-tag">Derrame cerebral</span>
+            <span class="effect-tag">Paranoia</span>
+            <span class="effect-tag">Dependencia severa</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="drug-card">
+        <div class="drug-card-img met">💊</div>
+        <div class="drug-card-body">
+          <div class="drug-name">Metanfetamina</div>
+          <span class="drug-risk risk-very-high">Riesgo extremo</span>
+          <p>Destruye tejido cerebral de forma acelerada. Una de las drogas más devastadoras: envejece a los consumidores visiblemente en semanas.</p>
+          <div class="drug-effects">
+            <span class="effect-tag">Psicosis permanente</span>
+            <span class="effect-tag">Daño cerebral</span>
+            <span class="effect-tag">Deterioro físico rápido</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="drug-card">
+        <div class="drug-card-img fent">⚠️</div>
+        <div class="drug-card-body">
+          <div class="drug-name">Fentanilo</div>
+          <span class="drug-risk risk-very-high">Riesgo mortal</span>
+          <p>100 veces más potente que la morfina. Una dosis del tamaño de un grano de sal puede ser letal. Principal causa de sobredosis en América del Norte.</p>
+          <div class="drug-effects">
+            <span class="effect-tag">Sobredosis inmediata</span>
+            <span class="effect-tag">Paro respiratorio</span>
+            <span class="effect-tag">Muerte</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- PREVENCIÓN -->
+<section class="prevention-section" id="prevencion">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-label">Estrategias probadas</div>
+      <h2 class="section-title">CÓMO<br>PREVENIR</h2>
+      <p style="color:var(--muted);max-width:600px;margin-top:16px;line-height:1.7;font-size:15px;">La prevención más efectiva combina información veraz, habilidades sociales, apoyo familiar y entornos seguros. Estas son las estrategias con mayor evidencia científica.</p>
+    </div>
+
+    <div class="prevention-grid reveal">
+
+      <div class="prev-card">
+        <div class="prev-icon">🗣️</div>
+        <h3>Comunicación abierta</h3>
+        <p>Habla con honestidad sobre las drogas desde casa. Las familias con comunicación abierta reducen hasta un 40% el riesgo de consumo en jóvenes.</p>
+      </div>
+
+      <div class="prev-card">
+        <div class="prev-icon">🧠</div>
+        <h3>Educación basada en evidencia</h3>
+        <p>Enseñar los efectos reales en el cerebro, no solo "di no". Los programas de educación efectiva incluyen habilidades para rechazar presión social.</p>
+      </div>
+
+      <div class="prev-card">
+        <div class="prev-icon">⚽</div>
+        <h3>Actividades alternativas</h3>
+        <p>El deporte, arte, música y actividades comunitarias llenan el tiempo libre con experiencias positivas que generan dopamina natural.</p>
+      </div>
+
+      <div class="prev-card">
+        <div class="prev-icon">👥</div>
+        <h3>Elige bien tus amistades</h3>
+        <p>El grupo de amigos es el factor de riesgo número 1 en adolescentes. Rodearse de personas con valores similares protege contra la presión de grupo.</p>
+      </div>
+
+      <div class="prev-card">
+        <div class="prev-icon">💪</div>
+        <h3>Fortalece tu autoestima</h3>
+        <p>Las personas con alta autoestima tienen más facilidad para decir "no". Trabajar en tu seguridad personal es una de las mejores defensas.</p>
+      </div>
+
+      <div class="prev-card">
+        <div class="prev-icon">🏠</div>
+        <h3>Entorno familiar estable</h3>
+        <p>Un hogar con reglas claras, afecto y supervisión reduce significativamente el riesgo. No se trata de control, sino de conexión y confianza.</p>
+      </div>
+
+      <div class="prev-card">
+        <div class="prev-icon">🎯</div>
+        <h3>Metas y proyectos de vida</h3>
+        <p>Tener sueños, objetivos y un sentido de propósito actúa como escudo. Los jóvenes con metas claras tienen menor tendencia al consumo.</p>
+      </div>
+
+      <div class="prev-card">
+        <div class="prev-icon">🤝</div>
+        <h3>Busca apoyo profesional</h3>
+        <p>Si alguien en tu entorno consume, busca ayuda antes de que escale. Los especialistas en adicciones pueden intervenir antes de que sea una crisis.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- SEÑALES DE ALERTA -->
+<section class="signs-section" id="señales">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-label">Detección temprana</div>
+      <h2 class="section-title">SEÑALES<br>DE ALERTA</h2>
+    </div>
+
+    <div class="signs-layout reveal">
+      <div class="signs-list">
+        <h3 style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--accent);margin-bottom:8px;letter-spacing:0.05em;">¿Qué observar en un ser querido?</h3>
+        <p style="color:var(--muted);font-size:14px;margin-bottom:24px;line-height:1.6;">Reconocer las señales a tiempo puede marcar la diferencia entre una intervención temprana y una crisis grave.</p>
+
+        <div class="sign-item">
+          <div class="sign-icon">👁️</div>
+          <div class="sign-content">
+            <h4>Cambios físicos repentinos</h4>
+            <p>Pérdida de peso rápida, ojos rojos o vidriosos, pupilas muy dilatadas o contraídas, higiene descuidada o mal olor.</p>
+          </div>
+        </div>
+
+        <div class="sign-item">
+          <div class="sign-icon">🔄</div>
+          <div class="sign-content">
+            <h4>Cambios de comportamiento extremos</h4>
+            <p>De ser alegre a irritable sin razón, secretismo, mentiras frecuentes, cambio radical de amigos o abandono de actividades que antes le gustaban.</p>
+          </div>
+        </div>
+
+        <div class="sign-item">
+          <div class="sign-icon">📚</div>
+          <div class="sign-content">
+            <h4>Deterioro escolar o laboral</h4>
+            <p>Caída de calificaciones, ausencias frecuentes, pérdida de empleo, incapacidad para cumplir responsabilidades básicas.</p>
+          </div>
+        </div>
+
+        <div class="sign-item">
+          <div class="sign-icon">💸</div>
+          <div class="sign-content">
+            <h4>Problemas económicos inexplicables</h4>
+            <p>Pedir dinero constantemente sin explicación, objetos que desaparecen de casa, gastos ocultos o deudas inusuales.</p>
+          </div>
+        </div>
+
+        <div class="sign-item">
+          <div class="sign-icon">😴</div>
+          <div class="sign-content">
+            <h4>Alteraciones del sueño y energía</h4>
+            <p>Dormir en exceso o estar despierto por días, periodos de energía inusual seguidos de agotamiento profundo.</p>
+          </div>
+        </div>
+
+        <div class="sign-item">
+          <div class="sign-icon">🌡️</div>
+          <div class="sign-content">
+            <h4>Síntomas físicos de abstinencia</h4>
+            <p>Temblores, sudoración, náuseas o irritabilidad extrema cuando no puede consumir. Señal de dependencia física establecida.</p>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="cta-box">
+          <h3>¿NECESITAS AYUDA AHORA?</h3>
+          <p>Si tú o alguien que conoces está enfrentando un problema con las drogas, no esperes más. Hay ayuda disponible y la recuperación es posible.</p>
+
+          <div class="hotline">
+            <div class="hotline-label">Línea de ayuda nacional México</div>
+            <div class="hotline-num">800-911-2000</div>
+          </div>
+
+          <div class="resources">
+            <a href="https://www.gob.mx/salud/conadic" target="_blank" class="resource-link">
+              <span>🏛️</span> CONADIC — Centro de atención
+            </a>
+            <a href="https://www.cedro.org.mx" target="_blank" class="resource-link">
+              <span>🔬</span> CEDRO — Investigación y tratamiento
+            </a>
+            <a href="https://www.aa.org.mx" target="_blank" class="resource-link">
+              <span>🤝</span> Alcohólicos Anónimos México
+            </a>
+            <a href="https://na.org" target="_blank" class="resource-link">
+              <span>💊</span> Narcóticos Anónimos
+            </a>
+          </div>
+
+          <div style="margin-top:28px;padding:16px;border:1px solid var(--border);background:rgba(74,222,128,0.05);">
+            <p style="font-size:12px;color:var(--accent3);line-height:1.6;letter-spacing:0.02em;">✓ El tratamiento es confidencial · ✓ No hay que tocar fondo para pedir ayuda · ✓ La recuperación es un proceso, no un fracaso</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <div>
+        <div class="footer-brand">VERDAD<span>DROGA</span></div>
+        <p class="footer-desc">Información basada en evidencia científica para la prevención del consumo de drogas. Este sitio tiene fines educativos y de salud pública. Si estás en crisis, llama al 800-911-2000.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Contenido</h4>
+        <ul>
+          <li><a href="#mitos">Mitos y realidades</a></li>
+          <li><a href="#drogas">Sustancias</a></li>
+          <li><a href="#prevencion">Prevención</a></li>
+          <li><a href="#señales">Señales de alerta</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Recursos</h4>
+        <ul>
+          <li><a href="https://www.gob.mx/salud/conadic" target="_blank">CONADIC</a></li>
+          <li><a href="https://www.who.int/es/health-topics/drug-use" target="_blank">OMS — Drogas</a></li>
+          <li><a href="https://www.unodc.org/unodc/es/" target="_blank">UNODC</a></li>
+          <li><a href="https://na.org" target="_blank">Narcóticos Anónimos</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>Contenido con fines educativos y de salud pública · México 2025</span>
+      <span>En caso de emergencia: <strong>911</strong></span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => entry.target.classList.add('visible'), i * 80);
+      }
+    });
+  }, { threshold: 0.1 });
+  reveals.forEach(el => observer.observe(el));
+
+  // Nav scroll effect
+  window.addEventListener('scroll', () => {
+    const nav = document.querySelector('nav');
+    nav.style.borderBottomColor = window.scrollY > 50 ? 'rgba(232,64,64,0.2)' : 'var(--border)';
+  });
+</script>
+</body>
+</html>
